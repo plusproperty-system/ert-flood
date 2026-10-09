@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>อัปเดตข้อมูลแดชบอร์ดน้ำท่วม</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#EDF2F3;--surface:#fff;--sunk:#E2EAEC;--ink:#10262F;--muted:#526B75;--line:#CFDBDF;--water:#1B6F8F;--water-soft:#D8EAF0;--ok:#1C9A50;--crit:#D61F1F;--font:"IBM Plex Sans Thai","Leelawadee UI",Tahoma,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0D1B21;--surface:#15272E;--sunk:#0F2027;--ink:#E7F0F2;--muted:#9BB1B9;--line:#274049;--water:#62B8D6;--water-soft:#17333E;--ok:#45C47E;--crit:#FF5555}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--font)}
+.wrap{max-width:980px;margin:0 auto;padding:24px 20px 60px}
+h1{font-size:26px;margin:0 0 4px}
+h2{font-size:19px;margin:0 0 6px}
+p{margin:0 0 10px}
+.muted{color:var(--muted);font-size:14px}
+a{color:var(--water)}
+.card{background:var(--surface);border-radius:14px;padding:20px 22px;margin-top:20px;box-shadow:0 1px 2px rgba(16,38,47,.06),0 8px 24px rgba(16,38,47,.06)}
+ol{margin:6px 0 12px;padding-left:22px}
+li+li{margin-top:4px}
+.drop{display:grid;place-items:center;gap:6px;border:2px dashed var(--line);border-radius:12px;padding:22px 14px;text-align:center;cursor:pointer;color:var(--muted)}
+.drop.over,.drop:hover{border-color:var(--water);background:var(--water-soft);color:var(--ink)}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:9px 16px;min-height:40px;cursor:pointer;font:inherit;font-weight:600}
+.btn:disabled{opacity:.45;cursor:default}
+.btn.sec{background:none;color:var(--water);border:1px solid var(--line);font-weight:500}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+.msg{min-height:22px;margin:10px 0 0;font-size:14px}
+.err{color:var(--crit)}
+.good{color:var(--ok)}
+dl{display:grid;grid-template-columns:minmax(150px,34%) 1fr;gap:4px 14px;margin:12px 0 0;font-size:14px}
+dt{color:var(--muted)}dd{margin:0}
+table{border-collapse:collapse;width:100%;font-size:14px;margin-top:10px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:13px}
+.tbox{overflow-x:auto;max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:10px;margin-top:8px}
+label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input,select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-height:40px;min-width:0}
+.form{display:grid;grid-template-columns:2fr 1fr;gap:10px;margin-top:12px}
+.form .wide{grid-column:1/-1}
+@media (max-width:640px){.form{grid-template-columns:1fr}dl{grid-template-columns:1fr}}
+code{background:var(--sunk);padding:1px 6px;border-radius:5px;font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>อัปเดตข้อมูลแดชบอร์ดน้ำท่วม</h1>
+  <p class="muted">หน้านี้สำหรับผู้ดูแล ไฟล์ที่เลือกจะอ่านในเบราว์เซอร์นี้เท่านั้น ไม่ถูกส่งไปที่ใด ผลลัพธ์ที่ได้มีเฉพาะตัวเลขระดับน้ำ 4 ค่า สถานะ และจำนวนอุปกรณ์รายโครงการ ไม่มีชื่อ อีเมล หรือจำนวนผู้พักอาศัย <a href="./">กลับไปที่แดชบอร์ด</a></p>
+
+  <section class="card" aria-labelledby="h1">
+    <h2 id="h1">1. ข้อมูลสำรวจจากหน้างาน</h2>
+    <ol>
+      <li>ส่งออกไฟล์ <b>คำตอบทั้งหมด</b> (.xlsx) จากแบบฟอร์ม แล้วเลือกไฟล์ด้านล่าง</li>
+      <li>ตรวจตัวเลขสรุป แล้วกด <b>ดาวน์โหลด survey.json</b></li>
+      <li>เปิด <a id="upLink" target="_blank" rel="noopener">หน้าอัปโหลดไฟล์ของ GitHub</a> ลากไฟล์ <code>survey.json</code> ไปวาง แล้วกด <b>Commit changes</b> เว็บจะอัปเดตภายในประมาณ 1–2 นาที</li>
+    </ol>
+    <label class="drop" id="svDrop"><input type="file" id="svFile" accept=".xlsx,.xlsm,.xls"><span>เลือกไฟล์ หรือลากไฟล์มาวางที่นี่</span></label>
+    <p class="msg" id="svMsg" aria-live="polite"></p>
+    <div id="svOut"></div>
+    <div class="row"><button class="btn" id="svDl" type="button" disabled>ดาวน์โหลด survey.json</button></div>
+  </section>
+
+  <section class="card" aria-labelledby="h2">
+    <h2 id="h2">2. สถานะตาม ERT Update</h2>
+    <p class="muted">ใช้เมื่อ ERT Update ระบุสถานะของโครงการโดยตรง สถานะนี้จะแทนผลจากสูตรจนกว่าจะลบออก แก้ไขแล้วกดดาวน์โหลด <code>ert.json</code> และอัปโหลดแบบเดียวกับข้อ 1</p>
+    <div class="tbox"><table><thead><tr><th>โครงการ</th><th>สถานะ</th><th>หมายเหตุ</th><th>เวลา ERT</th><th></th></tr></thead><tbody id="ertBody"></tbody></table></div>
+    <div class="form">
+      <label class="wide">โครงการ <input id="eProj" list="plist" placeholder="พิมพ์ชื่อโครงการแล้วเลือกจากรายการ"></label>
+      <label>สถานะ <select id="eSt"><option>ปกติ</option><option>เฝ้าระวัง</option><option>เฝ้าระวังพิเศษ</option><option>วิกฤต</option><option>วิกฤตรุนแรง</option></select></label>
+      <label>เวลา ERT Update <input id="eAt" type="datetime-local"></label>
+      <label class="wide">หมายเหตุ <input id="eNote" maxlength="200" placeholder="เช่น โซนบางนาน้ำแห้งแล้ว"></label>
+    </div>
+    <div class="row"><button class="btn sec" id="eAdd" type="button">เพิ่มหรือแก้ไขรายการ</button><button class="btn" id="eDl" type="button">ดาวน์โหลด ert.json</button></div>
+    <p class="msg" id="eMsg" aria-live="polite"></p>
+  </section>
+
+  <section class="card" aria-labelledby="h3">
+    <h2 id="h3">3. ระดับน้ำ ThaiWater</h2>
+    <p class="muted">ระบบดึงอัตโนมัติทุกชั่วโมง ถ้าต้องการดึงทันที เปิด <a id="actLink" target="_blank" rel="noopener">หน้า Actions</a> เลือก <b>ThaiWater hourly</b> แล้วกด <b>Run workflow</b></p>
+    <p class="muted" id="twInfo"></p>
+  </section>
+</div>
+<datalist id="plist"></datalist>
+<script>
+(async () => {
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const REPO = (() => { const h = location.hostname, seg = location.pathname.split('/').filter(Boolean); return h.endsWith('github.io') ? `https://github.com/${h.split('.')[0]}/${seg[0] || ''}` : 'https://github.com/plusproperty-system/ert-flood'; })();
+$('upLink').href = REPO + '/upload/main/docs/data'; $('actLink').href = REPO + '/actions';
+const get = u => fetch(u + '?v=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
+const [MST, ERT0, TWL] = await Promise.all([get('data/master.json'), get('data/ert.json'), get('data/water/latest.json')]);
+if (!MST) { $('svMsg').className = 'msg err'; $('svMsg').textContent = 'โหลดรายชื่อโครงการไม่สำเร็จ'; return; }
+const PJ = MST.projects, norm = s => String(s ?? '').toLowerCase().replace(/[\s\-–—.,()_/;]/g, '');
+const BYN = new Map(); PJ.forEach(p => { const k = norm(p.n); if (!BYN.has(k)) BYN.set(k, p); });
+/* names used in the survey system that differ from the master list */
+const ALIAS = {"คลังสินค้าโชติธนวัฒน์ กม.16": "5502-0017|โชติธนวัฒน์", "คุณ": "5500-2066|คุณ บาย ยู", "นิติบุคคอาคารชุด บ้านเพียงเพลิน": "5500-3011|บ้านเพียงเพลิน", "บริษัท กรุงไทย-แอกซ่า ประกันชีวิต จำกัด (มหาชน)": "5502-0062|กรุงไทย-แอกซ่า ประกันชีวิต", "บางนา ทาวเวอร์ (อยุธยา แคปปิตอล)": "5502-0005|อยุธยา แคปปิตอล", "บ้านแสนสิริ พัฒนาการ 30": "5500-1041|บ้านแสนสิริ พัฒนาการ", "ปาร์ค 11": "5502-0079|อาคาร พาร์ค 11", "มหาจักรีสิรินธร คณะอักษรศาสตร์ จุฬาลงกรณ์มหาวิทยาลัย": "5502-0010|มหาจักรีสิรินธร", "ลา กาซิตา หัวหิน": "5500-3016|ลา กาซิต้า", "ลา ฮาบานา หัวหิน": "5500-3018|ลา ฮาบานา", "วนา เรสซิเดนซ์ พระราม 9 - ศรีนครินทร์": "5500-1178|วนา เรสซิเด้นซ์ พระราม 9-ศรีนครินทร์", "วีรันดา เรสซิเด้นซ์ หัวหิน": "5500-3020|วีรันดา", "ศูนย์การค้า นานาสแควร์": "5503-0005|นานา สแควร์", "หอศิลปวัฒนธรรมเมืองน่าน และแหล่งเรียนรู้ศิลปวัฒนธรรมล้านนาตะวันออก": "5502-0081|ศูนย์ศิลปวัฒนธรรมเมืองน่าน", "ออทัมน์ หัวหิน": "5500-3008|ออทัมน์", "อาคาร ปาโซ่ ทาวเวอร์": "5502-0075|ปาโซ่ ทาวเวอร์", "อาคาร วิริยะพันธุ์": "5502-0054|วิริยะพันธุ์", "อาคาร เจียไต๋ สำนักงานใหญ่": "5503-0010|เจียไต๋ ทาวเวอร์", "อาคารชลันต์ทิพย์": "5502-0066|ชลันต์ทิพย์", "อาคารแพลน บี ทาวเวอร์": "5502-0065|แพลนบี", "อีเอสอาร์": "5502-0074|โรงงานและคลังสินค้า ESR Asia Suvarnabhumi", "เดคคอร์มาร์ท": "5502-0070|เดคคอร์มาร์ท (DM HOME)", "เดอะ รีเซิร์ฟ": "5500-2096|เดอะ รีเซิร์ฟ เกษมสันต์ 3", "เดอะ เม็ท คอนโดมิเนียม": "5500-2026|เดอะ เม็ท", "เดอะ แสตนดาร์ด เรสซิเดนซ์ ภูเก็ต": "5500-4032|เดอะสแตนดาร์ด เรสซิเดนซ์ ภูเก็ต", "เดอะ ไพรม์ 11": "5500-2124|เดอะ ไพร์ม 11", "เดอะเทลส์ สตอรี่ทู - ป่าสัก": "5500-4035|เดอะเทลล์ สตอรี่ทู-ป่าสัก", "เดอะเทลส์ สตอรี่วัน - บางโจ": "5500-4034|เดอะเทลล์ สตอรี่วัน-บางโจ", "เรน ชะอำ-หัวหิน": "5500-3014|เรน ชะอำ", "เอ็มเอสไอจี ประกันภัย (ประเทศไทย) จำกัด (มหาชน); MSIG": "5502-0034|เอ็ม เอส ไอ จี"};
+Object.entries(ALIAS).forEach(([a, k]) => { const p = PJ.find(q => q.k === k); if (p) BYN.set(norm(a), p); });
+$('plist').innerHTML = PJ.map(p => `<option value="${esc(p.n)}">${esc(p.io + ' · ' + p.pv)}</option>`).join('');
+if (TWL) $('twInfo').textContent = 'ดึงล่าสุด ' + TWL.at + ' · ' + (TWL.note || '');
+const comb = (I, J, K, L) => { const i = +I || 0, j = +J || 0, k = +K || 0, l = L === 1 ? 1 : 0;
+  if (i === 15 && j === 50) return 'เฝ้าระวังพิเศษ'; if (l === 1 || k >= 60) return 'วิกฤตรุนแรง'; if (k > 0 || i >= 15) return 'วิกฤต';
+  if (i <= 0 && (j === 0 || j > 50)) return 'ปกติ'; if (j >= 30) return 'เฝ้าระวัง'; return 'วิกฤต'; };
+function save(name, obj) {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(obj, null, 1)], { type: 'application/json' })); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+const load = src => new Promise((ok, no) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = no; document.head.appendChild(s); });
+
+/* ---------- survey ---------- */
+let SV = null;
+function parse(wb) {
+  const sh = wb.SheetNames.find(n => n.includes('ตรวจเช็คสถานการณ์')) || wb.SheetNames[2] || wb.SheetNames[0];
+  const aoa = XLSX.utils.sheet_to_json(wb.Sheets[sh], { header: 1, raw: true, defval: null });
+  const hi = aoa.findIndex(r => r && r.some(c => String(c ?? '').trim() === 'โครงการ') && r.some(c => String(c ?? '').includes('วันที่')));
+  if (hi < 0) throw new Error('ไม่พบหัวตาราง "โครงการ" ในชีต ' + sh);
+  const H = aoa[hi].map(h => String(h ?? '').trim()), col = f => H.findIndex(f);
+  const c = { at: col(h => h.startsWith('วันที่ตอบ')), n: col(h => h === 'โครงการ'), J: col(h => h.includes('บ่อ')), I: col(h => h.includes('ถนน')),
+    K: col(h => h.startsWith('ระดับน้ำในโครงการ')), L: col(h => h.startsWith('ระบบไฟฟ้า')), rep: col(h => h.startsWith('สถานการณ์น้ำโครงการ')) };
+  const miss = ['n', 'J', 'I', 'K', 'L'].filter(k => c[k] < 0);
+  if (miss.length) throw new Error('ไม่พบคอลัมน์ที่ต้องใช้ในชีต ' + sh);
+  const num = v => { if (v == null || v === '') return null; if (typeof v === 'number') return v; const n = Number(String(v).replace(/,/g, '').trim()); return String(v).trim() !== '' && isFinite(n) ? n : null; };
+  const pow = v => { const s = String(v ?? '').trim(); return /ไม่ปกติ|ไม่ได้|ดับ/.test(s) ? 1 : /ปกติ|ได้/.test(s) ? 0 : null; };
+  const tm = v => { if (v == null || v === '') return ''; if (typeof v === 'number') return XLSX.SSF.format('yyyy-mm-dd hh:mm', v);
+    const s = String(v).trim(), m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/.exec(s);
+    if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')} ${(m[4] || '00').padStart(2, '0')}:${m[5] || '00'}`; return s.replace('T', ' ').slice(0, 16); };
+  const rows = {}, unmatched = new Map(); let n = 0, text = 0;
+  aoa.slice(hi + 1).forEach(r => {
+    if (!r || !r[c.n]) return; n++;
+    const p = BYN.get(norm(r[c.n])); if (!p) { unmatched.set(String(r[c.n]), (unmatched.get(String(r[c.n])) || 0) + 1); return; }
+    const at = c.at >= 0 ? tm(r[c.at]) : '';
+    const filled = [c.I, c.J, c.K, c.L].some(i => r[i] != null && String(r[i]).trim() !== '');   /* prefer the latest answer that has any value */
+    if (rows[p.k] && (rows[p.k]._f && !filled || rows[p.k]._f === filled && rows[p.k].at > at)) return;
+    const v = { at, _f: filled, I: num(r[c.I]), J: num(r[c.J]), K: num(r[c.K]), L: pow(r[c.L]), rep: c.rep >= 0 && r[c.rep] != null ? String(r[c.rep]).trim() : '' };
+    ['I', 'J', 'K'].forEach(k => { if (v[k] == null && r[c[k]] != null && String(r[c[k]]).trim() !== '') text++; });
+    v.st = comb(v.I, v.J, v.K, v.L); rows[p.k] = v;
+  });
+  Object.values(rows).forEach(v => { delete v._f; if (!v.rep) delete v.rep; ['I', 'J', 'K', 'L'].forEach(k => { if (v[k] == null) delete v[k]; }); });
+  const ats = Object.values(rows).map(r => r.at).filter(Boolean).sort();
+  return { at: ats.pop() || '', sheet: sh, n, text, rows, unmatched, tm, num };
+}
+function parseEq(wb, tm, num) {
+  const sh = wb.SheetNames.find(n => n.includes('สำรวจอุปกรณ์')); if (!sh) return null;
+  const aoa = XLSX.utils.sheet_to_json(wb.Sheets[sh], { header: 1, raw: true, defval: null });
+  const hi = aoa.findIndex(r => r && r.some(c => String(c ?? '').trim() === 'โครงการ')); if (hi < 0) return null;
+  const H = aoa[hi].map(h => String(h ?? '').trim()), ni = H.findIndex(h => h.startsWith('จำนวนกระสอบทรายที่ต้องการ'));
+  const at = H.findIndex(h => h.startsWith('วันที่ตอบ')), nm = H.indexOf('โครงการ');
+  const find = (pre, from, to) => { for (let i = from; i < to; i++) if (H[i].startsWith(pre)) return i; return -1; };
+  const end = H.length, cut = ni < 0 ? end : ni;
+  const E = { sand: find('จำนวนกระสอบทราย', 0, cut), pump: find('จำนวนปั๊มสูบน้ำ', 0, cut), mega: find('จำนวนโทรโข่ง', 0, cut), hp: find('จำนวนเครื่อง ฉีดแรงดันน้ำ', 0, cut),
+    boat: find('จำนวนเรือ', 0, cut), batt: find('จำนวนแบตเตอรี่', 0, cut), fuel: find('ปริมาณน้ำมัน', 0, cut), aid: find('ชุดปฐมพยาบาล', 0, cut), safe: find('อุปกรณ์ Safety', 0, cut), light: find('จำนวนไฟฉาย', 0, cut) };
+  const Q = { sand: ni, pump: find('จำนวนปั๊มน้ำที่ต้องการ', cut, end), safe: find('อุปกรณ์ Safety', cut, end), boat: find('เรือ', cut, end), hp: find('เครื่องฉีดแรงดันน้ำ', cut, end), food: find('อาหาร', cut, end), oth: find('อื่นๆ ที่ต้องการ', cut, end) };
+  const has = v => { const s = String(v ?? '').trim(); return /^ไม่มี/.test(s) || s === '0' ? 0 : /^มี/.test(s) || +s > 0 ? 1 : null; };
+  const eq = {}, rq = {}, eat = {};
+  aoa.slice(hi + 1).forEach(r => {
+    if (!r || !r[nm]) return; const p = BYN.get(norm(r[nm])); if (!p) return;
+    const a = at >= 0 ? tm(r[at]) : ''; if (eat[p.k] && eat[p.k] > a) return; eat[p.k] = a;
+    const e = {}, q = {};
+    for (const [k, i] of Object.entries(E)) { if (i < 0) continue; const v = k === 'aid' || k === 'safe' ? has(r[i]) : num(r[i]); if (v != null) e[k] = v; }
+    for (const [k, i] of Object.entries(Q)) { if (i < 0 || r[i] == null) continue; const s = String(r[i]).trim(); if (!s || s === '0' || s === 'ไม่ต้องการ') continue;
+      const n = num(r[i]); if (k === 'safe' || k === 'oth' || k === 'food') q[k] = n != null ? n : s.slice(0, 80); else if (n) q[k] = n; }
+    eq[p.k] = { at: a, ...e }; if (Object.keys(q).length) rq[p.k] = q; else delete rq[p.k];
+  });
+  return { sheet: sh, eq, rq };
+}
+async function readSv(file) {
+  const msg = $('svMsg'); msg.className = 'msg'; msg.textContent = 'กำลังอ่านไฟล์'; $('svDl').disabled = true; $('svOut').innerHTML = ''; SV = null;
+  try {
+    if (!window.XLSX) await load('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+    const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' }), r = parse(wb), eqr = parseEq(wb, r.tm, r.num);
+    const vals = Object.values(r.rows), cnt = {}; vals.forEach(v => { cnt[v.st] = (cnt[v.st] || 0) + 1; });
+    SV = { at: r.at, file: file.name, rows: r.rows, eq: eqr ? eqr.eq : {}, rq: eqr ? eqr.rq : {} };
+    $('svOut').innerHTML = `<dl><dt>ชีตที่ใช้</dt><dd>${esc(r.sheet)}</dd><dt>คำตอบในไฟล์</dt><dd>${r.n} แถว</dd><dt>จับคู่โครงการได้</dt><dd>${vals.length} จาก ${PJ.length} โครงการ (ใช้คำตอบล่าสุดของแต่ละโครงการ)</dd>
+      <dt>คำตอบล่าสุด</dt><dd>${esc(r.at)}</dd><dt>สถานะตามสูตร</dt><dd>${Object.entries(cnt).map(([k, v]) => esc(k) + ' ' + v).join(' · ')}</dd>
+      <dt>ช่องระดับน้ำที่เป็นข้อความ</dt><dd>${r.text} ช่อง นับเป็นค่าว่าง</dd><dt>อุปกรณ์และเสบียง</dt><dd>${eqr ? `${Object.keys(eqr.eq).length} โครงการ ขอสนับสนุน ${Object.keys(eqr.rq).length} โครงการ (ชีต ${esc(eqr.sheet)})` : 'ไม่พบชีตสำรวจอุปกรณ์'}</dd></dl>` +
+      (r.unmatched.size ? `<p class="msg err">ชื่อโครงการที่ไม่ตรงกับรายชื่อ ${r.unmatched.size} ชื่อ ข้อมูลของชื่อเหล่านี้จะไม่ขึ้นแดชบอร์ด</p><div class="tbox"><table><thead><tr><th>ชื่อในไฟล์</th><th>จำนวนคำตอบ</th></tr></thead><tbody>${[...r.unmatched].map(([k, v]) => `<tr><td>${esc(k)}</td><td>${v}</td></tr>`).join('')}</tbody></table></div>` : '');
+    msg.className = 'msg good'; msg.textContent = 'อ่านไฟล์สำเร็จ'; $('svDl').disabled = false;
+  } catch (e) { msg.className = 'msg err'; msg.textContent = 'ใช้ไฟล์นี้ไม่ได้: ' + (e && e.message ? e.message : 'อ่านไฟล์ไม่ได้'); }
+}
+$('svFile').addEventListener('change', e => { if (e.target.files[0]) readSv(e.target.files[0]); });
+['dragenter', 'dragover'].forEach(t => $('svDrop').addEventListener(t, e => { e.preventDefault(); $('svDrop').classList.add('over'); }));
+['dragleave', 'drop'].forEach(t => $('svDrop').addEventListener(t, e => { e.preventDefault(); $('svDrop').classList.remove('over'); if (t === 'drop' && e.dataTransfer.files[0]) readSv(e.dataTransfer.files[0]); }));
+$('svDl').onclick = () => { if (SV) save('survey.json', SV); };
+
+/* ---------- ERT ---------- */
+const ERT = { items: { ...((ERT0 && ERT0.items) || {}) } }, BYK = new Map(PJ.map(p => [p.k, p]));
+function renderErt() {
+  const it = Object.entries(ERT.items);
+  $('ertBody').innerHTML = it.length ? it.map(([k, e]) => `<tr><td>${esc(BYK.get(k) ? BYK.get(k).n : k)}</td><td>${esc(e.st)}</td><td>${esc(e.note || '')}</td><td>${esc(e.at || '')}</td><td><button class="btn sec" type="button" data-del="${esc(k)}">ลบ</button></td></tr>`).join('')
+    : '<tr><td colspan="5" class="muted">ไม่มีรายการ สถานะทุกโครงการมาจากสูตร</td></tr>';
+}
+$('ertBody').addEventListener('click', e => { const b = e.target.closest('[data-del]'); if (b) { delete ERT.items[b.dataset.del]; renderErt(); $('eMsg').className = 'msg'; $('eMsg').textContent = 'ลบแล้ว อย่าลืมดาวน์โหลดและอัปโหลด ert.json'; } });
+$('eAdd').onclick = () => {
+  const p = BYN.get(norm($('eProj').value)), msg = $('eMsg');
+  if (!p) { msg.className = 'msg err'; msg.textContent = 'ไม่พบโครงการนี้ เลือกชื่อจากรายการที่ขึ้นให้'; return; }
+  const d = new Date(), z = n => String(n).padStart(2, '0'), at = $('eAt').value ? $('eAt').value.replace('T', ' ') : `${d.getFullYear()}-${z(d.getMonth() + 1)}-${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`;
+  ERT.items[p.k] = { st: $('eSt').value, note: $('eNote').value.trim(), at }; renderErt();
+  msg.className = 'msg good'; msg.textContent = 'บันทึกในรายการแล้ว: ' + p.n + ' กดดาวน์โหลด ert.json แล้วอัปโหลดไปที่ GitHub';
+};
+$('eDl').onclick = () => save('ert.json', ERT);
+renderErt();
+})();
+</script>
+</body>
+</html>

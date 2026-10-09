@@ -1,0 +1,1673 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>สถานการณ์น้ำท่วมโครงการ PMR</title>
+<meta name="description" content="สถานการณ์น้ำท่วมและระดับน้ำรอบโครงการในความดูแลของ PMR อัปเดตระดับน้ำจาก ThaiWater ทุกชั่วโมง">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 3C11 10 7 15 7 20a9 9 0 0 0 18 0c0-5-4-10-9-17z%22 fill=%22%231B6F8F%22/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#EDF2F3; --surface:#FFFFFF; --sunk:#E2EAEC; --ink:#10262F; --muted:#526B75; --line:#CFDBDF;
+  --water:#1B6F8F; --water-soft:#D8EAF0;
+  --ok:#1C9A50; --ok-bg:#D8F1E2;
+  --watch:#F2B600; --watch-bg:#FFF1B8; --watch2:#EE7600; --watch2-bg:#FFE3C2;
+  --crit:#D61F1F; --crit-bg:#FBD3D3;
+  --xcrit:#7A2BC0; --xcrit-bg:#E7D7F8; --danger:#000000; --danger-bg:#C8CDD0;
+  --o1:#0B4F6C; --o1bg:#CCE2EC; --o2:#2F86AD; --o2bg:#DCECF3; --o3:#5F7E8B; --o3bg:#E3EBEE;
+  --na:#7A8B91; --na-bg:#E3E9EB;
+  --shadow:0 1px 2px rgba(16,38,47,.06),0 8px 24px rgba(16,38,47,.06); --land:#F4F1E6; --t0:#C3DDF0; --t1:#C2E9E3; --t2:#F0E4B4; --t3:#E7D3C5; --t4:#D7DDE3; --t5:#F4D8E6;
+  --r0:#8DBCE6; --r1:#B4D3EF; --r2:#D8E8F6; --r3:#E2C466; --r4:#ECD88F; --r5:#F5E9BC; --r6:#B4A58A; --r7:#CDBFEA; --r8:#CDD49B; --r9:#A9C3DE; --r10:#F1C6A0; --r11:#CBBEA6; --r12:#EFB9C7; --r13:#6FC3B7; --r14:#A3DAD2; --r15:#D0EDE9;
+  --font:"IBM Plex Sans Thai","Leelawadee UI","Thonburi","Noto Sans Thai",Tahoma,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1B21; --surface:#15272E; --sunk:#0F2027; --ink:#E7F0F2; --muted:#9BB1B9; --line:#274049;
+    --water:#62B8D6; --water-soft:#17333E;
+    --ok:#45C47E; --ok-bg:#11331F;
+    --watch:#FFD43B; --watch-bg:#4A3B00; --watch2:#FF9838; --watch2-bg:#432507;
+    --crit:#FF5555; --crit-bg:#4B1515;
+    --xcrit:#B98CF2; --xcrit-bg:#2F1B4E; --danger:#000000; --danger-bg:#4A555A;
+  --o1:#9ADBF5; --o1bg:#113A4D; --o2:#62B8D6; --o2bg:#15303D; --o3:#9BB1B9; --o3bg:#1C3038;
+    --na:#93A5AB; --na-bg:#22363D;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); --land:#1B2B26; --t0:#284759; --t1:#25504B; --t2:#524821; --t3:#523E36; --t4:#3A454B; --t5:#523546;
+  --r0:#2F5F8A; --r1:#274C6D; --r2:#203B53; --r3:#7A6420; --r4:#63521F; --r5:#4C401D; --r6:#63584A; --r7:#4A3F6B; --r8:#4F5626; --r9:#2E4A66; --r10:#6B4526; --r11:#4F483C; --r12:#6E3445; --r13:#1F6258; --r14:#1D4E47; --r15:#1B3B37;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1B21; --surface:#15272E; --sunk:#0F2027; --ink:#E7F0F2; --muted:#9BB1B9; --line:#274049;
+  --water:#62B8D6; --water-soft:#17333E;
+  --ok:#45C47E; --ok-bg:#11331F;
+  --watch:#FFD43B; --watch-bg:#4A3B00; --watch2:#FF9838; --watch2-bg:#432507;
+  --crit:#FF5555; --crit-bg:#4B1515;
+  --xcrit:#B98CF2; --xcrit-bg:#2F1B4E; --danger:#000000; --danger-bg:#4A555A;
+  --o1:#9ADBF5; --o1bg:#113A4D; --o2:#62B8D6; --o2bg:#15303D; --o3:#9BB1B9; --o3bg:#1C3038;
+  --na:#93A5AB; --na-bg:#22363D;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25); --land:#1B2B26; --t0:#284759; --t1:#25504B; --t2:#524821; --t3:#523E36; --t4:#3A454B; --t5:#523546;
+  --r0:#2F5F8A; --r1:#274C6D; --r2:#203B53; --r3:#7A6420; --r4:#63521F; --r5:#4C401D; --r6:#63584A; --r7:#4A3F6B; --r8:#4F5626; --r9:#2E4A66; --r10:#6B4526; --r11:#4F483C; --r12:#6E3445; --r13:#1F6258; --r14:#1D4E47; --r15:#1B3B37;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--water);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 20px 56px}
+
+/* header */
+.top{padding:28px 0 20px;display:flex;flex-wrap:wrap;gap:12px 32px;align-items:flex-end;justify-content:space-between;border-bottom:3px solid var(--ink)}
+.top h1{margin:0;font-size:clamp(22px,3.2vw,32px);line-height:1.2;font-weight:700;letter-spacing:-.005em}
+.top p{margin:4px 0 0;color:var(--muted);max-width:60ch}
+.asof{display:grid;gap:2px;font-size:13px;color:var(--muted);text-align:right}
+.asof b{color:var(--ink);font-weight:600}
+
+/* summary */
+.summary{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:24px;margin-top:24px}
+.panel{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:22px 24px}
+.impact h2{margin:0;font-weight:500;font-size:16px;color:var(--muted)}
+.impact .lead{margin:6px 0 2px;font-size:clamp(26px,3.6vw,40px);line-height:1.2;font-weight:700}
+.impact .lead span{font-weight:400;color:var(--muted);font-size:.62em}
+.impact .def{margin:0;color:var(--muted);font-size:13.5px}
+.strip{display:flex;height:34px;margin:18px 0 8px;border-radius:6px;overflow:hidden;background:var(--sunk)}
+.strip i{display:block;height:100%}
+.strip-key{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:13px;color:var(--muted)}
+.strip-key span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;background:var(--c);vertical-align:-1px}
+.split{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-top:20px;border-top:1px solid var(--line)}
+.split div{padding:14px 12px 0 0}
+.split div+div{padding-left:16px;border-left:1px solid var(--line)}
+.split b{display:block;font-size:24px;line-height:1.2;font-weight:700}
+.split small{color:var(--muted);font-size:13px;line-height:1.4;display:block}
+
+/* gauge = the pit cross-section used as legend + filter */
+.gauge h2{margin:0 0 4px;font-size:17px;font-weight:600}
+.gauge .hint{margin:0 0 14px;color:var(--muted);font-size:13.5px}
+.pit{display:grid;gap:0}
+.band{display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:stretch;width:100%;text-align:left;background:none;border:0;padding:0;cursor:pointer;border-radius:8px}
+.band .wall{background:var(--c);position:relative}
+.band .wall::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,transparent 0 7px,rgba(255,255,255,.55) 7px 8px);mix-blend-mode:overlay}
+.band:first-child .wall{border-radius:8px 8px 0 0}
+.band:last-child .wall{border-radius:0 0 8px 8px}
+.band .txt{padding:10px 14px}
+.band .txt b{display:block;font-weight:600;font-size:15.5px}
+.band .txt small{display:block;color:var(--muted);font-size:13px;line-height:1.45}
+.band .num{padding:10px 6px 10px 12px;font-size:26px;font-weight:700;line-height:1.5;min-width:56px;text-align:right;font-variant-numeric:tabular-nums}
+.band:hover .txt b{text-decoration:underline;text-underline-offset:3px}
+.band[aria-pressed="true"]{background:var(--water-soft)}
+.rim{display:grid;grid-template-columns:38px 1fr;align-items:center;font-size:12px;color:var(--muted)}
+.rim::before{content:"";height:4px;background:var(--ink)}
+.rim span{padding-left:14px;border-top:1px dashed var(--line);margin-top:-1px;transform:translateY(-.2em)}
+
+/* sections */
+.sec{margin-top:36px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 24px;margin-bottom:12px}
+.sec-head h2{margin:0;font-size:20px;font-weight:700}
+.sec-head p{margin:0;color:var(--muted);font-size:13.5px;max-width:70ch}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0;margin-top:28px;border-bottom:1px solid var(--line)}
+.filters input,.filters select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-height:38px}
+.filters input{flex:1 1 220px;min-width:0}
+.filters select{flex:0 1 auto;max-width:100%}
+.filters .count{margin-left:auto;color:var(--muted);font-size:13.5px}
+.linkbtn{background:none;border:0;color:var(--water);cursor:pointer;padding:6px 4px;text-decoration:underline;text-underline-offset:3px}
+
+/* corridor board */
+.board{display:grid;gap:12px}
+.cor{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:14px 18px 16px;border-left:6px solid var(--lv)}
+.cor-head{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.cor-head h3{margin:0;font-size:16px;font-weight:600}
+.lv{font-size:12.5px;font-weight:600;padding:1px 9px;border-radius:99px;background:var(--lvbg);color:var(--lv);white-space:nowrap}
+.cor-st{margin:4px 0 0;font-size:13.5px;color:var(--muted)}
+.cor-st b{color:var(--ink);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.chip{display:inline-flex;align-items:center;gap:7px;max-width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 10px 5px 8px;cursor:pointer;font-size:13.5px;line-height:1.35;text-align:left}
+.chip::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:var(--c)}
+.chip.t-condo::before{border-radius:2px}
+.chip:hover{border-color:var(--c)}
+.chip.s-crit,.chip.s-xcrit{background:var(--cbg);border-color:var(--c);font-weight:600}
+.chip.s-watch{background:var(--cbg);border-color:transparent}
+
+.s-ok{--c:var(--ok);--cbg:var(--ok-bg)} .s-watch{--c:var(--watch);--cbg:var(--watch-bg)}
+.s-crit{--c:var(--crit);--cbg:var(--crit-bg)} .s-xcrit{--c:var(--xcrit);--cbg:var(--xcrit-bg)} .s-na{--c:var(--na);--cbg:var(--na-bg)}
+.s-danger{--c:var(--danger);--cbg:var(--danger-bg)}
+.chip.s-danger,.tag.s-danger,.zt td.n.s-danger b{background:#000;color:#fff;border-color:#fff}
+.chip.s-danger::before{background:#fff}
+.band.s-danger .wall{box-shadow:inset 0 0 0 1px var(--muted)}
+.l-hi{--lv:var(--o1);--lvbg:var(--o1bg)} .l-mid{--lv:var(--o2);--lvbg:var(--o2bg)} .l-low{--lv:var(--o3);--lvbg:var(--o3bg)}
+.tag{display:inline-block;font-size:12.5px;font-weight:600;padding:1px 9px;border-radius:99px;background:var(--cbg);color:var(--ink);border:1px solid var(--c);white-space:nowrap}
+
+/* review list */
+.review{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.rv{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;border:0;text-align:left;cursor:pointer;display:block;width:100%}
+.rv b{display:block;font-weight:600}
+.rv .pair{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0;font-size:13px;color:var(--muted)}
+.rv p{margin:0;font-size:13.5px;color:var(--muted)}
+
+/* table */
+.tablebox{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:14px}
+th,td{padding:9px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-weight:600;font-size:13px;color:var(--muted);white-space:nowrap;background:var(--surface);position:sticky;top:0}
+th button{background:none;border:0;padding:0;font-weight:600;cursor:pointer;color:inherit}
+th button[aria-sort]::after{content:" ↕";opacity:.5}
+th button[aria-sort="ascending"]::after{content:" ↑";opacity:1}
+th button[aria-sort="descending"]::after{content:" ↓";opacity:1}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--sunk)}
+td small{display:block;color:var(--muted);font-size:12.5px}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+
+/* tooltip */
+#tip{position:fixed;z-index:50;max-width:min(380px,calc(100vw - 24px));background:var(--ink);color:var(--bg);border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;box-shadow:0 10px 30px rgba(0,0,0,.3);pointer-events:none;opacity:0;transition:opacity .12s}
+#tip.on{opacity:1}
+#tip b{font-weight:600}
+#tip .tn{font-size:14.5px;font-weight:600;margin-bottom:4px}
+#tip .row{display:flex;gap:8px;align-items:baseline;margin-top:3px}
+#tip .dot{flex:none;width:9px;height:9px;border-radius:50%;background:var(--c);transform:translateY(1px)}
+#tip hr{border:0;border-top:1px solid color-mix(in srgb,var(--bg) 25%,transparent);margin:8px 0}
+#tip ul{margin:4px 0 0;padding-left:16px}
+#tip .dim{opacity:.75}
+
+/* detail sheet */
+dialog{border:0;padding:0;margin:0 0 0 auto;height:100dvh;max-height:100dvh;width:min(520px,100vw);max-width:100vw;background:var(--surface);color:var(--ink);box-shadow:-12px 0 40px rgba(0,0,0,.25)}
+dialog::backdrop{background:rgba(8,20,26,.45)}
+.sheet{display:flex;flex-direction:column;height:100%}
+.sheet header{padding:calc(18px + env(safe-area-inset-top,0px)) 22px 14px;border-bottom:1px solid var(--line);display:flex;gap:12px;justify-content:space-between;align-items:flex-start}
+.sheet header h3{margin:0;font-size:19px;line-height:1.3}
+.sheet header small{color:var(--muted);display:block}
+.sheet .x{background:var(--sunk);border:0;border-radius:8px;min-width:40px;min-height:40px;cursor:pointer;font-size:18px}
+.sheet .body{padding:16px 22px calc(28px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+.sheet h4{margin:20px 0 6px;font-size:14px;color:var(--muted);font-weight:600}
+.sheet p{margin:0 0 6px}
+.kv{display:grid;grid-template-columns:minmax(110px,34%) 1fr;gap:6px 14px;margin:0}
+.kv dt{color:var(--muted);font-size:13.5px}
+.kv dd{margin:0}
+.callout{background:var(--sunk);border-radius:10px;padding:12px 14px;border-left:5px solid var(--lv,var(--water))}
+.callout ul{margin:6px 0 0;padding-left:18px}
+.note{font-size:13px;color:var(--muted)}
+
+/* zone summary + map */
+.zonegrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.zonegrid .tablebox{max-height:760px;overflow:auto}
+table.zt{min-width:460px}
+.zt td.n,.zt th.n{text-align:right;font-variant-numeric:tabular-nums;width:1%;white-space:nowrap}
+.zt td.n b{display:inline-block;min-width:26px;text-align:center;border-radius:6px;padding:0 6px;background:var(--cbg);border:1px solid var(--c)}
+.zt td.n.z0{color:var(--muted);opacity:.45}
+.zt .zbar{margin-top:5px;max-width:220px}
+.zt .zbar i{background:var(--c)}
+.zt tr[aria-selected="true"]{background:var(--water-soft)}
+.zonesel{margin:0 0 12px;font-size:14px;min-height:24px;color:var(--muted)}
+.zonesel b{color:var(--ink)}
+.mapbox{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:12px;position:relative}
+#map{display:block;width:100%;height:auto;border-radius:8px;background:var(--land);user-select:none;-webkit-user-select:none}
+#map.zoomed{cursor:grab;touch-action:none}
+#map .sea{fill:var(--water-soft)}
+#map .riv{fill:none;stroke:var(--water);stroke-linecap:round;stroke-linejoin:round;opacity:.75}
+#map .rlab{fill:var(--water);font-family:var(--font);font-style:italic}
+#map .zm,#map .sm{cursor:pointer}
+#map .zm .f{fill:var(--c);stroke:var(--surface)}
+#map .zm .ring{fill:none;stroke:var(--ink)}
+#map .zm .sel{fill:none;stroke:var(--water)}
+#map .zm text{fill:#fff;font-family:var(--font);font-weight:700;text-anchor:middle;pointer-events:none}
+#map .zm.s-watch text{fill:#231a00}
+#map .zm text.zlab{fill:var(--ink);font-family:var(--font);font-weight:600;text-anchor:start;paint-order:stroke;stroke:var(--land);pointer-events:none}
+#map .sm rect{fill:var(--o1);stroke:var(--surface)}
+#map .sm.high rect{fill:var(--surface);stroke:var(--o1)}
+#map :focus-visible{outline:none}
+#map .zm:focus-visible .f{stroke:var(--water)}
+.mapctl{position:absolute;top:20px;right:20px;display:grid;gap:6px}
+.mapctl button{min-width:40px;min-height:40px;border-radius:8px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:16px;padding:0 10px;box-shadow:var(--shadow)}
+.mapnote{margin:10px 4px 0;font-size:13px;line-height:1.45;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);padding:10px 4px 2px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend svg{flex:none}
+/* area map */
+.areagrid{display:grid;grid-template-columns:minmax(0,1fr);gap:24px;align-items:start}
+#pmap{display:block;width:100%;height:auto;border-radius:8px;background:var(--water-soft);user-select:none;-webkit-user-select:none}
+#pmap.zoomed{cursor:grab;touch-action:none}
+#pmap .pv{fill:color-mix(in srgb,var(--r) 45%,var(--land));stroke:var(--muted);stroke-width:1;stroke-opacity:.55}
+#pmap .pvlab{fill:var(--muted);font-family:var(--font);font-weight:600;text-anchor:middle;pointer-events:none}
+#pmap .za{fill:var(--r);stroke:var(--surface);cursor:pointer}
+#pmap .za.zc1{fill:color-mix(in srgb,var(--r) 86%,var(--ink))}
+#pmap .za.zc2{fill:color-mix(in srgb,var(--r) 55%,var(--surface))}
+#pmap .za.zc3{fill:color-mix(in srgb,var(--r) 74%,var(--ink))}
+#pmap .za.zc4{fill:color-mix(in srgb,var(--r) 28%,var(--surface))}
+.rg0{--r:var(--r0)}.rg1{--r:var(--r1)}.rg2{--r:var(--r2)}.rg3{--r:var(--r3)}.rg4{--r:var(--r4)}.rg5{--r:var(--r5)}.rg6{--r:var(--r6)}.rg7{--r:var(--r7)}.rg8{--r:var(--r8)}.rg9{--r:var(--r9)}.rg10{--r:var(--r10)}.rg11{--r:var(--r11)}.rg12{--r:var(--r12)}.rg13{--r:var(--r13)}.rg14{--r:var(--r14)}.rg15{--r:var(--r15)}
+#pmap .za:hover{stroke:var(--ink)}
+#pmap .za[aria-pressed="true"]{stroke:var(--ink)}
+.t0{--t:var(--t0)}.t1{--t:var(--t1)}.t2{--t:var(--t2)}.t3{--t:var(--t3)}.t4{--t:var(--t4)}.t5{--t:var(--t5)}.t6{--t:var(--t0)}.t7{--t:var(--t1)}
+#pmap .pp{cursor:pointer}
+#pmap .pp path{fill:var(--c);stroke:var(--surface)}
+#pmap .pp circle{fill:var(--surface)}
+#pmap .pp.s-danger path{stroke:#fff}
+#pmap .pp.off{opacity:.15}
+#pmap .zlab.dim{opacity:.35}
+#pmap .zlab{fill:var(--ink);font-family:var(--font);font-weight:600;text-anchor:middle;paint-order:stroke;stroke:var(--surface);pointer-events:none}
+.duo{display:grid;grid-template-columns:40fr 60fr;gap:10px;align-items:start;max-width:1080px;margin:0 auto}
+.dwrap{position:relative;min-width:0}
+.dwrap .mapctl{top:8px;right:8px}
+#thmap{display:block;width:100%;height:auto;border-radius:8px;background:var(--water-soft)}
+#thmap .tpv{fill:var(--r);stroke:var(--ink);stroke-width:.02;stroke-opacity:.3}
+#thmap .rgb{fill:none;stroke:var(--ink);stroke-width:.055;stroke-opacity:.75;stroke-linejoin:round;pointer-events:none}
+#thmap .rgl{font-size:.25px;font-weight:600;text-anchor:middle;paint-order:stroke;stroke:var(--surface);stroke-width:.08px;stroke-opacity:.75;pointer-events:none}
+.rgk i{flex:none;width:14px;height:14px;border-radius:3px;background:var(--r);border:1px solid var(--muted)}
+.rgk{color:var(--ink)}
+.rgk small{color:var(--muted);font-size:12px}
+#rlegend{font-size:13px;padding-top:12px}
+#thmap .frame{fill:none;stroke:var(--ink);stroke-width:.07}
+#thmap .lead{stroke:var(--ink);stroke-width:.045;stroke-dasharray:.13 .1}
+#thmap .arrow{fill:var(--ink)}
+#thmap text{font-family:var(--font);fill:var(--ink)}
+#thmap .ttl{font-size:.52px;font-weight:700;text-anchor:end}
+#thmap .cap{font-size:.27px;fill:var(--muted);font-weight:500}
+#thmap .leadlab{fill:var(--ink);paint-order:stroke;stroke:var(--land);stroke-width:.1px}
+#thmap .rn{font-size:.3px;font-weight:600}
+#thmap .rt{font-size:.3px;font-weight:700;text-anchor:end}
+#thmap .pill circle{fill:var(--c)}
+#thmap .pill text{font-size:.22px;font-weight:700;text-anchor:middle;fill:#fff}
+#thmap .pill.s-watch text,#thmap .pill.s-ok text{fill:#10262F}
+.areaside h3{margin:0 0 4px;font-size:17px;font-weight:600}
+.areaside p{margin:0 0 4px;color:var(--muted);font-size:13.5px}
+.areaside h4{margin:18px 0 8px;font-size:14px;font-weight:600;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.zlist{display:flex;flex-wrap:wrap;gap:6px}
+.zbtn{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:4px 8px 4px 10px;font-size:13.5px;line-height:1.4;cursor:pointer;text-align:left}
+.zbtn:hover{border-color:var(--ink)}
+.zbtn i{font-style:normal;font-size:11.5px;font-weight:700;min-width:19px;text-align:center;border-radius:9px;padding:0 5px;background:var(--c);color:#fff}
+.zbtn i.s-watch,.zbtn i.s-ok{color:#10262F}
+@media (max-width:700px){.duo{grid-template-columns:1fr}#thmap{max-width:320px;margin:0 auto}#thmap .lead,#thmap .arrow,#thmap .leadlab{display:none}}
+
+@media (max-width:980px){.zonegrid{grid-template-columns:1fr}.zonegrid .tablebox{max-height:440px}}
+
+footer{margin-top:40px;border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font-size:13.5px}
+footer h2{font-size:15px;color:var(--ink);margin:0 0 8px}
+footer ul{margin:0;padding-left:18px;max-width:92ch}
+footer li{margin-bottom:5px}
+
+@media (max-width:860px){
+  .summary{grid-template-columns:1fr}
+  .asof{text-align:left}
+  .split{grid-template-columns:1fr}
+  .split div+div{border-left:0;border-top:1px solid var(--line);padding-left:0;margin-top:12px}
+  .filters{position:static}
+  .filters .count{margin-left:0;flex-basis:100%}
+}
+@media (prefers-reduced-motion:reduce){#tip{transition:none}}
+
+/* v6: real pins, area table toggle */
+.twrap{position:relative;min-width:0}
+.twrap .mapctl{top:auto;bottom:8px;left:8px;right:auto}
+#thmap.zoomed{cursor:grab;touch-action:none}
+#thmap .tpv{cursor:pointer}
+#thmap .tpv.sel{stroke-opacity:1;stroke-width:.07}
+#thmap .tp{fill:var(--c);stroke:var(--surface);cursor:pointer}
+#thmap .tp.s-danger{stroke:#fff}
+#thmap .tp.off{opacity:.1}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:7px 14px;cursor:pointer;min-height:38px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.zbox{max-height:620px;overflow:auto}
+.zt .rsw{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--r);border:1px solid var(--muted);margin-right:8px;vertical-align:-1px}
+.zt tbody tr{cursor:pointer}
+.chip small{color:var(--muted);font-weight:400;font-size:12px}
+.zt .zbar{max-width:320px}
+
+/* v7: tabs, zone card, supply and staffing pages */
+.s-watch2{--c:var(--watch2);--cbg:var(--watch2-bg)}
+.chip.s-watch2{background:var(--cbg);border-color:var(--c)}
+.tabs{display:flex;gap:4px;margin-top:16px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 16px;cursor:pointer;font-weight:600;color:var(--muted);white-space:nowrap;min-height:44px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.page[hidden]{display:none}
+.zbar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--sunk)}
+.zbar i{background:var(--c)}
+.zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px;margin-top:12px}
+.zn{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 8px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 11px;cursor:pointer}
+.zn:hover{border-color:var(--ink)}
+.zn[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink);background:var(--water-soft)}
+.zn .sw{width:14px;height:14px;border-radius:3px;background:var(--r);border:1px solid var(--muted)}
+.zn b{font-weight:600;font-size:13.5px;line-height:1.3}
+.zn .fl{font-size:12px;font-weight:700;border-radius:99px;padding:0 8px;white-space:nowrap;background:var(--crit-bg);border:1px solid var(--crit);color:var(--ink)}
+.zn .fl.z{background:none;border-color:var(--line);color:var(--muted);font-weight:500}
+.zn .zbar,.zn small{grid-column:1/-1}
+.zn small{color:var(--muted);font-size:12px;line-height:1.35}
+.zoneshead{margin:16px 4px 0;font-size:14px;font-weight:600}
+.zoneshead span{font-weight:400;color:var(--muted);font-size:13px}
+.zonecard{background:var(--sunk);border-radius:10px;padding:14px 16px 16px;margin-bottom:10px;border-left:6px solid var(--r)}
+.zonecard[hidden]{display:none}
+.zc-head{display:flex;gap:8px 12px;align-items:baseline;justify-content:space-between;flex-wrap:wrap}
+.zc-head h3{margin:0;font-size:17px;font-weight:700}
+.zc-lead{margin:6px 0 2px;font-size:26px;font-weight:700;line-height:1.25}
+.zc-lead span{font-size:14px;font-weight:400;color:var(--muted)}
+.zc-stats{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.zc-stats .tag{font-size:13px;padding:2px 10px}
+.zonecard h4{margin:14px 0 6px;font-size:13.5px;font-weight:600;color:var(--muted)}
+.zonecard .strip{height:14px;margin:10px 0 0}
+table.mini{min-width:0;font-size:13.5px;background:var(--surface);border-radius:8px;overflow:hidden}
+table.mini th,table.mini td{padding:6px 10px}
+table.mini th{position:static;font-size:12.5px}
+table.mini td.n,table.mini th.n{text-align:right;font-variant-numeric:tabular-nums}
+#thmap .tpv.dim{opacity:.32}
+#thmap .rgb.sel{stroke-opacity:1}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
+.tile{background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px}
+.tile b{display:block;font-size:28px;line-height:1.2;font-weight:700;font-variant-numeric:tabular-nums}
+.tile span{display:block;font-size:13.5px;color:var(--ink)}
+.tile small{display:block;margin-top:6px;font-size:12.5px;line-height:1.45;color:var(--muted)}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 12px;align-items:end;background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px}
+.form label{display:grid;gap:4px;font-size:13px;color:var(--muted);min-width:0}
+.form input,.form select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-height:38px;min-width:0;width:100%}
+.form .wide{grid-column:span 2}
+.btn{background:var(--ink);color:var(--bg);border:0;border-radius:8px;padding:8px 16px;min-height:38px;cursor:pointer;font-weight:600}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.sm{padding:4px 10px;min-height:30px;font-size:13px;font-weight:500;background:none;color:var(--water);border:1px solid var(--line)}
+.btn.sm:hover{border-color:var(--water)}
+.btn.sm.warn{color:var(--crit);border-color:var(--crit)}
+.msg{margin:8px 2px 0;font-size:13.5px;color:var(--muted);min-height:20px}
+.msg.err{color:var(--crit)}
+.dbnote{background:var(--sunk);border-radius:10px;padding:12px 14px;font-size:13.5px;color:var(--muted);margin-bottom:12px}
+.logsel{border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:4px 8px;min-height:32px;font-size:13px}
+.reasons{margin:0;padding-left:16px;font-size:13px;line-height:1.5}
+.have{font-variant-numeric:tabular-nums;white-space:nowrap}
+.have em{font-style:normal;color:var(--muted)}
+.have .want{font-weight:600}
+.est{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:end;background:var(--surface);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px;margin:12px 0}
+.est label{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+.est input,.est select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-height:38px;max-width:100%}
+.est input{width:96px}
+.est output{flex:1 1 280px;font-size:15px;line-height:1.5}
+.est output b{font-size:24px;font-weight:700}
+.crit-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.crit-list li{background:var(--surface);border-radius:10px;box-shadow:var(--shadow);padding:10px 14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 14px;align-items:start}
+.crit-list li b{font-weight:600;font-size:14.5px}
+.crit-list li small{grid-column:1;color:var(--muted);font-size:13px}
+.crit-list li .cn{grid-row:1/span 2;grid-column:2;text-align:right;font-size:13px;color:var(--muted);white-space:nowrap}
+.crit-list li .cn b{display:block;font-size:22px;color:var(--ink);font-variant-numeric:tabular-nums}
+.crit-list li.pend{box-shadow:none;border:1px dashed var(--line);background:none}
+.subhead{margin:18px 0 8px;font-size:15px;font-weight:600}
+td .lv{display:inline-block}
+@media (max-width:700px){.form .wide{grid-column:auto}}
+
+.fslot{display:contents}
+#pmap .pv{cursor:pointer}
+
+#thmap .tpv{stroke-width:calc(.02px / var(--k,1))}
+#thmap .tpv.sel{stroke-width:calc(.07px / var(--k,1))}
+#thmap .rgb{stroke-width:calc(.055px / var(--k,1))}
+#thmap .rgb.sel{stroke-width:calc(.11px / var(--k,1))}
+#thmap .frame{stroke-width:calc(.06px / var(--k,1))}
+#thmap .rgl{font-size:calc(.25px / var(--k,1));stroke-width:calc(.08px / var(--k,1))}
+.tablebox.cap{max-height:560px;overflow:auto}
+@media (min-width:701px){.twrap{position:sticky;top:12px;align-self:start}}
+
+.form[hidden]{display:none}
+@media (max-width:700px){.filters select{flex:1 1 calc(50% - 8px);min-width:0}.filters{gap:6px}}
+
+/* yellow needs an edge to stay visible on light land and white cards */
+#thmap .tp.s-watch{stroke:#8A6A00}
+#pmap .pp.s-watch path{stroke:#8A6A00}
+.chip.s-watch::before,.strip-key .s-watch::before,#tip .s-watch .dot{box-shadow:0 0 0 1px #8A6A00}
+.chip.s-watch{border-color:var(--c)}
+.tag.s-watch,.zt td.n.s-watch b{border-color:#B38F00}
+#plegend svg.s-watch path{stroke:#8A6A00}
+#thmap .pill.s-watch2 text{fill:#10262F}
+
+/* ---- v8: Bangkok 4 zones, register and site-report flags ---- */
+#thmap .tpv.nb,#pmap .pv.nb{fill:none;pointer-events:none;cursor:default}
+#pmap .pv.nb{stroke:var(--ink);stroke-opacity:.35;stroke-dasharray:3 3}
+#pmap .pv.zn4{fill:color-mix(in srgb,var(--r) 62%,var(--land));stroke:var(--ink);stroke-opacity:.5}
+#pmap .pv.zn4.dim{opacity:.4}
+#pmap .pv.zn4.sel{stroke-opacity:1;stroke-width:2.2}
+#pmap .zlab.dim{opacity:.35}
+#pmap .zlab{fill:var(--ink);font-family:var(--font);font-weight:700;text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:var(--surface);stroke-opacity:.8;stroke-linejoin:round}
+.zgrp{grid-column:1/-1;margin:8px 2px 0;font-size:13px;font-weight:600;color:var(--muted)}
+.zgrp:first-child{margin-top:0}
+.zn .no{display:inline-block;min-width:18px;text-align:center;margin-right:5px;border-radius:5px;background:var(--r);border:1px solid var(--muted);font-size:12px;line-height:1.35;color:#10262F}
+.zn small.sub{color:var(--ink);opacity:.8}
+.zonecard .zc-sub{margin:4px 0 0;font-size:13px;color:var(--muted);line-height:1.5}
+.zonecard .zc-flags{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 0 0;font-size:13px;color:var(--muted)}
+.zonecard .zc-flags b{color:var(--ink);font-weight:700}
+.flag{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:12px;line-height:1.6;color:var(--muted);white-space:nowrap;margin:2px 4px 0 0}
+.flag.f-rep{border-color:var(--watch);color:var(--ink)}
+.flag.f-reg{border-color:var(--muted);color:var(--ink)}
+
+/* ---- v9: daily overview, water-source table, simple zone cards, sortable tables, downloads ---- */
+.sec.first{margin-top:20px}
+.sub{margin:-4px 0 12px;color:var(--muted);font-size:13.5px;max-width:90ch}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.daybar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.daybar label{display:flex;gap:8px;align-items:center;font-size:13.5px;color:var(--muted)}
+.daybar select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-height:38px;max-width:100%}
+.stale{margin:0 0 12px;padding:10px 14px;border-radius:10px;background:var(--watch-bg);border:1px solid var(--watch);font-size:14px}
+.stale::before{content:"!";display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--watch);color:#10262F;font-weight:700;margin-right:8px;font-size:13px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.kpi{display:grid;align-content:start;gap:2px;text-align:left;background:var(--surface);border:1px solid transparent;border-radius:12px;box-shadow:var(--shadow);padding:14px 16px;cursor:pointer;min-width:0}
+.kpi:hover{border-color:var(--ink)}
+.kpi.na{cursor:default}.kpi.na:hover{border-color:transparent}
+.kpi b{font-size:30px;line-height:1.15;font-weight:700;font-variant-numeric:tabular-nums}
+.kpi span{font-size:14px;font-weight:600}
+.kpi small{font-size:12.5px;color:var(--muted);line-height:1.45;overflow-wrap:anywhere}
+.stbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:12px}
+.stlab{font-size:13px;color:var(--muted);margin-right:4px}
+.stc{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:4px 12px 4px 8px;font-size:13.5px;cursor:pointer;min-height:34px}
+.stc i{width:11px;height:11px;border-radius:50%;background:var(--c)}
+.stc.s-watch i{box-shadow:0 0 0 1px #8A6A00}
+.stc b{font-variant-numeric:tabular-nums}
+.stc[aria-pressed="true"]{border-color:var(--ink);background:var(--cbg)}
+#wsTable tbody tr[aria-selected="true"],.zt tbody tr[aria-selected="true"]{background:var(--water-soft)}
+#wsTable td{vertical-align:middle}
+#wsTable .tag{margin:1px 2px 1px 0}
+.zl{display:flex;flex-wrap:wrap;gap:4px}
+.zch{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:6px;padding:0 7px;font-size:12.5px;white-space:nowrap;background:var(--surface)}
+.zch i{width:9px;height:9px;border-radius:2px;background:var(--r,var(--na));border:1px solid var(--muted)}
+.more{font-size:12px;color:var(--muted);align-self:center}
+.selbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 10px;font-size:14px;color:var(--muted)}
+.selbar[hidden]{display:none}
+.fchip{border:1px solid var(--ink);background:var(--water-soft);color:var(--ink);border-radius:99px;padding:4px 12px;cursor:pointer;font-size:13.5px;min-height:34px}
+.zgrp{margin:14px 2px 8px;font-size:13.5px;font-weight:600;color:var(--muted)}
+#zcards .zgrp:first-child{margin-top:0}
+.zgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.zc{position:relative;background:var(--surface);border-radius:12px;box-shadow:var(--shadow);border-top:5px solid var(--r);min-width:0}
+.zc.on{outline:2px solid var(--ink);outline-offset:-1px}
+.zc.zero{opacity:.6}
+.zc-main{display:grid;gap:6px;width:100%;text-align:left;background:none;border:0;padding:12px 44px 12px 14px;cursor:pointer;border-radius:12px;min-width:0}
+.zc-main:hover .zc-name{text-decoration:underline;text-underline-offset:3px}
+.zc-name{display:flex;align-items:flex-start;gap:7px;font-weight:600;font-size:14px;line-height:1.35}
+.zc-name .sw{flex:none;width:12px;height:12px;border-radius:3px;background:var(--r);border:1px solid var(--muted);margin-top:4px}
+.zc-name .no{flex:none;display:inline-block;min-width:20px;text-align:center;border-radius:5px;background:var(--r);border:1px solid var(--muted);font-size:12.5px;line-height:1.45;color:#10262F}
+.zc-num{font-size:13px;color:var(--muted)}
+.zc-num b{font-size:24px;color:var(--ink);font-weight:700;margin-right:2px;font-variant-numeric:tabular-nums}
+.zc .zbar{height:7px}
+.zc-kv{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:12.5px;color:var(--muted)}
+.zc-kv b{color:var(--ink);font-variant-numeric:tabular-nums}
+.zc-kv .hot b{color:var(--crit)}
+.zc-kv .wet b{color:var(--water)}
+.zc-dl{position:absolute;top:10px;right:8px;width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surface);border-radius:8px;cursor:pointer;color:var(--water)}
+.zc-dl:hover{border-color:var(--water)}
+.hdl{margin-left:12px;vertical-align:middle}
+th .sb{display:inline;text-align:left;background:none;border:0;padding:0;font:inherit;font-weight:600;color:inherit;cursor:pointer;line-height:1.35}
+th.n .sb{text-align:right}
+th[aria-sort] .sb::after{content:" ↕";opacity:.4;font-weight:400}
+th[aria-sort="ascending"] .sb::after{content:" ↑";opacity:1}
+th[aria-sort="descending"] .sb::after{content:" ↓";opacity:1}
+table.sortable td{vertical-align:middle}
+#ptable td,#rvTable td{font-size:13.5px}
+#ptable td:first-child{min-width:180px}
+#rvTable td:nth-child(5),#rvTable td:nth-child(6){min-width:220px}
+#critTable tr.pend td{color:var(--muted)}
+table.mini2{min-width:640px;font-size:13.5px}
+table.mini2 th,table.mini2 td{padding:7px 10px}
+table.mini2 td.n,table.mini2 th.n,#ptable td.n,#ptable th.n,#wsTable td.n,#wsTable th.n{text-align:right;font-variant-numeric:tabular-nums}
+table.mini2 tbody tr[data-zopen],table.mini2 tbody tr[data-ws],table.mini2 tbody tr[data-dfz],table.mini2 tbody tr[data-pvz]{cursor:pointer}
+.dacts{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}
+dialog.wide{width:min(1000px,100vw)}
+.sheet .tablebox{box-shadow:none;border:1px solid var(--line)}
+.sheet .tablebox.cap{max-height:420px}
+.rsw{display:inline-block;width:12px;height:12px;border-radius:3px;background:var(--r);border:1px solid var(--muted);margin-right:8px;vertical-align:-1px}
+/* import dialog */
+dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(560px,calc(100vw - 32px));border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.mbody{padding:18px 22px 20px;display:grid;gap:12px}
+.mbody header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.mbody h3{margin:0;font-size:18px}
+.mbody .x{background:var(--sunk);border:0;border-radius:8px;min-width:40px;min-height:40px;cursor:pointer;font-size:18px}
+.steps{margin:0;padding-left:20px;font-size:14px;line-height:1.6;color:var(--ink)}
+.steps li+li{margin-top:6px}
+.drop{display:grid;place-items:center;gap:6px;border:2px dashed var(--line);border-radius:12px;padding:22px 14px;text-align:center;cursor:pointer;color:var(--muted);font-size:14px}
+.drop.over,.drop:hover{border-color:var(--water);background:var(--water-soft);color:var(--ink)}
+.drop input{max-width:100%;font-size:13px}
+.mfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+#flash{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);z-index:60;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;max-width:calc(100vw - 32px)}
+#flash.on{opacity:1;transform:translate(-50%,0)}
+/* water rings around pins */
+#thmap .tr{fill:none;stroke:var(--o1)}
+#thmap .tr.high{stroke:var(--o2);stroke-dasharray:.05 .04}
+#pmap .pr{fill:none;stroke:var(--o1);stroke-width:2.4}
+#pmap .pr.high{stroke:var(--o2);stroke-dasharray:3 2}
+.lgr{fill:none;stroke-width:2.2}
+.lgr.over{stroke:var(--o1)}
+.lgr.high{stroke:var(--o2);stroke-dasharray:3 2}
+@media (max-width:700px){.kpi b{font-size:24px}.zc-main{padding-right:44px}.daybar{width:100%}.daybar label{flex:1 1 100%}.daybar select{flex:1}.hdl{margin:6px 0 0;display:inline-block}}
+@media (prefers-reduced-motion:reduce){#flash{transition:none}}
+
+.sec h2{scroll-margin-top:130px}
+#ptable{min-width:1240px}
+#ptable td:nth-child(2),#ptable td:nth-child(3),#ptable td:nth-child(4),#ptable td:nth-child(8),#ptable td:nth-child(9),#ptable td:nth-child(12){white-space:nowrap}
+#wsTable{min-width:1080px}
+#wsTable td:first-child{min-width:130px}
+#wsTable td:last-child{white-space:nowrap}
+@media (max-width:700px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis .kpi:first-child{grid-column:1/-1}.daybar label{font-size:12.5px}}
+
+/* ---- v10: filter panel, project search, status chips, equipment monitor ---- */
+.filters{display:block;position:static;margin-top:20px;padding:14px 16px 12px;background:var(--surface);border:0;border-radius:14px;box-shadow:var(--shadow)}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px 12px}
+.fl{display:grid;gap:4px;min-width:0}
+.fl label{font-size:12.5px;font-weight:600;color:var(--muted)}
+.fl select,.fl input{width:100%;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-height:38px;font:inherit}
+.fproj{grid-column:span 2}
+.combo{position:relative}
+.qlist{position:absolute;z-index:20;left:0;right:0;top:calc(100% + 4px);margin:0;padding:4px;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,.18);max-height:360px;overflow:auto}
+.qlist[hidden]{display:none}
+.qlist li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:8px;align-items:center;padding:7px 9px;border-radius:7px;cursor:pointer}
+.qlist li i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.qlist li span{min-width:0}
+.qlist li b{display:block;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qlist li small{display:block;color:var(--muted);font-size:12px}
+.qlist li em{font-style:normal;font-size:12px;color:var(--muted)}
+.qlist li[aria-selected="true"],.qlist li:hover{background:var(--water-soft)}
+.qlist li.qall{display:block;color:var(--water);font-size:13.5px;border-top:1px solid var(--line);border-radius:0 0 7px 7px;margin-top:2px}
+.fstat{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:12px;padding-top:10px;border-top:1px solid var(--line)}
+.fslab{font-size:12.5px;font-weight:600;color:var(--muted)}
+.fsts{display:flex;flex-wrap:wrap;gap:6px}
+.stc.qk{padding-left:12px;border-style:dashed}
+.fend{margin-left:auto;display:flex;gap:12px;align-items:center}
+.fend .count{margin:0;color:var(--muted);font-size:13.5px}
+.norv .rvcol,.norv .rvf{display:none}
+.inl{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.inl select{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:5px 8px;min-height:34px;font:inherit;color:var(--ink)}
+.gtable{min-width:1100px;font-size:13.5px}
+.gtable th .gsb{background:none;border:0;padding:0;font:inherit;font-weight:600;color:inherit;cursor:pointer;text-align:inherit}
+.gtable th[aria-sort] .gsb::after{content:" ↕";opacity:.4;font-weight:400}
+.gtable th[aria-sort="ascending"] .gsb::after{content:" ↑";opacity:1}
+.gtable th[aria-sort="descending"] .gsb::after{content:" ↓";opacity:1}
+.gtable th.n,.gtable td.n{text-align:right;font-variant-numeric:tabular-nums}
+.gtable tr.grow{cursor:pointer;background:var(--surface)}
+.gtable tr.grow:hover{background:var(--sunk)}
+.gtable tr.grow td{border-top:2px solid var(--line);vertical-align:middle}
+.gtable tr.grow .tag{margin:1px 2px 1px 0;font-size:12px}
+.gtable .tw{display:inline-block;width:16px;color:var(--muted)}
+.gtable tr.crow td{background:color-mix(in srgb,var(--sunk) 55%,var(--surface));font-size:13px}
+.gtable tr.crow td:first-child{padding-left:30px}
+.gtable tr.crow small{display:block;color:var(--muted);font-size:12px}
+.gtable td.warn{color:var(--crit);font-weight:600}
+.gtable .z0{color:var(--muted);opacity:.5}
+@media (max-width:700px){.fproj{grid-column:1/-1}.fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.fend{margin-left:0;width:100%;justify-content:space-between}}
+
+.rvimp{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.rvimp h4{margin:0 0 6px}
+
+/* v12 site-visit style multi-select filters */
+.fsv{margin-bottom:10px;padding-bottom:12px;border-bottom:1px dashed var(--line)}
+.flab{display:block;font-size:12.5px;font-weight:600;color:var(--muted);margin-bottom:4px}
+.ms{position:relative}
+.msb{width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:38px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px;cursor:pointer;text-align:left}
+.msb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.msb i{font-style:normal;color:var(--muted);font-size:12px}
+.msb.on{border-color:var(--ink);font-weight:600;background:var(--water-soft,#e8f2f6)}
+.msd{position:absolute;z-index:40;top:calc(100% + 4px);left:0;min-width:100%;width:max-content;max-width:320px;max-height:320px;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.14);padding:6px}
+.msq{width:100%;margin-bottom:4px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;font:inherit;font-size:13.5px;background:var(--surface);color:var(--ink)}
+.mso{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:6px;font-size:13.5px;cursor:pointer}
+.mso:hover{background:var(--water-soft,#eef4f7)}
+.mso span{flex:1}
+.mso b{font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
+.mso.all{border-bottom:1px solid var(--line);border-radius:0;margin-bottom:2px;font-weight:600}
+.mso input[type=checkbox]{width:16px;height:16px;min-height:0;flex:none;margin:0;padding:0;accent-color:var(--ink)}
+.msd{min-width:230px}
+.mso span{white-space:nowrap}
+
+/* v13 summary: selected projects + conditions */
+.sumgrid{display:grid;grid-template-columns:minmax(260px,1fr) 2.2fr;gap:14px;align-items:start}
+.sumbig{background:var(--surface);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px}
+.sbl{font-size:14px;font-weight:600;color:var(--muted)}
+.sbn{font-size:44px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.sbn small{font-size:16px;font-weight:600;color:var(--muted)}
+.sbs{font-size:13px;color:var(--muted);margin-bottom:10px}
+.sbbar{display:flex;height:10px;border-radius:99px;overflow:hidden;background:var(--line);margin-bottom:10px}
+.sbbar i{display:block;background:var(--c)}
+.sumbig .stbar{margin-top:0}
+.sbany{margin-top:12px;padding-top:10px;border-top:1px solid var(--line);font-size:13.5px;color:var(--ink)}
+.sumh{margin:0;font-size:16px}
+.sumsub{margin:2px 0 10px;font-size:13px;color:var(--muted)}
+.conds{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.cond{display:grid;gap:4px;text-align:left;background:var(--surface);border:1.5px solid transparent;border-radius:12px;box-shadow:var(--shadow);padding:12px 14px;cursor:pointer;font:inherit;color:var(--ink)}
+.cond:hover{border-color:var(--line)}
+.cond[aria-pressed="true"]{border-color:var(--ink);background:var(--water-soft,#e8f2f6)}
+.cond .ct{font-size:14px;font-weight:600}
+.cond .cn b{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.cond .cn small{font-size:13px;color:var(--muted)}
+.cond .cbar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.cond .cbar i{display:block;height:100%;background:var(--ink)}
+.cond .cd{font-size:12.5px;color:var(--muted);line-height:1.4}
+.cond.zero .cn b{color:var(--muted)}
+.cond.off{cursor:default;background:transparent;box-shadow:none;border:1.5px dashed var(--line)}
+@media (max-width:900px){.sumgrid{grid-template-columns:1fr}}
+@media (max-width:520px){.conds{grid-template-columns:1fr 1fr}.cond .cn b{font-size:22px}}
+.sbon{margin-top:10px;padding:8px 10px;border-radius:8px;background:var(--water-soft,#e8f2f6);font-size:13.5px}
+
+/* v13 waterways */
+:root{--ww0:#9CCDEB;--ww1:#3A8FD4;--ww2:#0B4A8C}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ww0:#24506A;--ww1:#3E8FC9;--ww2:#9FD8FF}}
+:root[data-theme="dark"]{--ww0:#24506A;--ww1:#3E8FC9;--ww2:#9FD8FF}
+.ww{fill:none;stroke-linecap:round;stroke-linejoin:round;cursor:help}
+.ww.l0{stroke:var(--ww0)} .ww.l1{stroke:var(--ww1)} .ww.l2{stroke:var(--ww2)}
+#pmap .ww.l0{stroke-width:1.3px} #pmap .ww.l1{stroke-width:2.4px} #pmap .ww.l2{stroke-width:3.4px}
+.wwlg{display:inline-flex;align-items:center;gap:5px}
+.wwlg i{display:inline-block;width:20px;height:4px;border-radius:2px;margin-left:4px}
+.wwlg i.l0{background:var(--ww0)} .wwlg i.l1{background:var(--ww1);height:5px} .wwlg i.l2{background:var(--ww2);height:6px}
+
+.fullbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ink);border-radius:8px;padding:6px 12px;color:var(--ink);text-decoration:none;font-weight:600;font-size:14px;background:var(--surface);margin-top:6px}
+.fullbtn:hover{background:var(--water-soft)}
+.auto{font-size:13px;color:var(--muted)}
+.loadmsg{padding:40px 0;text-align:center;color:var(--muted)}
+#thmap .stn,#pmap .stn{cursor:pointer}
+#thmap .stn path,#pmap .stn path{fill:var(--o1);stroke:var(--surface)}
+#thmap .stn.s4 path,#pmap .stn.s4 path{fill:var(--surface);stroke:var(--o1)}
+.lgs{fill:var(--o1);stroke:var(--surface)}
+.lgs.s4{fill:var(--surface);stroke:var(--o1)}
+.bmaq{border:1px solid var(--line,#ccd);border-radius:8px;padding:5px 10px;font:inherit;font-size:14px;min-width:200px;background:var(--surface);color:var(--ink)}
+#bmaBody tr{cursor:pointer}
+.blist{display:flex;flex-direction:column;gap:6px;margin:6px 0 10px}
+.brow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;text-align:left;border:1px solid var(--line,#d7dde3);border-radius:10px;padding:8px 12px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
+.brow:hover{background:var(--water-soft)}
+.brow small{flex-basis:100%;color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>สถานการณ์น้ำท่วมโครงการในความดูแล PMR</h1>
+      <p>สถานะรายโครงการตามสูตรประกาศ และระดับน้ำรอบโครงการจาก ThaiWater</p>
+      <a class="fullbtn" href="https://claude.ai/artifact/VrNYxGs4fTu9fnT2JEVnrD" target="_blank" rel="noopener">ดูเวอร์ชันเต็ม สำหรับทีมงาน ↗</a>
+    </div>
+    <div class="asof">
+      <span>ข้อมูลสำรวจล่าสุด <b id="asSv"></b></span>
+      <span>ERT Update <b id="asErt"></b></span>
+      <span>ระดับน้ำ ThaiWater <b id="asTw"></b></span>
+      <span>คลอง กทม. <b id="asBma"></b></span>
+    </div>
+  </header>
+  <nav class="tabs" role="tablist" aria-label="หน้าของแดชบอร์ด">
+    <button type="button" role="tab" id="tab-sit" data-tab="sit" aria-selected="true" aria-controls="pg-sit">สถานการณ์น้ำ</button>
+    <button type="button" role="tab" id="tab-watch" data-tab="watch" aria-selected="false" aria-controls="pg-watch">อุปกรณ์และเสบียงของโครงการที่ต้องเฝ้าระวัง</button>
+  </nav>
+  <p class="loadmsg" id="loadMsg">กำลังโหลดข้อมูล</p>
+  <!-- ================= page 1 ================= -->
+  <div class="page" id="pg-sit" hidden>
+  <div class="fslot">
+  <div class="filters" role="search" id="filters" aria-label="ตัวกรอง">
+    <div class="fgrid fsv" id="fSv" role="group" aria-label="ตัวกรองโครงการแบบ Site Visit"></div>
+    <div class="fgrid">
+      <div class="fl fproj"><label for="q">ชื่อโครงการ</label>
+        <div class="combo"><input id="q" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="qList" autocomplete="off" placeholder="พิมพ์ชื่อโครงการ IO Code หรือเขต">
+          <ul id="qList" class="qlist" role="listbox" aria-label="โครงการที่ตรงกับคำค้น" hidden></ul></div></div>
+      <div class="fl"><label for="fRegion">โซน</label><select id="fRegion"><option value="">ทุกโซน</option></select></div>
+      <div class="fl"><label for="fProv">จังหวัด</label><select id="fProv"><option value="">ทุกจังหวัด</option></select></div>
+      <div class="fl"><label for="fWs">แหล่งน้ำที่เตือน</label><select id="fWs"><option value="">ทุกแหล่งน้ำ</option></select></div>
+      <div class="fl"><label for="fRisk">ThaiWater ในรัศมี</label><select id="fRisk"><option value="">ทั้งหมด</option><option value="over">มีสถานีล้นตลิ่ง</option><option value="high">มีสถานีน้ำมาก</option><option value="norm">สถานีปกติ</option><option value="none">ไม่มีสถานี</option><option value="nocoord">ไม่มีพิกัด</option><option value="miss">ไม่มีในข้อมูล ThaiWater</option></select></div>
+      <div class="fl rvf"><label for="fRiv">ระยะจากแม่น้ำ</label><select id="fRiv"><option value="">ทั้งหมด</option><option value="3">ไม่เกิน 3 กม.</option><option value="6">3–6 กม.</option><option value="far">เกิน 6 กม.</option><option value="na">ไม่มีข้อมูล</option></select></div>
+      <div class="fl"><label for="fSrc">ที่มาและข้อสังเกต</label><select id="fSrc"><option value="">ทั้งหมด</option><option value="ert">สถานะตาม ERT Update</option><option value="calc">สถานะตามสูตรประกาศ</option><option value="river">สถานะตามระยะจากแม่น้ำ</option><option value="none">ไม่มีข้อมูล</option><option value="repw">หน้างานกรอกสถานะเฝ้าระวัง</option></select></div>
+    </div>
+    <div class="fstat"><span class="fslab" id="fStLab">สถานะ</span><div class="fsts" id="fSt" role="group" aria-labelledby="fStLab"></div>
+      <div class="fend"><span class="count" id="count" aria-live="polite"></span><button class="linkbtn" id="clear" type="button">ล้างตัวกรอง</button></div></div>
+  </div>
+  </div>
+
+  <section class="sec first" aria-labelledby="hDay">
+    <div class="sec-head">
+      <h2 id="hDay">สรุปสถานการณ์น้ำประจำวัน</h2>
+      <div class="daybar">
+        <label>ข้อมูลระดับน้ำ ThaiWater <select id="twDay" aria-label="วันที่ของข้อมูลระดับน้ำ"></select></label>
+        <span class="auto" id="twAuto">ดึงจาก ThaiWater อัตโนมัติทุกชั่วโมง</span>
+      </div>
+    </div>
+    <p class="stale" id="twStale" hidden></p>
+    <div class="sumgrid">
+      <div class="sumbig" id="sumBig"></div>
+      <div class="sumcond"><h3 class="sumh">ในจำนวนนี้ เข้าเงื่อนไขอะไรบ้าง</h3><p class="sumsub">หนึ่งโครงการเข้าได้หลายเงื่อนไข กดการ์ดเพื่อดูเฉพาะโครงการกลุ่มนั้น กดซ้ำเพื่อยกเลิก</p><div class="conds" id="kpis"></div></div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="hArea">
+    <div class="sec-head">
+      <h2 id="hArea">แผนที่โครงการ แยกตามโซน</h2>
+      <p>สีหมุดคือสถานะโครงการ วงสีน้ำเงินคืออยู่ในรัศมีสถานีล้นตลิ่ง สามเหลี่ยมคือสถานีวัดระดับน้ำที่เตือน เลื่อนลูกกลิ้งเมาส์บนแผนที่เพื่อซูม ลากเพื่อเลื่อน</p>
+    </div>
+    <div class="selbar" id="selbar" hidden></div>
+    <div class="areagrid">
+      <div class="mapbox">
+        <div class="duo">
+          <div class="twrap">
+            <svg id="thmap" viewBox="0 0 8.3 15.55" role="img" aria-label="แผนที่ประเทศไทย ระบายสีตามโซน ปักจุดโครงการตามพิกัดจริงและสีตามสถานะ ข้อมูลเดียวกันอยู่ในตารางด้านล่าง"></svg>
+            <div class="mapctl">
+              <button type="button" id="tIn" aria-label="ขยายแผนที่ประเทศไทย">+</button>
+              <button type="button" id="tOut" aria-label="ย่อแผนที่ประเทศไทย">−</button>
+              <button type="button" id="tAll" aria-label="ดูแผนที่ทั้งประเทศ">ทั้งประเทศ</button>
+            </div>
+          </div>
+          <div class="dwrap">
+            <div style="position:relative">
+              <svg id="pmap" role="img" aria-label="ภาพขยายกรุงเทพฯ ปริมณฑล และอยุธยา ปักหมุดโครงการตามพิกัดจริงและสีตามสถานะ"></svg>
+              <div class="mapctl">
+                <button type="button" id="pIn" aria-label="ขยายภาพขยายกรุงเทพฯ และปริมณฑล">+</button>
+                <button type="button" id="pOut" aria-label="ย่อภาพขยายกรุงเทพฯ และปริมณฑล">−</button>
+                <button type="button" id="pBkk" aria-label="ซูมไปที่กรุงเทพฯ ชั้นใน">กทม.</button>
+                <button type="button" id="pAll" aria-label="ดูภาพขยายทั้งหมด">ทั้งหมด</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="legend" id="plegend"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="hZc">
+    <div class="sec-head">
+      <h2 id="hZc">สรุปรายโซน</h2>
+      <div class="acts"><button class="btn sm" type="button" id="zcDl">ดาวน์โหลดสรุปรายโซน CSV</button></div>
+    </div>
+    <p class="sub">ชี้ที่การ์ดเพื่อดูรายละเอียด กดเพื่อกรองทั้งหน้าและซูมแผนที่ไปที่โซนนั้น</p>
+    <div id="zcards"></div>
+  </section>
+
+  <section class="sec" aria-labelledby="hWs">
+    <div class="sec-head">
+      <h2 id="hWs">แหล่งน้ำที่ต้องเฝ้าระวัง</h2>
+      <div class="acts"><button class="btn sm" type="button" data-dl="wsTable" data-fn="แหล่งน้ำเฝ้าระวัง">ดาวน์โหลด CSV</button></div>
+    </div>
+    <p class="sub">คลอง แม่น้ำ ที่มีสถานีวัดระดับน้ำล้นตลิ่งหรือน้ำมากในรัศมีของโครงการ กดที่แถวเพื่อดูรายละเอียดรายโซนและรายโครงการ กดหัวตารางเพื่อเรียงลำดับ</p>
+    <div class="tablebox">
+      <table id="wsTable" class="sortable">
+        <thead><tr><th>แหล่งน้ำ</th><th>ระดับเตือนสูงสุด</th><th class="n">สถานีที่เตือน</th><th class="n">ระดับเทียบตลิ่ง<br>สูงสุด (ม.)</th><th class="n">โครงการในรัศมี<br>สถานีล้นตลิ่ง</th><th class="n">โครงการในรัศมี<br>สถานีน้ำมาก</th><th>โซนที่เกี่ยวข้อง</th><th>สถานะโครงการในรัศมี</th><th>วัดล่าสุด</th></tr></thead>
+        <tbody id="wsBody"></tbody>
+      </table>
+      <div class="empty" id="wsEmpty" hidden>ไม่มีแหล่งน้ำที่ล้นตลิ่งหรือน้ำมากในรัศมีของโครงการตามตัวกรองนี้</div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="hBma">
+    <div class="sec-head">
+      <h2 id="hBma">ระดับน้ำคลอง กทม. เทียบตลิ่ง</h2>
+      <div class="acts">
+        <label class="inl">แสดง <select id="bmaScope"><option value="near">เฉพาะจุดวัดที่จับคู่กับโครงการ</option><option value="all">ทุกจุดวัด</option></select></label>
+        <input id="bmaQ" class="bmaq" type="search" placeholder="ค้นหาคลอง จุดวัด เขต" aria-label="ค้นหาจุดวัด">
+        <button class="btn sm" type="button" data-dl="bmaT" data-fn="ระดับน้ำคลอง กทม.">ดาวน์โหลด CSV</button>
+      </div>
+    </div>
+    <p class="sub" id="bmaSub"></p>
+    <div class="tiles" id="bmaTiles"></div>
+    <div class="tablebox cap" style="margin-top:12px">
+      <table id="bmaT" class="sortable">
+        <thead><tr><th>สถานะจุดวัด</th><th>คลอง</th><th>จุดวัด</th><th>เขต</th><th class="n">ระดับน้ำ<br>(ม.รทก.)</th><th class="n">ตลิ่ง<br>(ม.รทก.)</th><th class="n">ผิวน้ำห่างตลิ่ง<br>(ซม.)</th><th class="n">ห่างระดับ<br>วิกฤต (ซม.)</th><th class="n">โครงการ</th><th>สถานะโครงการ</th><th>วัดเมื่อ</th></tr></thead>
+        <tbody id="bmaBody"></tbody>
+      </table>
+      <div class="empty" id="bmaEmpty" hidden>ไม่มีจุดวัดตามตัวกรองนี้</div>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="hZone">
+    <div class="sec-head">
+      <h2 id="hZone">จำนวนโครงการและสถานะตามพื้นที่</h2>
+      <div class="acts">
+        <div class="seg" role="group" aria-label="ระดับพื้นที่">
+          <button type="button" data-lv="g" aria-pressed="true">โซน</button>
+          <button type="button" data-lv="pv" aria-pressed="false">จังหวัด</button>
+          <button type="button" data-lv="d" aria-pressed="false">เขต/อำเภอ</button>
+        </div>
+        <button class="btn sm" type="button" data-dl="ztable" data-fn="สถานะตามพื้นที่">ดาวน์โหลด CSV</button>
+      </div>
+    </div>
+    <div class="tablebox zbox">
+      <table class="zt sortable" id="ztable">
+        <thead><tr><th id="zHead">โซน</th><th class="n">โครงการ</th><th class="n">วิกฤต<br>รุนแรง</th><th class="n">วิกฤต</th><th class="n">เฝ้าระวัง<br>พิเศษ</th><th class="n">เฝ้าระวัง</th><th class="n">ปกติ</th><th class="n">ไม่มี<br>ข้อมูล</th><th class="n">ในรัศมี<br>สถานีล้นตลิ่ง</th><th class="n">ในรัศมี<br>สถานีน้ำมาก</th><th class="n">หน้างานกรอก<br>เฝ้าระวัง</th></tr></thead>
+        <tbody id="zbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="sec" aria-labelledby="hTable">
+    <div class="sec-head">
+      <h2 id="hTable">รายการโครงการ</h2>
+      <div class="acts"><button class="btn sm" type="button" data-dl="ptable" data-fn="รายการโครงการ">ดาวน์โหลด CSV</button></div>
+    </div>
+    <div class="tablebox cap">
+      <table id="ptable" class="sortable">
+        <thead><tr><th>โครงการ</th><th>IO Code</th><th>สังกัด</th><th>โซน</th><th>เขต/อำเภอ</th><th>จังหวัด</th><th>สถานะ</th><th>ที่มาของสถานะ</th><th>หน้างานกรอก</th><th>ThaiWater</th><th>แหล่งน้ำที่เตือน</th><th class="n">ระยะ (กม.)</th><th class="rvcol">แม่น้ำ/คลองใกล้สุด</th><th class="n rvcol">ระยะ (กม.)</th><th class="n">ผิวน้ำห่างตลิ่ง<br>คลอง กทม. (ซม.)</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+      <div class="empty" id="empty" hidden>ไม่พบโครงการตามตัวกรองนี้ ลองล้างตัวกรองหรือเปลี่ยนคำค้น</div>
+    </div>
+  </section>
+
+  </div>
+
+  <!-- ================= page: watch-list equipment ================= -->
+  <div class="page" id="pg-watch" role="tabpanel" aria-labelledby="tab-watch" hidden>
+    <div class="fslot"></div>
+  <section class="sec first" aria-labelledby="hEq">
+    <div class="sec-head">
+      <h2 id="hEq">อุปกรณ์และเสบียงของโครงการที่ต้องเฝ้าระวัง</h2>
+      <div class="acts">
+        <label class="inl">สถานะที่นับ <select id="eqScope"><option value="4">เฝ้าระวังขึ้นไป</option><option value="3">เฝ้าระวังพิเศษขึ้นไป</option><option value="2">วิกฤตขึ้นไป</option><option value="9">ทุกสถานะ</option></select></label>
+        <label class="inl">จัดกลุ่มตาม <select id="eqGroup"><option value="wway">แม่น้ำหรือคลองที่ใกล้โครงการ</option><option value="tw">แหล่งน้ำที่ ThaiWater เตือน</option><option value="zone">โซน</option></select></label>
+        <button class="btn sm" type="button" id="eqDl">ดาวน์โหลด CSV</button>
+      </div>
+    </div>
+    <p class="sub">จำนวนที่หน้างานกรอกในแบบสำรวจอุปกรณ์ กดที่แถวกลุ่มเพื่อดูรายโครงการ กดชื่อโครงการเพื่อดูรายละเอียด กดหัวตารางเพื่อเรียงลำดับ</p>
+    <div class="tiles" id="eqTiles"></div>
+    <div class="tablebox cap" style="margin-top:12px">
+      <table id="eqMon" class="gtable">
+        <thead><tr><th data-gs="0">กลุ่ม</th><th data-gs="1">โครงการ</th><th class="n" data-gs="2">กระสอบทราย</th><th class="n" data-gs="3">ปั๊มสูบน้ำ</th><th class="n" data-gs="4">เครื่องฉีด<br>แรงดัน</th><th class="n" data-gs="5">แบตเตอรี่/<br>Power box</th><th class="n" data-gs="6">ไฟฉาย</th><th class="n" data-gs="7">ชุดปฐม<br>พยาบาล</th><th class="n" data-gs="8">อุปกรณ์<br>Safety</th><th class="n" data-gs="9">ไม่มีปั๊ม</th><th data-gs="10">ขอสนับสนุนเพิ่ม</th></tr></thead>
+        <tbody id="eqBodyM"></tbody>
+      </table>
+      <div class="empty" id="eqEmpty" hidden>ไม่มีโครงการในสถานะที่เลือกตามตัวกรองนี้</div>
+    </div>
+  </section>
+  </div>
+
+  <footer>
+    <h2>วิธีอ่านและข้อจำกัดของข้อมูล</h2>
+    <ul id="notes"></ul>
+  </footer>
+</div>
+<div id="tip" role="tooltip"></div>
+<div id="flash" role="status" aria-live="polite"></div>
+<dialog id="dlg" aria-labelledby="dTitle"><div class="sheet">
+  <header><div><h3 id="dTitle"></h3><small id="dSub"></small></div><button class="x" id="dClose" type="button" aria-label="ปิดรายละเอียด">✕</button></header>
+  <div class="body" id="dBody"></div>
+</div></dialog>
+<script>
+(async () => {
+const MS_SKIP = ['om'];
+const RV_HINT = 'ยังไม่มีข้อมูลระยะแม่น้ำ ผู้ดูแลต้องรัน Actions › Rivers and canals ใน GitHub';
+const EXTRA_COND = [{ k: 'bma', t: 'ใกล้จุดวัดคลอง กทม. ที่วิกฤตหรือล้นตลิ่ง', d: 'จุดวัดของสำนักการระบายน้ำ กทม. ที่จับคู่กับโครงการ', f: p => !!(p.bm && p.bm.lv >= 4) }];   /* no OM names on the public site */
+const FULL = 'https://claude.ai/artifact/VrNYxGs4fTu9fnT2JEVnrD';
+const bust = Math.floor(Date.now() / 6e4);
+const get = (u, opt) => fetch(u + '?v=' + bust).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); }).catch(e => { if (opt) return null; throw e; });
+let DATA;
+try { DATA = await Promise.all([get('data/master.json'), get('data/geo.json'), get('data/ert.json', 1), get('data/survey.json', 1), get('data/water/index.json', 1), get('data/water/latest.json', 1), get('data/rivers.json', 1), get('data/bma/latest.json', 1), get('data/waterways.json', 1)]); }
+catch (e) { document.getElementById('loadMsg').textContent = 'โหลดข้อมูลไม่สำเร็จ ลองโหลดหน้าใหม่อีกครั้ง'; return; }
+const [MST, GEO, ERTD, SV, TWI, TWL0, RVD, BMAD, WWD] = DATA;
+if (WWD && WWD.ways && WWD.ways.length) { GEO.ww = WWD.ways; GEO.wwsrc = 'OpenStreetMap ' + (WWD.at || ''); }
+/* alert points that darken nearby waterways: ThaiWater alert stations + BMA canal gauges with coordinates */
+const WW_PTS = () => [...(TWCUR.stations || []).filter(s => s.la && s.sit >= 4).map(s => ({ la: s.la, lo: s.lo, lv: s.sit === 5 ? 2 : 1 })),
+  ...((BM && BM.stations) || []).filter(s => s.la != null && s.lv >= 3).map(s => ({ la: s.la, lo: s.ln, lv: s.lv >= 4 ? 2 : 1 }))];
+const BM = BMAD && BMAD.stations ? BMAD : { at: '', stations: [], pj: {}, radius: 3 };
+const RVP = RVD && RVD.pj ? RVD.pj : {}, ZW2 = RVD && RVD.zones ? RVD.zones.watch2 : 3, ZW = RVD && RVD.zones ? RVD.zones.watch : 6;
+const TWL = TWL0 || { at: '', note: '', stations: [], pj: {} };
+/* the announcement formula as set by the user: original formula first, extra rule only where it says "ไม่ตรงเงื่อนไข"; blank and text = 0 */
+const comb = (I, J, K, L) => { const i = +I || 0, j = +J || 0, k = +K || 0, l = L === 1 ? 1 : 0;
+  if (i === 15 && j === 50) return 'เฝ้าระวังพิเศษ'; if (l === 1 || k >= 60) return 'วิกฤตรุนแรง'; if (k > 0 || i >= 15) return 'วิกฤต';
+  if (i <= 0 && (j === 0 || j > 50)) return 'ปกติ'; if (j >= 30) return 'เฝ้าระวัง'; return 'วิกฤต'; };
+const REPM = { 'คงที่': 'ปกติ', 'ลดลง': 'ปกติ', 'ปกติ': 'ปกติ', 'เฝ้าระวัง': 'เฝ้าระวัง', 'วิกฤต': 'วิกฤต', 'สูงขึ้น': 'เฝ้าระวัง' };
+const MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const d2th = s => { const m = /^(\d{4})-(\d\d)-(\d\d)(?:[ T](\d\d:\d\d))?/.exec(String(s || '')); return m ? `${+m[3]} ${MON[+m[2] - 1]} ${+m[1] + 543}${m[4] ? ' ' + m[4] + ' น.' : ''}` : ''; };
+const SVR = SV && SV.rows ? SV.rows : {}, ERTI = ERTD && ERTD.items ? ERTD.items : {};
+const P = MST.projects.map((m, i) => {
+  const p = { ...m, i, sys: [], eq: (SV && SV.eq && SV.eq[m.k]) || {}, rq: (SV && SV.rq && SV.rq[m.k]) || {}, tw: (TWL.pj || {})[m.k] || { a: 'miss' }, bm: BM.pj[m.k] || null };
+  if (RVP[m.k]) p.rv = RVP[m.k];
+  const r = SVR[m.k], e = ERTI[m.k];
+  if (r) { p.pit = r.J ?? null; p.road = r.I ?? null; p.inp = r.K ?? null; p.pow = r.L ?? null; p.repraw = r.rep || ''; p.rep = REPM[String(r.rep || '').trim()] || ''; p.svat = r.at || ''; }
+  if (e) { p.st = e.st; p.src = 'ert'; p.ert = e.note || ''; p.why = 'ERT Update ' + d2th(e.at) + (e.note ? ': ' + e.note : ''); }
+  else if (r) {
+    p.st = comb(r.I, r.J, r.K, r.L); p.src = 'calc';
+    const has = [r.I, r.J, r.K].some(v => v != null) || r.L != null;
+    p.why = has ? `ข้อมูลสำรวจ ${d2th(r.at)}: น้ำหน้าถนน ${r.I != null ? r.I + ' ซม.' : 'ไม่ได้กรอก'} ระดับน้ำบ่อ ${r.J != null ? r.J + ' ซม.' : 'ไม่ได้กรอก'} น้ำในโครงการ ${r.K != null ? r.K + ' ซม.' : 'ไม่ได้กรอก'} ระบบไฟฟ้า${r.L === 1 ? 'ใช้งานไม่ได้' : r.L === 0 ? 'ใช้งานได้' : 'ไม่ได้กรอก'}`
+      : `ข้อมูลสำรวจ ${d2th(r.at)} ยังไม่มีตัวเลขระดับน้ำ ค่าว่างนับเป็น 0 สูตรประกาศจึงให้สถานะปกติ`;
+    /* no water-level numbers: a river within 3 km = เฝ้าระวังพิเศษ, within 6 km = เฝ้าระวัง (the more severe of this and the formula wins) */
+    const rv = p.rv && p.rv.rv;
+    if (![r.I, r.J, r.K].some(v => v != null) && rv) {
+      const z = rv.d <= ZW2 ? 'เฝ้าระวังพิเศษ' : rv.d <= ZW ? 'เฝ้าระวัง' : null, ord = ['วิกฤตรุนแรง', 'วิกฤต', 'เฝ้าระวังพิเศษ', 'เฝ้าระวัง', 'ปกติ'];
+      if (z && ord.indexOf(z) < ord.indexOf(p.st)) { p.st = z; p.src = 'river'; p.why = `ข้อมูลสำรวจ ${d2th(r.at)} ยังไม่มีตัวเลขระดับน้ำ และโครงการอยู่ห่าง${rv.n} ${rv.d.toFixed(1)} กม. (ไม่เกิน ${rv.d <= ZW2 ? ZW2 : ZW} กม.) จึงเป็น${z}`; }
+    }
+  } else { p.st = 'ไม่ระบุ'; p.src = 'none'; p.why = 'ยังไม่มีข้อมูลของโครงการนี้ในแบบสำรวจ'; }
+  return p;
+});
+document.getElementById('loadMsg').remove(); document.getElementById('pg-sit').hidden = false;
+const S = {
+  'วิกฤตรุนแรง':{k:'xcrit',o:1,rule:'ระบบไฟฟ้าใช้ไม่ได้ หรือน้ำในโครงการตั้งแต่ 60 ซม.'},
+  'วิกฤต':{k:'crit',o:2,rule:'มีน้ำในโครงการ หรือน้ำหน้าถนนตั้งแต่ 15 ซม. หรือผิวน้ำห่างปากท่อน้อยกว่า 30 ซม. (ท่อ 0 และถนนแห้งนับเป็นปกติ)'},
+  'เฝ้าระวังพิเศษ':{k:'watch2',o:3,rule:'น้ำหน้าถนน 15 ซม. พอดี และผิวน้ำห่างปากท่อ 50 ซม. พอดี'},
+  'เฝ้าระวัง':{k:'watch',o:4,rule:'ผิวน้ำห่างปากท่อ 30–50 ซม. หรือน้ำหน้าถนน 1–14 ซม. โดยท่อยังห่างตั้งแต่ 30 ซม.'},
+  'ปกติ':{k:'ok',o:5,rule:'ถนนแห้ง ไม่มีน้ำในโครงการ ไฟฟ้าใช้ได้ และผิวน้ำห่างปากท่อเกิน 50 ซม. หรือไม่ได้กรอกค่า'},
+  'ไม่ระบุ':{k:'na',o:6,rule:''}
+};
+const ORDER = ['วิกฤตรุนแรง','วิกฤต','เฝ้าระวังพิเศษ','เฝ้าระวัง','ปกติ'];
+const ALLST = [...ORDER, 'ไม่ระบุ'];
+const KEYS = ['xcrit','crit','watch2','watch','ok','na'];
+const A = { over:{t:'มีสถานีล้นตลิ่งในรัศมี',s:'ล้นตลิ่ง',lv:'hi',o:0}, high:{t:'มีสถานีน้ำมากในรัศมี',s:'น้ำมาก',lv:'mid',o:1}, norm:{t:'สถานีในรัศมีปกติ',s:'ปกติ',lv:'low',o:2}, none:{t:'ไม่มีสถานีในรัศมี',s:'ไม่มีสถานี',lv:'low',o:3}, nocoord:{t:'ไม่มีพิกัด',s:'ไม่มีพิกัด',lv:'low',o:4}, miss:{t:'ไม่มีในไฟล์ ThaiWater',s:'ไม่มีข้อมูล',lv:'low',o:5} };
+const SRC = { ert:'ตาม ERT Update', calc:'ตามสูตรประกาศ', river:'ตามระยะจากแม่น้ำ', none:'ไม่มีข้อมูล' };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf = n => (+n || 0).toLocaleString('en-US');
+const stName = st => st === 'ไม่ระบุ' ? 'ไม่มีข้อมูลสถานะ' : st;
+const stShort = st => st === 'ไม่ระบุ' ? 'ไม่มีข้อมูล' : st;
+const isAffected = p => S[p.st].o <= 4, isFlooded = p => S[p.st].o <= 2;
+const rgName = g => g == null ? 'ไม่ทราบจังหวัด' : (GEO.rg[g].bk ? 'กทม. ' + GEO.rg[g].no + ' · ' : '') + GEO.rg[g].n;
+const repWatch = p => p.rep === 'เฝ้าระวัง' && p.st === 'ปกติ', inReg = p => !!p.reg, isWatch = p => S[p.st].o === 3 || S[p.st].o === 4;
+const regText = p => p.fm0 || [p.imp ? p.impt : '', p.sys.length ? 'งานระบบได้รับผลกระทบ: ' + p.sys.join(', ') : ''].filter(Boolean).join('; ');
+const srcMatch = (p, v) => v === 'repw' ? repWatch(p) : v === 'reg' ? inReg(p) : v === 'rkh' ? p.rk === 'สูง' : v === 'rkm' ? p.rk === 'กลาง' : p.src === v;
+const flags = p => (repWatch(p) ? '<span class="flag f-rep">หน้างานกรอกเฝ้าระวัง</span>' : '') + (inReg(p) ? '<span class="flag f-reg">ทะเบียนผลกระทบ</span>' : '');
+const area = p => [p.d, p.pv].filter(Boolean).join(' ') || 'ไม่ทราบจังหวัด';
+const km = v => (+v).toFixed(1) + ' กม.';
+const tag = st => `<span class="tag s-${S[st].k}">${stShort(st)}</span>`;
+const F = { dist: '', lv: 'g' };
+let dragged = false, TAB = 'sit', lastRg = '';
+P.forEach(p => { p.sys = p.sys || []; p.eq = p.eq || {}; p.rq = p.rq || {}; });
+const BYIO = new Map(P.map(p => [p.io + '|' + p.n, p])), BYNAME = new Map(P.map(p => [p.n, p]));
+
+function twLines(p) {
+  const t = p.tw, out = [];
+  if (t.on) out.push(`<b>${esc(t.on)}</b>${t.orv ? ' ' + esc(t.orv) : ''} ห่าง ${km(t.od)} ล้นตลิ่ง ${(+t.oo).toFixed(2)} ม.`);
+  if (t.hn) out.push(`<b>${esc(t.hn)}</b>${t.hrv ? ' ' + esc(t.hrv) : ''} ห่าง ${km(t.hd)} ${t.hx < 0 ? 'ต่ำกว่าตลิ่ง ' + Math.abs(t.hx).toFixed(2) + ' ม.' : 'น้ำมาก'}`);
+  if (!out.length && t.no != null) out.push(`สถานีล้นตลิ่งที่ใกล้ที่สุดอยู่ห่าง ${km(t.no)}`);
+  return out;
+}
+const cntBy = ps => { const m = {}; ps.forEach(p => { m[p.st] = (m[p.st] || 0) + 1; }); return m; };
+const stripHTML = ps => { const c = cntBy(ps); return ALLST.filter(st => c[st]).map(st => `<i class="s-${S[st].k}" style="width:${c[st] / ps.length * 100}%;background:var(--c)"></i>`).join(''); };
+
+/* ---------- helpers: dates, csv, sorting, downloads ---------- */
+const TH_M = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+const tsParse = s => { const m = /^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)/.exec(String(s || '')); return m ? new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:00+07:00`) : null; };
+const thDate = (s, withTime = true) => { const m = /^(\d{4})-(\d\d)-(\d\d)(?:[ T](\d\d:\d\d))?/.exec(String(s || '')); if (!m) return ''; return `${+m[3]} ${TH_M[+m[2] - 1]} ${+m[1] + 543}` + (withTime && m[4] ? ` เวลา ${m[4]} น.` : ''); };
+const thShort = s => { const m = /^(\d{4})-(\d\d)-(\d\d)(?:[ T](\d\d:\d\d))?/.exec(String(s || '')); return m ? `${+m[3]} ${TH_M[+m[2] - 1]}${m[4] ? ' ' + m[4] : ''}` : ''; };
+const todayStamp = () => { const d = new Date(); return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0'); };
+const csvCell = s => { s = String(s ?? '').replace(/\s+/g, ' ').trim(); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+const csvOf = rows => rows.map(r => r.map(csvCell).join(',')).join('\r\n');
+function tableCSV(tbl) {
+  const txt = c => c.dataset.csv ?? (c.innerText || c.textContent);
+  const head = [...tbl.tHead.rows[0].cells].filter(c => !c.classList.contains('nocsv')).map(txt);
+  const body = [...tbl.tBodies[0].rows].map(r => [...r.cells].filter((c, i) => !tbl.tHead.rows[0].cells[i] || !tbl.tHead.rows[0].cells[i].classList.contains('nocsv')).map(txt));
+  return csvOf([head, ...body]);
+}
+let DL = null;
+async function saveFile(name, text) {
+  const data = '\uFEFF' + text;
+  if (DL) {
+    try { await DL.save({ filename: name, data }); return; }
+    catch (e) { const c = e && e.code; if (c === 'declined' || c === 'rate_limited') return; if (!['unavailable', 'not_granted', 'capability_disabled', 'capability_removed'].includes(c)) { flash('ดาวน์โหลดไม่สำเร็จ ลองอีกครั้ง'); return; } }
+  }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type: 'text/csv;charset=utf-8' })); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+function flash(t) { const el = $('flash'); el.textContent = t; el.classList.add('on'); clearTimeout(flash.t); flash.t = setTimeout(() => el.classList.remove('on'), 3200); }
+function sortInit(root) {
+  root.querySelectorAll('table.sortable thead th').forEach(th => {
+    if (th.querySelector('.sb') || th.classList.contains('nosort')) return;
+    th.innerHTML = `<button type="button" class="sb">${th.innerHTML}</button>`; th.setAttribute('aria-sort', 'none');
+  });
+}
+const lead = v => { if (v == null) return null; const s = String(v).trim(); if (s === '' || s === '–' || s === '-') return null; const m = /^[-+−]?[\d,]*\.?\d+/.exec(s.replace('−', '-')); return m ? +m[0].replace(/,/g, '') : undefined; };
+function resort(tbl) {
+  if (!tbl) return; const s = tbl._s;
+  tbl.querySelectorAll('thead th').forEach((th, j) => { if (!th.classList.contains('nosort')) th.setAttribute('aria-sort', s && s.i === j ? (s.d > 0 ? 'ascending' : 'descending') : 'none'); });
+  if (!s) return;
+  const tb = tbl.tBodies[0], rows = [...tb.rows], val = r => { const c = r.cells[s.i]; return c ? (c.dataset.v ?? c.textContent.trim()) : ''; };
+  const keyed = rows.map((r, k) => { const v = val(r), n = lead(v); return { r, v, n, k }; });
+  const allNum = keyed.every(x => x.n !== undefined);
+  keyed.sort((a, b) => {
+    const ea = allNum ? a.n === null : a.v === '' || a.v === '–', eb = allNum ? b.n === null : b.v === '' || b.v === '–';
+    if (ea !== eb) return ea ? 1 : -1;
+    const c = allNum ? (a.n ?? 0) - (b.n ?? 0) : String(a.v).localeCompare(String(b.v), 'th', { numeric: true });
+    return c * s.d || a.k - b.k;
+  });
+  keyed.forEach(x => tb.appendChild(x.r));
+}
+function sortBy(tbl, i) { const s = tbl._s; tbl._s = { i, d: s && s.i === i ? -s.d : 1 }; resort(tbl); }
+
+
+/* ---------- ThaiWater snapshots (written every hour by GitHub Actions) ---------- */
+let TWCUR = TWL, WS = new Map();
+function buildWS() {
+  const m = new Map(), src = n => { let w = m.get(n); if (!w) m.set(n, w = { k: n, n, lv: 'high', st: new Map(), ps: new Map() }); return w; };
+  P.forEach(p => { const t = p.tw || {}; p._ws = new Set();
+    if (t.on) { const w = src(t.orv || t.on); w.lv = 'over'; w.st.set(t.oc || t.on, { n: t.on, c: t.oc || '', lv: 'over', x: t.oo, l: t.ol, b: t.ob, pc: t.op, t: t.ot }); w.ps.set(p.i, { p, lv: 'over', d: t.od, s: t.on }); p._ws.add(w.k); }
+    if (t.hn) { const w = src(t.hrv || t.hn); if (!w.st.has(t.hn)) w.st.set(t.hn, { n: t.hn, c: '', lv: 'high', x: t.hx, t: t.ht }); if (!w.ps.has(p.i)) w.ps.set(p.i, { p, lv: 'high', d: t.hd, s: t.hn }); p._ws.add(w.k); }
+  });
+  m.forEach(w => { const st = [...w.st.values()]; w.x = Math.max(...st.map(s => s.x ?? -99)); w.t = st.map(s => s.t || '').sort().pop() || ''; });
+  WS = m;
+  const cur = $('fWs').value, ks = [...m.values()].sort((a, b) => (a.lv === 'over' ? 0 : 1) - (b.lv === 'over' ? 0 : 1) || b.ps.size - a.ps.size);
+  $('fWs').innerHTML = '<option value="">ทุกแหล่งน้ำ</option>' + ks.map(w => `<option value="${esc(w.k)}">${esc(w.n)} (${w.lv === 'over' ? 'ล้นตลิ่ง' : 'น้ำมาก'})</option>`).join('');
+  $('fWs').value = m.has(cur) ? cur : '';
+}
+
+const STN = () => (TWCUR.stations || []).map((s, j) => [s, j]).sort((a, b) => a[0].sit - b[0].sit);
+function stnTip(j) {
+  const s = (TWCUR.stations || [])[j]; if (!s) return '';
+  return `<div class="tn">${esc(s.n)}${s.c ? ' <span class="dim">' + esc(s.c) + '</span>' : ''}</div><div class="dim">${esc(s.ty)}${s.rv && s.rv !== s.n ? ' · ' + esc(s.rv) : ''}</div><hr>
+    <b>${esc(s.s || '')}</b>${s.x != null ? ` เทียบตลิ่ง ${xFmt(s.x)} ม.` : ''}${s.pc != null ? ` · ${Math.round(s.pc)}% ของความจุลำน้ำ` : ''}
+    ${s.l != null ? `<div class="dim">ระดับน้ำ ${s.l.toFixed(2)} ตลิ่ง ${s.b != null ? s.b.toFixed(2) : '–'}</div>` : ''}<div class="dim">วัดเมื่อ ${esc(thShort(s.t))}</div>`;
+}
+function applyTw(s) { TWCUR = s; P.forEach(p => { p.tw = (s.pj || {})[p.k] || { a: 'miss' }; }); buildWS(); renderDaySel(); renderNotes(); apply(); }
+function renderDaySel() {
+  const days = (TWI && TWI.days ? TWI.days : []).slice().sort((a, b) => String(b.at).localeCompare(String(a.at)));
+  if (!days.some(d => d.at === TWCUR.at) && TWCUR.at) days.unshift({ day: TWCUR.at.slice(0, 10), at: TWCUR.at });
+  $('twDay').innerHTML = days.map((d, k) => `<option value="${esc(d.day)}"${d.at === TWCUR.at ? ' selected' : ''}>${thDate(d.at)}${k === 0 ? ' (ล่าสุด)' : ''}</option>`).join('');
+  $('asTw').textContent = thDate(TWCUR.at);
+}
+$('twDay').addEventListener('change', async e => {
+  const days = (TWI && TWI.days) || [], latest = days.length ? days[days.length - 1].day : '', d = e.target.value;
+  try { applyTw(d === latest ? TWL : await get('data/water/' + d + '.json')); } catch (err) { flash('โหลดข้อมูลวันที่เลือกไม่สำเร็จ'); }
+});
+const twAgeH = () => { const d = tsParse(TWCUR.at); return d ? (Date.now() - d) / 36e5 : 0; };
+
+/* ---------- BMA drainage department canal levels (weather.bangkok.go.th/water, hourly via GitHub Actions) ---------- */
+const BLV = { 5: ['ล้นตลิ่ง', 'hi'], 4: ['วิกฤต', 'hi'], 3: ['เตือนภัย', 'mid'], 1: ['ปกติ', 'low'], 0: ['ไม่มีข้อมูล', 'low'] };
+const bLab = s => `<span class="lv l-${BLV[s.lv][1]}">${esc(s.lv === 0 ? (s.s || 'ไม่มีข้อมูล') : BLV[s.lv][0])}</span>`;
+const cm = v => v == null ? '–' : (v < 0 ? '−' : '') + Math.abs(v);
+const m2 = v => v == null ? '–' : (+v).toFixed(2);
+const bmaHow = h => h[2] === 'r' ? `ห่าง ${h[1].toFixed(1)} กม.` : 'อยู่เขตเดียวกัน';
+function bmaProj(list) {   /* station index -> projects (from the filtered list) */
+  const m = new Map();
+  list.forEach(p => (p.bm ? p.bm.st : []).forEach(h => { if (!m.has(h[0])) m.set(h[0], []); m.get(h[0]).push([p, h]); }));
+  return m;
+}
+function bmaCell(p) {
+  const b = p.bm; if (!b) return `<td data-v="" data-csv="">–</td>`;
+  const s = BM.stations[b.st[0][0]];
+  return `<td data-v="${b.g ?? ''}" data-csv="${b.g ?? ''}">${b.g != null ? `<b>${cm(b.g)}</b> ` : ''}<span class="dim">${esc(s.k || s.n)}</span> ${bLab(s)}</td>`;
+}
+function renderBma(list) {
+  const S0 = BM.stations, pm = bmaProj(list), scope = $('bmaScope').value, q = $('bmaQ').value.trim().toLowerCase();
+  if (!S0.length) { $('bmaSub').textContent = 'ยังไม่มีข้อมูล ให้ผู้ดูแลรัน Actions › BMA canal levels hourly หนึ่งครั้ง'; $('bmaT').hidden = true; $('bmaTiles').innerHTML = ''; return; }
+  $('bmaSub').textContent = `ข้อมูลจากสำนักการระบายน้ำ กทม. ดึงเมื่อ ${thDate(BM.at)} · ${S0.length} จุดวัด · ห่างตลิ่ง = ตลิ่งด้านที่ต่ำกว่า ลบ ระดับน้ำด้านใน (ค่าติดลบคือล้นตลิ่ง) · จับคู่โครงการในรัศมี ${BM.radius} กม. เมื่อจุดวัดมีพิกัด (${BM.withxy} จุด) ที่เหลือจับคู่กับโครงการในเขตเดียวกัน · กดแถวเพื่อดูโครงการ`;
+  const rows = S0.map((s, j) => [s, j]).filter(([s, j]) => (scope === 'all' || pm.has(j)) && (!q || (s.n + ' ' + s.k + ' ' + s.d + ' ' + s.c).toLowerCase().includes(q)));
+  const near = [...pm.keys()].map(j => S0[j]);
+  const t = (n, lab, sm) => `<div class="tile"><b>${n}</b><span>${lab}</span><small>${sm}</small></div>`;
+  const pc = lv => new Set([...pm.entries()].filter(([j]) => S0[j].lv >= lv).flatMap(([, a]) => a.map(x => x[0].k))).size;
+  $('bmaTiles').innerHTML = t(S0.filter(s => s.lv === 5).length, 'จุดวัดล้นตลิ่ง', `ใกล้โครงการ ${near.filter(s => s.lv === 5).length} จุด · โครงการที่เกี่ยวข้อง ${pc(5)}`) +
+    t(S0.filter(s => s.lv === 4).length, 'จุดวัดถึงระดับวิกฤต', `ใกล้โครงการ ${near.filter(s => s.lv === 4).length} จุด · โครงการที่เกี่ยวข้อง (วิกฤตขึ้นไป) ${pc(4)}`) +
+    t(S0.filter(s => s.lv === 3).length, 'จุดวัดถึงระดับเตือนภัย', `ใกล้โครงการ ${near.filter(s => s.lv === 3).length} จุด · โครงการที่เกี่ยวข้อง (เตือนภัยขึ้นไป) ${pc(3)}`) +
+    t(S0.filter(s => s.lv === 0).length, 'จุดวัดขัดข้องหรือไม่มีข้อมูล', 'ตรวจกับหน้างานแทน');
+  $('bmaBody').innerHTML = rows.map(([s, j]) => { const ps = pm.get(j) || [];
+    return `<tr data-bma="${j}" tabindex="0"><td data-v="${9 - s.lv}" data-csv="${esc(s.lv === 0 ? s.s : BLV[s.lv][0])}">${bLab(s)}</td><td>${esc(s.k || '–')}</td><td data-v="${esc(s.n)}"><b>${esc(s.n)}</b> <span class="dim">${esc(s.c)}</span></td><td>${esc(s.d || '–')}</td>
+      <td class="n" data-v="${s.l ?? ''}">${m2(s.l)}</td><td class="n" data-v="${s.b ?? ''}">${m2(s.b)}</td><td class="n" data-v="${s.g ?? ''}"><b>${cm(s.g)}</b></td><td class="n" data-v="${s.gc ?? ''}">${cm(s.gc)}</td>
+      <td class="n" data-v="${ps.length}">${ps.length || '–'}</td><td data-csv="${esc(stCsv(ps.map(x => x[0])))}">${ps.length ? stCsv(ps.map(x => x[0])).split('; ').map(x => esc(x)).join(' · ') : '–'}</td><td data-v="${esc(s.t || '')}">${esc(thShort(s.t) || '–')}</td></tr>`; }).join('');
+  $('bmaT').hidden = !rows.length; $('bmaEmpty').hidden = rows.length > 0; resort($('bmaT'));
+}
+function openBma(j) {
+  const s = BM.stations[j], ps = (bmaProj(current()).get(j) || []).sort((a, b) => S[a[0].st].o - S[b[0].st].o);
+  let h = `<p>${bLab(s)} <span class="note">วัดเมื่อ ${esc(thShort(s.t) || '–')}</span></p><dl class="kv"><dt>คลอง</dt><dd>${esc(s.k || '–')}</dd><dt>เขต</dt><dd>${esc(s.d || '–')}</dd>
+    <dt>ระดับน้ำด้านใน</dt><dd>${m2(s.l)} ม.รทก.</dd>${s.lo != null ? `<dt>ระดับน้ำด้านนอก</dt><dd>${m2(s.lo)} ม.รทก.</dd>` : ''}<dt>ตลิ่ง ซ้าย / ขวา</dt><dd>${m2(s.bl)} / ${m2(s.br)} ม.รทก.</dd>
+    <dt>ผิวน้ำห่างตลิ่ง</dt><dd>${s.g != null ? (s.g < 0 ? `ล้นตลิ่ง ${-s.g} ซม.` : `${s.g} ซม.`) : 'ไม่มีระดับตลิ่ง'}</dd><dt>เตือนภัย / วิกฤต</dt><dd>${m2(s.w)} / ${m2(s.cr)} ม.รทก.${s.gc != null ? ` (ห่างระดับวิกฤต ${cm(s.gc)} ซม.)` : ''}</dd>
+    <dt>พิกัดจุดวัด</dt><dd>${s.la != null ? `${s.la}, ${s.ln}${s.cs === 'auto' ? ' (จับคู่ชื่อกับ ThaiWater อัตโนมัติ)' : ''}` : 'ไม่มี จับคู่โครงการด้วยเขต'}</dd></dl>`;
+  h += `<h4>โครงการที่จับคู่ ${ps.length} โครงการ (ตามตัวกรอง)</h4>` + (ps.length ? `<div class="blist">${ps.map(([p, x]) => `<button type="button" class="brow" data-i="${p.i}"><b>${esc(p.n)}</b>${tag(p.st)}<small>${bmaHow(x)}</small></button>`).join('')}</div>` : '<p class="note">ไม่มีโครงการในรัศมีหรือในเขตเดียวกัน</p>');
+  h += `<p class="note">ที่มา: <a href="${s.id ? 'https://weather.bangkok.go.th/water/StationDetail?id=' + s.id : 'https://weather.bangkok.go.th/water/'}" target="_blank" rel="noopener">weather.bangkok.go.th/water ↗</a></p>`;
+  openSheet(s.n, `${s.c} · สำนักการระบายน้ำ กทม.`, h, false);
+}
+function bmaDetail(p) {
+  const b = p.bm; if (!b) return '';
+  return `<h4>จุดวัดระดับน้ำคลอง กทม. (ข้อมูล ${esc(thDate(BM.at))})</h4><div class="blist">${b.st.map(x => { const s = BM.stations[x[0]];
+    return `<button type="button" class="brow" data-bma="${x[0]}"><b>${esc(s.n)}</b>${bLab(s)}<small>${s.g != null ? (s.g < 0 ? 'ล้นตลิ่ง ' + -s.g + ' ซม.' : 'ผิวน้ำห่างตลิ่ง ' + s.g + ' ซม.') : s.gc != null ? 'ห่างระดับวิกฤต ' + cm(s.gc) + ' ซม.' : 'ไม่มีระดับตลิ่ง'} · ${bmaHow(x)} · วัดเมื่อ ${esc(thShort(s.t) || '–')}</small></button>`; }).join('')}</div>${b.n > b.st.length ? `<p class="note">แสดง ${b.st.length} จาก ${b.n} จุด เรียงจากเสี่ยงมากไปน้อย</p>` : ''}`;
+}
+/* ---------- filters ---------- */
+F.st = new Set(); F.pick = null;
+let HAS_RV = P.some(p => p.rv);
+document.body.classList.toggle('norv', !HAS_RV);
+const rvD = p => p.rv && p.rv.rv ? p.rv.rv.d : null;
+const FIDS = ['q', 'fRegion', 'fProv', 'fRisk', 'fSrc', 'fWs', 'fRiv'];
+/* project filters matching the PMR Site Visit dashboard (multi-select, "ทั้งหมด" = no filter) */
+const svf = k => p => { const v = p.sv && p.sv[k]; return v == null || v === '' || v === '-' ? 'ไม่ระบุ' : v; };
+const MSD = [
+  { k: 'sns', lab: 'ผู้พัฒนา (Sansiri / Non Sansiri)', f: svf('sns') },
+  { k: 'seg', lab: 'Segment', f: p => { const v = svf('seg')(p); return /^s-series$/i.test(v) ? 'S-Series' : v; } },
+  { k: 'pg', lab: 'Product Group', f: svf('pg') },
+  { k: 'ps', lab: 'Project Status', f: svf('ps') },
+  { k: 'ss', lab: 'Sub-Status (นิติฯ)', f: svf('ss') },
+  { k: 'uc', lab: 'Under-con / นิติฯ', f: svf('uc') },
+  { k: 'ins', lab: 'สถานะประกัน', f: svf('ins') },
+  { k: 'om', lab: 'Operation Manager (OM)', f: p => p.om || 'ไม่ระบุ', search: true },
+  { k: 'bu', lab: 'BU / สังกัด', f: p => p.bu || 'ไม่ระบุ' }
+].filter(d => !(typeof MS_SKIP !== 'undefined' && MS_SKIP.includes(d.k)));
+F.ms = {};
+const msOn = k => F.ms[k] && F.ms[k].size;
+function msLabel(d) { const s = F.ms[d.k]; return !s || !s.size ? 'ทั้งหมด' : s.size === 1 ? [...s][0] : `เลือก ${s.size} รายการ`; }
+function msBuild() {
+  $('fSv').innerHTML = MSD.map(d => `<div class="fl"><span class="flab" id="msl-${d.k}">${esc(d.lab)}</span><div class="ms" data-ms="${d.k}">
+    <button type="button" class="msb" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="msl-${d.k} msv-${d.k}"><span id="msv-${d.k}">ทั้งหมด</span><i aria-hidden="true">▾</i></button>
+    <div class="msd" hidden>${d.search ? '<input type="search" class="msq" placeholder="ค้นหา..." aria-label="ค้นหาในรายการ">' : ''}<div class="msl"></div></div></div></div>`).join('');
+}
+function msFill(box) {
+  const d = MSD.find(x => x.k === box.dataset.ms), sel = F.ms[d.k] || new Set(), base = current({ ms: d.k }), cnt = {};
+  base.forEach(p => { const v = d.f(p); cnt[v] = (cnt[v] || 0) + 1; });
+  const vals = [...new Set(P.map(d.f))].sort((a, b) => (a === 'ไม่ระบุ') - (b === 'ไม่ระบุ') || String(a).localeCompare(String(b), 'th', { numeric: true }));
+  const q = (box.querySelector('.msq') || { value: '' }).value.trim().toLowerCase();
+  box.querySelector('.msl').innerHTML = `<label class="mso all"><input type="checkbox" data-msall${sel.size ? '' : ' checked'}><span>ทั้งหมด (${vals.length})</span></label>` +
+    vals.filter(v => !q || String(v).toLowerCase().includes(q)).map(v => `<label class="mso"><input type="checkbox" data-msv="${esc(v)}"${sel.has(v) ? ' checked' : ''}><span>${esc(v)}</span><b>${cnt[v] || 0}</b></label>`).join('');
+}
+function msSync() { MSD.forEach(d => { const el = $('msv-' + d.k); if (el) { el.textContent = msLabel(d); el.closest('.msb').classList.toggle('on', !!msOn(d.k)); } }); document.querySelectorAll('.ms .msd:not([hidden])').forEach(dd => msFill(dd.parentNode)); }
+function msClose(except) { document.querySelectorAll('.ms').forEach(b => { if (b !== except) { b.querySelector('.msd').hidden = true; b.querySelector('.msb').setAttribute('aria-expanded', 'false'); } }); }
+msBuild();
+$('fSv').addEventListener('click', e => {
+  const b = e.target.closest('.msb'); if (!b) return;
+  const box = b.parentNode, dd = box.querySelector('.msd'), open = dd.hidden;
+  msClose(box); dd.hidden = !open; b.setAttribute('aria-expanded', String(open));
+  if (open) { msFill(box); const q = box.querySelector('.msq'); if (q) { q.value = ''; q.focus(); } }
+});
+$('fSv').addEventListener('input', e => { if (e.target.matches('.msq')) msFill(e.target.closest('.ms')); });
+$('fSv').addEventListener('change', e => {
+  const box = e.target.closest('.ms'); if (!box) return; const k = box.dataset.ms;
+  if (e.target.matches('[data-msall]')) F.ms[k] = new Set();
+  else if (e.target.matches('[data-msv]')) { const s = F.ms[k] || (F.ms[k] = new Set()), v = e.target.dataset.msv; e.target.checked ? s.add(v) : s.delete(v); }
+  apply();
+});
+document.addEventListener('click', e => { if (!e.target.closest('.ms')) msClose(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.querySelector('.ms .msd:not([hidden])')) { msClose(); } });
+$('clear').addEventListener('click', () => { F.ms = {}; F.cond = ''; msClose(); });
+$('sumBig').addEventListener('click', e => { const b = e.target.closest('[data-cond]'); if (b) { e.stopPropagation(); F.cond = ''; apply(); } });
+$('kpis').addEventListener('click', e => { const b = e.target.closest('[data-cond]'); if (!b || b.disabled) return; e.stopPropagation(); F.cond = F.cond === b.dataset.cond ? '' : b.dataset.cond; apply(); });
+function current(o = {}) {
+  const q = $('q').value.trim().toLowerCase(), rg = $('fRegion').value, pv = $('fProv').value, a = $('fRisk').value, src = $('fSrc').value, ws = $('fWs').value, rv = $('fRiv').value;
+  const rvOK = p => { if (!rv) return true; const d = rvD(p); return rv === 'na' ? d == null : d != null && (rv === '3' ? d <= 3 : rv === '6' ? d > 3 && d <= 6 : d > 6); };
+  return P.filter(p => (o.st || !F.st.size || F.st.has(p.st)) && (o.cond || !F.cond || condF(F.cond)(p)) && MSD.every(d => o.ms === d.k || !msOn(d.k) || F.ms[d.k].has(d.f(p))) &&
+    (o.area || ((!rg || String(p.g) === rg) && (!pv || p.pv === pv) && (!F.dist || p.d + '|' + p.pv === F.dist))) &&
+    (o.ws || !ws || p._ws.has(ws)) && (!a || p.tw.a === a) && (!src || srcMatch(p, src)) && rvOK(p) &&
+    (F.pick != null ? p.i === F.pick : !q || [p.n, p.io, p.bu, p.d, p.pv, p.om, p.ww].join(' ').toLowerCase().includes(q)));
+}
+const AFF = ORDER.filter(st => S[st].o <= 4);
+function setSt(sts) { const same = sts.length === F.st.size && sts.every(s => F.st.has(s)); F.st = new Set(same ? [] : sts); apply(); }
+function renderFst() {
+  const c = cntBy(current({ st: true }));
+  $('fSt').innerHTML = ALLST.map(st => `<button type="button" class="stc s-${S[st].k}" data-fst="${st}" aria-pressed="${F.st.has(st)}"><i></i>${stShort(st)} <b>${c[st] || 0}</b></button>`).join('') +
+    `<button type="button" class="stc qk" data-fst="__aff" aria-pressed="${AFF.length === F.st.size && AFF.every(s => F.st.has(s))}">เฝ้าระวังขึ้นไป</button>`;
+}
+/* project search with suggestions */
+let qSel = -1;
+function qMatches(v) {
+  v = v.trim().toLowerCase(); if (!v) return [];
+  const hit = P.filter(p => [p.n, p.io, p.d, p.pv].join(' ').toLowerCase().includes(v));
+  return hit.sort((a, b) => (a.n.toLowerCase().startsWith(v) ? 0 : 1) - (b.n.toLowerCase().startsWith(v) ? 0 : 1) || S[a.st].o - S[b.st].o || a.n.localeCompare(b.n, 'th')).slice(0, 8);
+}
+function qOpen(show) { const l = $('qList'); l.hidden = !show; $('q').setAttribute('aria-expanded', String(show)); if (!show) { qSel = -1; $('q').removeAttribute('aria-activedescendant'); } }
+function qRender() {
+  const ms = qMatches($('q').value), l = $('qList');
+  if (!ms.length || F.pick != null) return qOpen(false);
+  l.innerHTML = ms.map((p, k) => `<li id="qo${k}" role="option" data-qi="${p.i}" aria-selected="${k === qSel}" class="s-${S[p.st].k}"><i></i><span><b>${esc(p.n)}</b><small>${esc([p.io, zShort(p.g), p.d].filter(Boolean).join(' · '))}</small></span><em>${stShort(p.st)}</em></li>`).join('') +
+    `<li class="qall" role="option" data-qi="all" id="qo${ms.length}" aria-selected="${qSel === ms.length}">ดูทุกโครงการที่มีคำว่า "${esc($('q').value.trim())}"</li>`;
+  qOpen(true);
+}
+function qPick(i) {
+  if (i === 'all') { F.pick = null; qOpen(false); apply(); return; }
+  const p = P[+i]; if (!p) return; F.pick = p.i; $('q').value = p.n; qOpen(false); apply();
+  if (p.la != null) { tz.fit(ix(p.lo) - .25, iy(p.la) - .25, ix(p.lo) + .25, iy(p.la) + .25);
+    if (p.la >= GEO.win[0] && p.la <= GEO.win[2] && p.lo >= GEO.win[1] && p.lo <= GEO.win[3]) { const [x, y] = proj([p.la, p.lo]); pz.fit(x - 40, y - 50, x + 40, y + 20); } }
+}
+$('q').addEventListener('input', () => { F.pick = null; qSel = -1; qRender(); });
+$('q').addEventListener('focus', () => { if (F.pick == null) qRender(); });
+$('q').addEventListener('keydown', e => {
+  const items = [...$('qList').querySelectorAll('[role=option]')];
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { if ($('qList').hidden) qRender(); if (!items.length) return; e.preventDefault(); qSel = (qSel + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length; qRender(); $('q').setAttribute('aria-activedescendant', 'qo' + qSel); }
+  else if (e.key === 'Enter') { if (!$('qList').hidden && qSel >= 0 && items[qSel]) { e.preventDefault(); qPick(items[qSel].dataset.qi); } else { qOpen(false); } }
+  else if (e.key === 'Escape') qOpen(false);
+});
+$('qList').addEventListener('mousedown', e => { const li = e.target.closest('[data-qi]'); if (li) { e.preventDefault(); qPick(li.dataset.qi); } });
+$('q').addEventListener('blur', () => setTimeout(() => qOpen(false), 120));
+let lastWs = '';
+function apply() {
+  const list = current(), rg = $('fRegion').value, ws = $('fWs').value;
+  $('count').textContent = `แสดง ${list.length} จาก ${P.length} โครงการ`;
+  renderFst(); msSync();
+  if (TAB === 'sit') {
+    if (rg !== lastRg || ws !== lastWs) { lastRg = rg; lastWs = ws; if (ws) fitWs(ws); else if (rg === '') { tz.zoom(1, [4.15, 7.8]); pz.zoom(1, [MP.W / 2, MP.H / 2]); } else { fitRegion(+rg); fitBMR(rg); } }
+    renderDay(list); renderWs(); renderSelbar(); renderTH(list); renderBMR(list); renderLegends(list); renderZCards(list); renderZones(); renderTable(list); renderBma(list);
+  } else if (TAB === 'watch') renderEqMon();
+}
+
+/* ---------- watch-list equipment monitor ---------- */
+const EQC = [['sand', 'กระสอบทราย'], ['pump', 'ปั๊มสูบน้ำ'], ['hp', 'เครื่องฉีดแรงดัน'], ['batt', 'แบตเตอรี่/Power box'], ['light', 'ไฟฉาย']];
+const RQL = { sand: 'กระสอบทราย', pump: 'ปั๊ม', safe: 'Safety', hp: 'ฉีดแรงดัน', boat: 'เรือ', mega: 'โทรโข่ง', light: 'ไฟฉาย', gate: 'แผงกั้นน้ำ', tarp: 'ผ้าใบ', food: 'อาหาร/เสบียง', oth: 'อื่นๆ' };
+const rqText = p => Object.keys(RQL).filter(k => p.rq && p.rq[k] != null && p.rq[k] !== false && p.rq[k] !== 0).map(k => RQL[k] + (typeof p.rq[k] === 'number' ? ' ' + nf(p.rq[k]) : typeof p.rq[k] === 'string' ? ' (' + p.rq[k] + ')' : '')).join(', ');
+const hasEq = p => p.eq && Object.keys(p.eq).some(k => k !== 'at');
+function eqGroupOf(p, by) {
+  if (by === 'zone') return zShort(p.g);
+  if (by === 'wway') { const n = p.rv && p.rv.near && p.rv.near[0]; if (n) return n.n; if (HAS_RV) return 'ไม่มีแม่น้ำหรือคลองในรัศมี 6 กม.'; }
+  return wsName(p) || 'ไม่มีสถานีเตือนในรัศมี';
+}
+let EQOPEN = new Set(), EQS = { i: 1, d: -1 };
+function eqRows() {
+  const lim = +$('eqScope').value, by = $('eqGroup').value;
+  const ps = current({ st: true }).filter(p => p.st !== 'ไม่ระบุ' && S[p.st].o <= lim);
+  const m = new Map(); ps.forEach(p => { const k = eqGroupOf(p, by); (m.get(k) || m.set(k, []).get(k)).push(p); });
+  return { ps, by, groups: [...m].map(([k, q]) => ({ k, ps: q, v: [k, q.length, ...EQC.map(([e]) => q.reduce((a, p) => a + (+((p.eq || {})[e]) || 0), 0)), q.filter(p => (p.eq || {}).aid === 1).length, q.filter(p => (p.eq || {}).safe === 1).length, q.filter(p => hasEq(p) && !(p.eq.pump > 0)).length, q.filter(p => rqText(p)).length] })) };
+}
+function renderEqMon() {
+  if (!$('eqMon')) return;
+  if (!HAS_RV && $('eqGroup').value === 'wway' && !$('eqGroup').dataset.touched) $('eqGroup').value = 'tw';
+  const { ps, groups } = eqRows(), rep = ps.filter(hasEq);
+  const sum = k => ps.reduce((a, p) => a + (+((p.eq || {})[k]) || 0), 0);
+  $('eqTiles').innerHTML =
+    `<div class="tile"><b>${ps.length}</b><span>โครงการในสถานะที่เลือก</span><small>${stCsv(ps).replace(/; /g, ' · ') || 'ไม่มี'}</small></div>` +
+    `<div class="tile"><b>${nf(sum('sand'))}</b><span>กระสอบทรายที่มี (ใบ)</span><small>รายงานอุปกรณ์ ${rep.length} จาก ${ps.length} โครงการ</small></div>` +
+    `<div class="tile"><b>${nf(sum('pump'))}</b><span>ปั๊มสูบน้ำที่มี (เครื่อง)</span><small>ไม่มีปั๊มเลย ${rep.filter(p => !(p.eq.pump > 0)).length} โครงการ</small></div>` +
+    `<div class="tile"><b>${ps.filter(p => rqText(p)).length}</b><span>โครงการที่ขอสนับสนุนเพิ่ม</span><small>ขออาหารหรือเสบียง ${ps.filter(p => p.rq && p.rq.food).length} โครงการ</small></div>`;
+  const g = [...groups].sort((a, b) => { const x = a.v[EQS.i], y = b.v[EQS.i]; return (typeof x === 'number' ? x - y : String(x).localeCompare(String(y), 'th')) * EQS.d || b.ps.length - a.ps.length; });
+  const n = v => v ? nf(v) : '<span class="z0">0</span>';
+  $('eqBodyM').innerHTML = g.map(r => { const open = EQOPEN.has(r.k);
+    const head = `<tr class="grow" data-eqg="${esc(r.k)}" tabindex="0" aria-expanded="${open}"><td><span class="tw">${open ? '▾' : '▸'}</span><b>${esc(r.k)}</b></td><td><b>${r.ps.length}</b> ${stTags(r.ps)}</td>${r.v.slice(2, 7).map(v => `<td class="n">${n(v)}</td>`).join('')}<td class="n">${r.v[7]}/${r.ps.length}</td><td class="n">${r.v[8]}/${r.ps.length}</td><td class="n ${r.v[9] ? 'warn' : ''}">${r.v[9] || '–'}</td><td>${r.v[10] ? r.v[10] + ' โครงการ' : '–'}</td></tr>`;
+    const kids = open ? r.ps.sort((a, b) => S[a.st].o - S[b.st].o || a.n.localeCompare(b.n, 'th')).map(p => { const e = p.eq || {}, d = p.rv && p.rv.near && p.rv.near[0];
+      return `<tr class="crow" data-i="${p.i}" tabindex="0"><td><span class="ind"></span>${esc(p.n)}<small>${esc([zShort(p.g), d ? d.n + ' ' + d.d.toFixed(1) + ' กม.' : ''].filter(Boolean).join(' · '))}</small></td><td data-v="${S[p.st].o}" data-csv="${stShort(p.st)}">${tag(p.st)}</td>${EQC.map(([k]) => `<td class="n">${e[k] != null ? nf(e[k]) : '–'}</td>`).join('')}<td class="n">${e.aid == null ? '–' : e.aid ? 'มี' : 'ไม่มี'}</td><td class="n">${e.safe == null ? '–' : e.safe ? 'มี' : 'ไม่มี'}</td><td class="n ${hasEq(p) && !(e.pump > 0) ? 'warn' : ''}">${hasEq(p) ? (e.pump > 0 ? '–' : 'ไม่มีปั๊ม') : 'ไม่ได้รายงาน'}</td><td><small>${esc(rqText(p)) || '–'}</small></td></tr>`; }).join('') : '';
+    return head + kids; }).join('');
+  $('eqEmpty').hidden = g.length > 0;
+  $('eqMon').querySelectorAll('th[data-gs]').forEach(th => th.setAttribute('aria-sort', +th.dataset.gs === EQS.i ? (EQS.d > 0 ? 'ascending' : 'descending') : 'none'));
+}
+['eqScope', 'eqGroup'].forEach(id => $(id).addEventListener('input', e => { if (id === 'eqGroup') e.target.dataset.touched = '1'; EQOPEN.clear(); renderEqMon(); }));
+$('eqMon').querySelectorAll('th[data-gs]').forEach(th => { th.innerHTML = `<button type="button" class="gsb">${th.innerHTML}</button>`; });
+$('eqMon').addEventListener('click', e => {
+  const b = e.target.closest('th .gsb'); if (b) { const i = +b.closest('th').dataset.gs; EQS = { i, d: EQS.i === i ? -EQS.d : (i === 0 ? 1 : -1) }; renderEqMon(); return; }
+  const g = e.target.closest('tr[data-eqg]'); if (g) { e.stopPropagation(); const k = g.dataset.eqg; EQOPEN.has(k) ? EQOPEN.delete(k) : EQOPEN.add(k); renderEqMon(); }
+});
+$('eqMon').addEventListener('keydown', e => { if (e.key === 'Enter') { const g = e.target.closest('tr[data-eqg]'); if (g) g.click(); } });
+$('eqDl').onclick = () => { const { ps, by } = eqRows();
+  const head = ['กลุ่ม', 'โครงการ', 'IO Code', 'โซน', 'สถานะ', ...EQC.map(x => x[1]), 'ชุดปฐมพยาบาล', 'อุปกรณ์ Safety', 'ขอสนับสนุนเพิ่ม', 'แม่น้ำ/คลองใกล้สุด', 'ระยะ (กม.)'];
+  saveFile(`อุปกรณ์และเสบียง_${todayStamp()}.csv`, csvOf([head, ...ps.sort((a, b) => eqGroupOf(a, by).localeCompare(eqGroupOf(b, by), 'th') || S[a.st].o - S[b.st].o).map(p => { const e = p.eq || {}, d = p.rv && p.rv.near && p.rv.near[0];
+    return [eqGroupOf(p, by), p.n, p.io, zShort(p.g), stShort(p.st), ...EQC.map(([k]) => e[k] ?? ''), e.aid == null ? '' : e.aid ? 'มี' : 'ไม่มี', e.safe == null ? '' : e.safe ? 'มี' : 'ไม่มี', rqText(p), d ? d.n : '', d ? d.d : '']; })])); };
+
+/* ---------- daily summary ---------- */
+const zShort = g => g == null ? 'ไม่ทราบจังหวัด' : GEO.rg[g].bk ? 'กทม. ' + GEO.rg[g].no + ' ' + GEO.rg[g].n : GEO.rg[g].n;
+/* summary: how many projects are selected, then which conditions they meet */
+const COND = [
+  { k: 'rv3', t: 'อยู่ห่างแม่น้ำไม่เกิน 3 กม.', d: 'วัดจากที่ตั้งโครงการถึงแม่น้ำสายที่ใกล้ที่สุด', rv: 1, f: p => rvD(p) != null && rvD(p) <= 3 },
+  { k: 'rv6', t: 'อยู่ห่างแม่น้ำ 3–6 กม.', d: 'ไกลกว่า 3 กม. แต่ไม่เกิน 6 กม.', rv: 1, f: p => rvD(p) != null && rvD(p) > 3 && rvD(p) <= 6 },
+  { k: 'over', t: 'ใกล้สถานีวัดน้ำที่ล้นตลิ่ง', d: 'สถานี ThaiWater ล้นตลิ่ง ห่างไม่เกิน 10 กม. (คลอง กทม. 3 กม.)', f: p => p.tw.a === 'over' },
+  { k: 'high', t: 'ใกล้สถานีวัดน้ำที่น้ำมาก', d: 'ยังไม่ล้นตลิ่ง แต่ระดับน้ำสูงเกินเกณฑ์เตือน', f: p => p.tw.a === 'high' },
+  ...(typeof EXTRA_COND !== 'undefined' ? EXTRA_COND : []),
+  ...(P.some(p => p.rep === 'เฝ้าระวัง') ? [{ k: 'repw', t: 'หน้างานแจ้งว่าเฝ้าระวัง', d: 'หน้างานกรอกสถานะเฝ้าระวังในแบบสำรวจ', f: p => p.rep === 'เฝ้าระวัง' }] : []),
+  { k: 'ert', t: 'มีสถานะจาก ERT Update', d: 'ทีม ERT ยืนยันสถานะของโครงการนี้แล้ว', f: p => p.src === 'ert' }
+];
+F.cond = '';
+const condF = k => (COND.find(c => c.k === k) || { f: () => true }).f;
+function renderDay(list) {
+  const base = F.cond ? current({ cond: true }) : list, n = base.length, c = cntBy(base), age = twAgeH();
+  const pct = x => n ? Math.round(x / n * 100) : 0;
+  const any = base.filter(p => COND.some(cd => !(cd.rv && !HAS_RV) && cd.f(p))).length;
+  $('sumBig').innerHTML = `<div class="sbl">จำนวนโครงการ</div><div class="sbn">${nf(n)}<small> โครงการ</small></div>
+    <div class="sbs">จากทั้งหมด ${nf(P.length)} โครงการ${n < P.length ? ' ตามตัวกรองด้านบน' : ''}</div>
+    <div class="sbbar" aria-hidden="true">${ALLST.filter(st => c[st]).map(st => `<i class="s-${S[st].k}" style="flex:${c[st]}"></i>`).join('')}</div>
+    <div class="stbar" id="stbar" role="group" aria-label="สถานะโครงการ กดเพื่อกรอง">${ALLST.map(st => `<button type="button" class="stc s-${S[st].k}" data-st="${st}" aria-pressed="${F.st.has(st)}" data-tipt="${esc(S[st].rule || 'ไม่มีข้อมูลของโครงการนี้ในแบบสำรวจ')}"><i></i>${stShort(st)} <b>${c[st] || 0}</b></button>`).join('')}</div>
+    ${F.cond ? `<div class="sbon">กำลังดูเฉพาะ <b>${esc((COND.find(x => x.k === F.cond) || {}).t || '')}</b> ${nf(list.length)} โครงการ <button type="button" class="linkbtn" data-cond="${F.cond}">ยกเลิก</button></div>` : ''}
+    <div class="sbany"><b>${nf(any)}</b> โครงการเข้าอย่างน้อย 1 เงื่อนไข · <b>${nf(n - any)}</b> โครงการไม่เข้าเงื่อนไขใดเลย</div>`;
+  $('kpis').innerHTML = COND.map(cd => {
+    const off = cd.rv && !HAS_RV, x = off ? 0 : base.filter(cd.f).length, on = F.cond === cd.k;
+    return `<button type="button" class="cond${off ? ' off' : ''}${x ? '' : ' zero'}" data-cond="${cd.k}" aria-pressed="${on}"${off ? ' disabled' : ''}>
+      <span class="ct">${cd.t}</span><span class="cn"><b>${off ? '–' : nf(x)}</b>${off ? '' : ` <small>โครงการ · ${pct(x)}%</small>`}</span>
+      <span class="cbar"><i style="width:${off ? 0 : pct(x)}%"></i></span><span class="cd">${off ? (typeof RV_HINT !== 'undefined' ? RV_HINT : 'ยังไม่มีข้อมูลระยะแม่น้ำ กดปุ่ม "นำเข้าระยะแม่น้ำ"') : cd.d}</span></button>`;
+  }).join('');
+  $('twStale').hidden = age <= 24;
+  $('twStale').textContent = `ข้อมูลระดับน้ำที่แสดงเป็นของวันที่ ${thDate(TWCUR.at)} ผ่านมาแล้ว ${age >= 48 ? Math.floor(age / 24) + ' วัน' : Math.round(age) + ' ชั่วโมง'} ระบบดึงข้อมูลใหม่ทุกชั่วโมง ถ้ายังไม่อัปเดต ให้ผู้ดูแลตรวจหน้า Actions ใน GitHub`;
+}
+
+/* ---------- water sources table and popup ---------- */
+const tagN = (st, n) => `<span class="tag s-${S[st].k}">${stShort(st)} ${n}</span>`;
+const stTags = ps => { const c = cntBy(ps); return ALLST.filter(st => c[st]).map(st => tagN(st, c[st])).join(' '); };
+const stCsv = ps => { const c = cntBy(ps); return ALLST.filter(st => c[st]).map(st => `${stShort(st)} ${c[st]}`).join('; '); };
+const xFmt = x => x == null || x <= -98 ? '–' : (x > 0 ? '+' : x < 0 ? '−' : '') + Math.abs(x).toFixed(2);
+const lvTag = lv => lv === 'over' ? '<span class="lv l-hi">ล้นตลิ่ง</span>' : '<span class="lv l-mid">น้ำมาก</span>';
+function wsZones(ps) { const m = new Map(); ps.forEach(x => { const g = x.p.g ?? -1; (m.get(g) || m.set(g, []).get(g)).push(x); }); return [...m].sort((a, b) => b[1].length - a[1].length); }
+function renderWs() {
+  const inL = new Set(current({ ws: true }).map(p => p.i)), sel = $('fWs').value;
+  const rows = [...WS.values()].map(w => ({ w, ps: [...w.ps.values()].filter(x => inL.has(x.p.i)) })).filter(x => x.ps.length)
+    .sort((a, b) => (a.w.lv === 'over' ? 0 : 1) - (b.w.lv === 'over' ? 0 : 1) || b.ps.length - a.ps.length);
+  $('wsBody').innerHTML = rows.map(({ w, ps }) => { const zs = wsZones(ps), nOv = ps.filter(x => x.lv === 'over').length;
+    return `<tr data-ws="${esc(w.k)}" tabindex="0" aria-selected="${sel === w.k}"><td data-v="${esc(w.n)}"><b>${esc(w.n)}</b></td><td data-v="${w.lv === 'over' ? 0 : 1}" data-csv="${w.lv === 'over' ? 'ล้นตลิ่ง' : 'น้ำมาก'}">${lvTag(w.lv)}</td>
+      <td class="n">${w.st.size}</td><td class="n" data-v="${w.x}">${xFmt(w.x)}</td><td class="n">${nOv || '–'}</td><td class="n">${ps.length - nOv || '–'}</td>
+      <td data-v="${zs.length}" data-csv="${esc(zs.map(([g, a]) => zShort(g < 0 ? null : g) + ' ' + a.length).join('; '))}"><span class="zl">${zs.slice(0, 3).map(([g, a]) => `<span class="zch${g >= 0 ? ' rg' + g : ''}"><i></i>${esc(g < 0 ? 'ไม่ทราบ' : GEO.rg[g].bk ? 'กทม. ' + GEO.rg[g].no : GEO.rg[g].s)} <b>${a.length}</b></span>`).join('')}${zs.length > 3 ? `<span class="more">+${zs.length - 3} โซน</span>` : ''}</span></td>
+      <td data-v="${Math.min(...ps.map(x => S[x.p.st].o))}" data-csv="${esc(stCsv(ps.map(x => x.p)))}">${stTags(ps.map(x => x.p))}</td><td data-v="${esc(w.t)}">${esc(thShort(w.t))}</td></tr>`; }).join('');
+  $('wsEmpty').hidden = rows.length > 0; resort($('wsTable'));
+}
+function openSheet(title, sub, html, wide) {
+  hideTip(); $('dTitle').textContent = title; $('dSub').textContent = sub; $('dBody').innerHTML = html; $('dBody').scrollTop = 0;
+  $('dlg').classList.toggle('wide', !!wide); sortInit($('dBody')); if (!$('dlg').open) $('dlg').showModal();
+}
+const projRowHTML = (p, extra = '') => `<tr data-i="${p.i}" tabindex="0"><td data-v="${esc(p.n)}"><b>${esc(p.n)}</b></td><td data-v="${p.g ?? 99}">${esc(zShort(p.g))}</td><td>${esc(p.d || '–')}</td>${extra}<td data-v="${S[p.st].o}" data-csv="${stShort(p.st)}">${tag(p.st)}</td><td data-v="${p.rep || ''}">${p.rep ? esc(p.rep) : '–'}</td></tr>`;
+function openWs(k) {
+  const w = WS.get(k); if (!w) return;
+  const inL = new Set(current({ ws: true }).map(p => p.i)), ps = [...w.ps.values()].filter(x => inL.has(x.p.i)), zs = wsZones(ps);
+  const nIn = s => ps.filter(x => x.s === s.n).length;
+  let h = `<div class="dacts"><button class="btn" type="button" data-wsmap="${esc(k)}">แสดงบนแผนที่และกรองทั้งหน้า</button><button class="btn sm" type="button" data-dl="dWsP" data-fn="โครงการในรัศมี ${esc(w.n)}">ดาวน์โหลด CSV</button></div>`;
+  h += `<p class="note">ข้อมูล ThaiWater ${esc(thDate(TWCUR.at))} รัศมีเตือน แม่น้ำ/ลำน้ำ 10 กม. คลอง กทม. 3 กม. ดึงอัตโนมัติทุกชั่วโมง</p>`;
+  h += `<h4>สถานีวัดระดับน้ำที่เตือน ${w.st.size} สถานี</h4><div class="tablebox"><table class="sortable mini2"><thead><tr><th>สถานี</th><th>ระดับ</th><th class="n">ระดับน้ำ (ม.รทก.)</th><th class="n">ระดับตลิ่ง (ม.รทก.)</th><th class="n">เทียบตลิ่ง (ม.)</th><th class="n">% ความจุลำน้ำ</th><th>เวลาวัด</th><th class="n">โครงการในรัศมี</th></tr></thead><tbody>` +
+    [...w.st.values()].map(s => `<tr><td><b>${esc(s.n)}</b>${s.c ? ` <small>${esc(s.c)}</small>` : ''}</td><td data-v="${s.lv === 'over' ? 0 : 1}" data-csv="${s.lv === 'over' ? 'ล้นตลิ่ง' : 'น้ำมาก'}">${lvTag(s.lv)}</td><td class="n">${s.l != null ? s.l.toFixed(2) : '–'}</td><td class="n">${s.b != null ? s.b.toFixed(2) : '–'}</td><td class="n" data-v="${s.x ?? ''}">${xFmt(s.x)}</td><td class="n">${s.pc != null ? s.pc.toFixed(0) + '%' : '–'}</td><td data-v="${esc(s.t || '')}">${esc(thShort(s.t))}</td><td class="n">${nIn(s)}</td></tr>`).join('') + '</tbody></table></div>';
+  h += `<h4>โซนที่เกี่ยวข้อง</h4><div class="tablebox"><table class="sortable mini2"><thead><tr><th>โซน</th><th class="n">โครงการในโซน</th><th class="n">ในรัศมีแหล่งน้ำนี้</th><th class="n">ในรัศมีสถานีล้นตลิ่ง</th><th class="n">ในรัศมีสถานีน้ำมาก</th><th>สถานะของโครงการในรัศมี</th></tr></thead><tbody>` +
+    zs.map(([g, a]) => `<tr${g >= 0 ? ` data-zopen="${g}" tabindex="0"` : ''}><td data-v="${esc(zShort(g < 0 ? null : g))}"><b>${g >= 0 ? `<i class="rsw rg${g}"></i>` : ''}${esc(zShort(g < 0 ? null : g))}</b></td><td class="n">${g >= 0 ? P.filter(p => p.g === g).length : '–'}</td><td class="n">${a.length}</td><td class="n">${a.filter(x => x.lv === 'over').length || '–'}</td><td class="n">${a.filter(x => x.lv === 'high').length || '–'}</td><td data-csv="${esc(stCsv(a.map(x => x.p)))}">${stTags(a.map(x => x.p))}</td></tr>`).join('') + '</tbody></table></div>';
+  h += `<h4>โครงการในรัศมี ${ps.length} โครงการ</h4><div class="tablebox cap"><table class="sortable mini2" id="dWsP"><thead><tr><th>โครงการ</th><th>โซน</th><th>เขต/อำเภอ</th><th>สถานีที่ใกล้</th><th class="n">ระยะ (กม.)</th><th>ระดับ</th><th>สถานะ</th><th>หน้างานกรอก</th></tr></thead><tbody>` +
+    ps.sort((a, b) => (a.lv === 'over' ? 0 : 1) - (b.lv === 'over' ? 0 : 1) || S[a.p.st].o - S[b.p.st].o || (a.d ?? 99) - (b.d ?? 99))
+      .map(x => projRowHTML(x.p, `<td>${esc(x.s)}</td><td class="n">${x.d != null ? x.d.toFixed(1) : '–'}</td><td data-v="${x.lv === 'over' ? 0 : 1}" data-csv="${x.lv === 'over' ? 'ล้นตลิ่ง' : 'น้ำมาก'}">${lvTag(x.lv)}</td>`)).join('') + '</tbody></table></div>';
+  openSheet('แหล่งน้ำ: ' + w.n, `ระดับเตือนสูงสุด ${w.lv === 'over' ? 'ล้นตลิ่ง' : 'น้ำมาก'} · ${ps.length} โครงการในรัศมี · ${zs.length} โซน`, h, true);
+}
+function fitWs(k) {
+  const w = WS.get(k); if (!w) return;
+  const ps = [...w.ps.values()].map(x => x.p).filter(p => p.la != null);
+  if (!ps.length) return;
+  const bb = (f) => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; ps.forEach(p => { const [x, y] = f(p); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }); return [x0, y0, x1, y1]; };
+  const [a, b, c, d] = bb(p => [ix(p.lo), iy(p.la)]); tz.fit(a - .15, b - .15, c + .15, d + .15);
+  const inw = ps.filter(p => p.la >= GEO.win[0] && p.la <= GEO.win[2] && p.lo >= GEO.win[1] && p.lo <= GEO.win[3]);
+  if (inw.length) { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; inw.forEach(p => { const [x, y] = proj([p.la, p.lo]); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }); pz.fit(x0 - 20, y0 - 30, x1 + 20, y1 + 12); }
+  else pz.zoom(1, [MP.W / 2, MP.H / 2]);
+}
+
+/* ---------- selection bar ---------- */
+function renderSelbar() {
+  const rg = $('fRegion').value, pv = $('fProv').value, ws = $('fWs').value, parts = [];
+  if (F.pick != null) parts.push(['pick', 'โครงการ ' + P[F.pick].n]);
+  if (rg !== '') parts.push(['rg', rgName(+rg)]); if (pv) parts.push(['pv', 'จังหวัด' + pv]); if (F.dist) parts.push(['d', F.dist.split('|')[0]]); if (ws) parts.push(['ws', 'แหล่งน้ำ ' + ws]);
+  const el = $('selbar'); el.hidden = !parts.length;
+  el.innerHTML = parts.length ? `<span>กำลังดูเฉพาะ</span>${parts.map(([k, t]) => `<button class="fchip" type="button" data-unset="${k}" aria-label="เลิกกรอง ${esc(t)}">${esc(t)} <span aria-hidden="true">✕</span></button>`).join('')}
+    ${rg !== '' ? `<button class="btn sm" type="button" data-zopen="${rg}">รายละเอียดโซน</button>` : ''}${ws ? `<button class="btn sm" type="button" data-wsopen="${esc(ws)}">รายละเอียดแหล่งน้ำ</button>` : ''}` : '';
+}
+
+/* ---------- zone cards ---------- */
+function renderZCards(list) {
+  const inL = new Set(list.map(p => p.i)), sel = $('fRegion').value;
+  const card = (r, g) => { const ps = P.filter(p => p.g === g && inL.has(p.i)), aff = ps.filter(isAffected).length, ov = ps.filter(p => p.tw.a === 'over').length, hi = ps.filter(p => p.tw.a === 'high').length;
+    return `<div class="zc rg${g}${sel === String(g) ? ' on' : ''}${ps.length ? '' : ' zero'}" data-tz="${g}">
+      <button class="zc-main" type="button" data-g="${g}" aria-pressed="${sel === String(g)}"><span class="zc-name">${r.bk ? `<span class="no">${r.no}</span>` : '<i class="sw"></i>'}${esc(r.n)}</span>
+      <span class="zc-num"><b>${ps.length}</b> โครงการ</span>${ps.length ? `<span class="zbar">${stripHTML(ps)}</span>` : '<span class="zbar"></span>'}
+      <span class="zc-kv"><span class="${aff ? 'hot' : ''}">เฝ้าระวังขึ้นไป <b>${aff}</b></span><span class="${ov ? 'wet' : ''}">ล้นตลิ่ง <b>${ov}</b></span><span>น้ำมาก <b>${hi}</b></span></span></button>
+      ${ps.length ? `<button class="zc-dl" type="button" data-zdl="${g}" aria-label="ดาวน์โหลดรายชื่อโครงการ ${esc(r.n)}" title="ดาวน์โหลด CSV"><svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true"><path d="M8 2v8m-3.5-3.5L8 10l3.5-3.5M3 13h10" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>` : ''}</div>`; };
+  const all = GEO.rg.map((r, g) => [r, g]);
+  $('zcards').innerHTML = `<p class="zgrp">กรุงเทพฯ และปริมณฑล 4 โซน</p><div class="zgrid">${all.filter(x => x[0].bk).map(x => card(...x)).join('')}</div>` +
+    `<p class="zgrp">ต่างจังหวัด 12 โซน</p><div class="zgrid">${all.filter(x => !x[0].bk).map(x => card(...x)).join('')}</div>`;
+}
+function zoneTip(g, pv) {
+  const r = GEO.rg[g]; if (!r) return ''; const inL = new Set(current({ area: true }).map(p => p.i)), ps = P.filter(q => q.g === g && inL.has(q.i)), c = cntBy(ps);
+  const ws = new Map(); ps.forEach(p => p._ws.forEach(k => ws.set(k, (ws.get(k) || 0) + 1)));
+  const wl = [...ws].sort((a, b) => (WS.get(a[0]).lv === 'over' ? 0 : 1) - (WS.get(b[0]).lv === 'over' ? 0 : 1) || b[1] - a[1]).slice(0, 4);
+  return `<div class="tn">${esc(rgName(g))}</div>${r.sub ? `<div class="dim">${esc(r.sub)}</div>` : pv ? `<div class="dim">จังหวัด${esc(pv)}</div>` : ''}<hr>` +
+    (ps.length ? `<b>${ps.length} โครงการ</b> ท่วมแล้ว ${ps.filter(isFlooded).length} · เฝ้าระวังขึ้นไป ${ps.filter(isAffected).length}<ul>${ALLST.filter(st => c[st]).map(st => `<li>${stShort(st)} ${c[st]}</li>`).join('')}</ul>
+      <div>หน้างานกรอกเฝ้าระวัง ${ps.filter(repWatch).length}</div>
+      <div>ในรัศมีสถานีล้นตลิ่ง ${ps.filter(p => p.tw.a === 'over').length} · น้ำมาก ${ps.filter(p => p.tw.a === 'high').length}</div>
+      ${wl.length ? `<hr><b>แหล่งน้ำที่เตือน</b><ul>${wl.map(([k, n]) => `<li>${esc(WS.get(k).n)} (${WS.get(k).lv === 'over' ? 'ล้นตลิ่ง' : 'น้ำมาก'}) ${n} โครงการ</li>`).join('')}</ul>` : ''}
+      <div class="dim">กดเพื่อกรองและซูมแผนที่</div>` : '<span class="dim">ไม่มีโครงการในตัวกรองนี้</span>');
+}
+const PCOLS = ['โครงการ', 'IO Code', 'สังกัด', 'โซน', 'เขต/อำเภอ', 'จังหวัด', 'สถานะ', 'ที่มาของสถานะ', 'หน้างานกรอก', 'ThaiWater', 'แหล่งน้ำที่เตือน', 'สถานีที่เตือน', 'ระยะ (กม.)'];
+const wsName = p => { const t = p.tw; return t.on ? (t.orv || t.on) : t.hn ? (t.hrv || t.hn) : ''; };
+const wsDist = p => { const t = p.tw; return t.on ? t.od : t.hn ? t.hd : null; };
+const projFields = p => [p.n, p.io, p.bu, zShort(p.g), p.d || '', p.pv || '', stShort(p.st), SRC[p.src], p.rep || '', A[p.tw.a].t, wsName(p), p.tw.on || p.tw.hn || '', wsDist(p) ?? ''];
+const zoneCSV = g => csvOf([PCOLS, ...P.filter(p => String(p.g) === String(g)).sort((a, b) => S[a.st].o - S[b.st].o || a.n.localeCompare(b.n, 'th')).map(projFields)]);
+function zonesSummaryCSV() {
+  const head = ['โซน', 'โครงการ', ...ALLST.map(stShort), 'ในรัศมีสถานีล้นตลิ่ง', 'ในรัศมีสถานีน้ำมาก', 'หน้างานกรอกเฝ้าระวัง', 'แหล่งน้ำที่เตือน'];
+  const inL = new Set(current({ area: true }).map(p => p.i));
+  return csvOf([head, ...GEO.rg.map((r, g) => { const ps = P.filter(p => p.g === g && inL.has(p.i)), c = cntBy(ps), ws = new Set(); ps.forEach(p => p._ws.forEach(k => ws.add(k)));
+    return [rgName(g), ps.length, ...ALLST.map(st => c[st] || 0), ps.filter(p => p.tw.a === 'over').length, ps.filter(p => p.tw.a === 'high').length, ps.filter(repWatch).length, [...ws].join('; ')]; })]);
+}
+function openZone(g) {
+  g = +g; const r = GEO.rg[g]; if (!r) return;
+  const ps = P.filter(p => p.g === g), c = cntBy(ps);
+  const key = p => r.bk ? (p.d ? p.d + '|' + p.pv : '') : (p.pv || ''), lab = k => r.bk ? (k ? k.split('|')[0] + (k.split('|')[1] === 'กรุงเทพฯ' ? '' : ' ' + k.split('|')[1]) : 'ไม่ระบุเขต') : (k || 'ไม่ทราบจังหวัด');
+  const groups = new Map(); ps.forEach(p => { const k = key(p); (groups.get(k) || groups.set(k, []).get(k)).push(p); });
+  const ws = new Map(); ps.forEach(p => p._ws.forEach(k => { const x = WS.get(k).ps.get(p.i); const o = ws.get(k) || ws.set(k, { ov: 0, hi: 0, ps: [] }).get(k); o[x.lv === 'over' ? 'ov' : 'hi']++; o.ps.push(p); }));
+  let h = `<div class="dacts"><button class="btn sm" type="button" data-zdl="${g}">ดาวน์โหลดรายชื่อโครงการ CSV</button></div>${r.sub ? `<p class="note">${esc(r.sub)}</p>` : ''}
+    <div class="zc-stats">${ALLST.filter(st => c[st]).map(st => tagN(st, c[st])).join(' ')}</div>
+    <p class="note">หน้างานกรอกเฝ้าระวัง ${ps.filter(repWatch).length} · ในรัศมีสถานีล้นตลิ่ง ${ps.filter(p => p.tw.a === 'over').length} · น้ำมาก ${ps.filter(p => p.tw.a === 'high').length}</p>`;
+  h += `<h4>${r.bk ? 'รายเขต/อำเภอ' : 'รายจังหวัด'} กดที่แถวเพื่อกรองทั้งหน้า</h4><div class="tablebox cap"><table class="sortable mini2"><thead><tr><th>${r.bk ? 'เขต/อำเภอ' : 'จังหวัด'}</th><th class="n">โครงการ</th><th class="n">ท่วมแล้ว</th><th class="n">เฝ้าระวังขึ้นไป</th><th class="n">ปกติ</th><th class="n">ในรัศมีล้นตลิ่ง</th><th class="n">หน้างานกรอกเฝ้าระวัง</th></tr></thead><tbody>` +
+    [...groups].sort((a, b) => b[1].length - a[1].length).map(([k, q]) => `<tr ${r.bk ? (k ? `data-dfz="${esc(k)}" data-g2="${g}"` : '') : `data-pvz="${esc(k)}" data-g2="${g}"`} tabindex="0"><td>${esc(lab(k))}</td><td class="n">${q.length}</td><td class="n">${q.filter(isFlooded).length || '–'}</td><td class="n">${q.filter(isAffected).length || '–'}</td><td class="n">${q.filter(p => p.st === 'ปกติ').length || '–'}</td><td class="n">${q.filter(p => p.tw.a === 'over').length || '–'}</td><td class="n">${q.filter(repWatch).length || '–'}</td></tr>`).join('') + '</tbody></table></div>';
+  if (ws.size) h += `<h4>แหล่งน้ำที่เตือนในโซนนี้</h4><div class="tablebox"><table class="sortable mini2"><thead><tr><th>แหล่งน้ำ</th><th>ระดับเตือนสูงสุด</th><th class="n">ในรัศมีล้นตลิ่ง</th><th class="n">ในรัศมีน้ำมาก</th><th>สถานะโครงการ</th></tr></thead><tbody>` +
+    [...ws].sort((a, b) => b[1].ov - a[1].ov || b[1].ps.length - a[1].ps.length).map(([k, o]) => `<tr data-ws="${esc(k)}" tabindex="0"><td><b>${esc(WS.get(k).n)}</b></td><td data-v="${WS.get(k).lv === 'over' ? 0 : 1}" data-csv="${WS.get(k).lv === 'over' ? 'ล้นตลิ่ง' : 'น้ำมาก'}">${lvTag(WS.get(k).lv)}</td><td class="n">${o.ov || '–'}</td><td class="n">${o.hi || '–'}</td><td data-csv="${esc(stCsv(o.ps))}">${stTags(o.ps)}</td></tr>`).join('') + '</tbody></table></div>';
+  h += `<h4>โครงการในโซน ${ps.length} โครงการ</h4><div class="tablebox cap"><table class="sortable mini2"><thead><tr><th>โครงการ</th><th>โซน</th><th>เขต/อำเภอ</th><th>ThaiWater</th><th>สถานะ</th><th>หน้างานกรอก</th></tr></thead><tbody>` +
+    ps.sort((a, b) => S[a.st].o - S[b.st].o || A[a.tw.a].o - A[b.tw.a].o || a.n.localeCompare(b.n, 'th')).map(p => projRowHTML(p, `<td data-v="${A[p.tw.a].o}" data-csv="${A[p.tw.a].t}"><span class="lv l-${A[p.tw.a].lv}">${A[p.tw.a].s}</span></td>`)).join('') + '</tbody></table></div>';
+  openSheet(rgName(g), `${ps.length} โครงการ · ท่วมแล้ว ${ps.filter(isFlooded).length} · เฝ้าระวังขึ้นไป ${ps.filter(isAffected).length}`, h, true);
+}
+$('zcDl').onclick = () => saveFile(`สรุปรายโซน_${todayStamp()}.csv`, zonesSummaryCSV());
+
+/* ---------- area table: zone / province / district ---------- */
+function renderZones() {
+  const list = current({ area: true }), lv = F.lv, key = p => lv === 'g' ? String(p.g ?? '') : lv === 'pv' ? (p.pv || '') : (p.d ? p.d + '|' + p.pv : '');
+  const lab = k => lv === 'g' ? rgName(k === '' ? null : +k) : lv === 'pv' ? (k || 'ไม่ทราบจังหวัด') : (k ? k.split('|').join(' จ.') : 'ไม่ระบุเขต/อำเภอ');
+  const m = new Map(); list.forEach(p => { const k = key(p) || ''; (m.get(k) || m.set(k, []).get(k)).push(p); });
+  const rows = [...m].map(([k, ps]) => { const c = cntBy(ps);
+    return { k, ps, n: ps.length, v: ALLST.map(st => c[st] || 0), ov: ps.filter(p => p.tw.a === 'over').length, hi: ps.filter(p => p.tw.a === 'high').length, rw: ps.filter(repWatch).length, rg: ps.filter(inReg).length, g: ps[0].g }; })
+    .sort((a, b) => b.v[0] - a.v[0] || b.v[1] - a.v[1] || b.v[2] - a.v[2] || b.v[3] - a.v[3] || b.ov - a.ov || b.n - a.n);
+  const sel = lv === 'g' ? $('fRegion').value : lv === 'pv' ? $('fProv').value : F.dist;
+  const cell = (v, k) => `<td class="n ${v ? 's-' + k : 'z0'}" data-v="${v}">${v ? `<b>${v}</b>` : '0'}</td>`, plain = v => `<td class="n ${v ? '' : 'z0'}" data-v="${v}">${v}</td>`;
+  $('zHead').querySelector('.sb') ? ($('zHead').querySelector('.sb').textContent = lv === 'g' ? 'โซน' : lv === 'pv' ? 'จังหวัด' : 'เขต/อำเภอ') : ($('zHead').textContent = lv === 'g' ? 'โซน' : lv === 'pv' ? 'จังหวัด' : 'เขต/อำเภอ');
+  $('zbody').innerHTML = rows.map(r => `<tr data-zk="${esc(r.k)}" tabindex="0" aria-selected="${r.k !== '' && r.k === sel}">
+    <td data-v="${esc(lab(r.k))}" data-csv="${esc(lab(r.k))}"><b>${r.g != null && lv !== 'd' ? `<i class="rsw rg${r.g}"></i>` : ''}${esc(lab(r.k))}</b><span class="zbar">${r.v.map((v, i) => v ? `<i class="s-${KEYS[i]}" style="width:${v / r.n * 100}%"></i>` : '').join('')}</span></td>
+    <td class="n">${r.n}</td>${r.v.map((v, i) => cell(v, KEYS[i])).join('')}${plain(r.ov)}${plain(r.hi)}${plain(r.rw)}</tr>`).join('');
+  resort($('ztable'));
+}
+function pickZone(k) {
+  if (k === '') return;
+  if (F.lv === 'g') { $('fRegion').value = $('fRegion').value === k ? '' : k; $('fProv').value = ''; F.dist = ''; }
+  else if (F.lv === 'pv') { $('fProv').value = $('fProv').value === k ? '' : k; }
+  else F.dist = F.dist === k ? '' : k;
+  apply();
+}
+function pickRegion(g) { const k = String(g); if (!GEO.rg[+k]) return; $('fRegion').value = $('fRegion').value === k ? '' : k; $('fProv').value = ''; F.dist = ''; apply(); }
+
+/* ---------- maps ---------- */
+function zoomer(svg, W, H, minW, draw) {
+  const v = { x: 0, y: 0, w: W, h: H }; let d = null, raf = 0;
+  const clamp = () => { v.w = Math.min(W, Math.max(minW, v.w)); v.h = v.w * H / W; v.x = Math.min(W - v.w, Math.max(0, v.x)); v.y = Math.min(H - v.h, Math.max(0, v.y)); };
+  const set = () => svg.setAttribute('viewBox', [v.x, v.y, v.w, v.h].map(n => n.toFixed(3)).join(' '));
+  const zoom = (f, c) => { const cx = c ? c[0] : v.x + v.w / 2, cy = c ? c[1] : v.y + v.h / 2; v.w = c ? W / f : v.w / f; v.h = v.w * H / W; v.x = cx - v.w / 2; v.y = cy - v.h / 2; clamp(); draw(); hideTip(); };
+  const fit = (x0, y0, x1, y1) => { v.w = Math.max((x1 - x0) * 1.3, (y1 - y0) * 1.3 * W / H); clamp(); v.x = (x0 + x1) / 2 - v.w / 2; v.y = (y0 + y1) / 2 - v.h / 2; clamp(); draw(); hideTip(); };
+  svg.addEventListener('pointerdown', e => { if (v.w >= W * .999) return; d = { x: e.clientX, y: e.clientY, vx: v.x, vy: v.y }; });
+  addEventListener('pointermove', e => { if (!d) return; const s = v.w / svg.clientWidth, mx = e.clientX - d.x, my = e.clientY - d.y;
+    if (Math.abs(mx) + Math.abs(my) > 5) { dragged = true; hideTip(); } if (dragged) { v.x = d.vx - mx * s; v.y = d.vy - my * s; clamp(); set(); } });
+  addEventListener('pointerup', () => { d = null; });
+  /* mouse wheel: zoom around the pointer; at full extent a wheel-out scrolls the page as usual */
+  svg.addEventListener('wheel', e => {
+    const f = Math.exp(-e.deltaY * (e.deltaMode === 1 ? .06 : e.deltaMode === 2 ? 1 : .0018));
+    if (f < 1 && v.w >= W * .999) return;
+    e.preventDefault(); hideTip();
+    const r = svg.getBoundingClientRect(), px = v.x + (e.clientX - r.left) / r.width * v.w, py = v.y + (e.clientY - r.top) / r.height * v.h;
+    const nw = Math.min(W, Math.max(minW, v.w / f)), s = nw / v.w;
+    v.x = px - (px - v.x) * s; v.y = py - (py - v.y) * s; v.w = nw; clamp();
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; draw(); });
+  }, { passive: false });
+  return { v, zoom, fit, set, k: () => W / v.w, busy: () => !!d };
+}
+addEventListener('pointerdown', () => { dragged = false; }, true);
+const ix = lo => (lo - 97.2) * .974, iy = la => 20.6 - la;
+const poly = r => 'M' + r.map(([la, lo]) => ix(lo).toFixed(2) + ',' + iy(la).toFixed(2)).join('L') + 'Z';
+const TPATH = GEO.tp.map(p => [p, p.r.map(poly).join('')]), RPATH = GEO.rg.map(r => r.b.map(poly).join('')), ZTPATH = GEO.zt.map(z => [z, z.r.map(poly).join('')]);
+const PINNED = P.filter(p => p.la != null).sort((a, b) => S[b.st].o - S[a.st].o);
+const tsvg = $('thmap'), tz = zoomer(tsvg, 8.3, 15.55, .35, () => renderTH(current()));
+function fitRegion(g) { let x0 = 99, y0 = 99, x1 = -99, y1 = -99;
+  GEO.rg[g].b.forEach(r => r.forEach(([la, lo]) => { const x = ix(lo), y = iy(la); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }));
+  tz.fit(x0, y0, x1, y1); }
+const ringOf = p => { const ws = $('fWs').value; if (ws) { const x = WS.get(ws) && WS.get(ws).ps.get(p.i); return x ? x.lv : ''; } return p.tw.a === 'over' ? 'over' : ''; };
+/* ---------- waterways on both maps: blue lines, darker = more alarming ---------- */
+let WW = GEO.ww || [], WWSRC = GEO.wwsrc || 'Natural Earth', WWC = null;
+const wwKey = n => String(n || '').replace(/[\s\-–.()]/g, '');
+function wwSet(ways, src) { WW = ways || []; WWSRC = src || ''; WWC = null; }
+function wwCache() {
+  if (WWC) return WWC;
+  const th = [], bm = [];
+  WW.forEach((w, i) => {
+    const dT = w.g.map(l => 'M' + l.map(([la, lo]) => ix(lo).toFixed(3) + ' ' + iy(la).toFixed(3)).join('L')).join('');
+    const dB = w.g.map(l => 'M' + l.map(q => proj(q).map(v => v.toFixed(1)).join(' ')).join('L')).join('');
+    if (w.t !== 'canal') th.push([i, dT]); bm.push([i, dB]);
+  });
+  return WWC = { th, bm, at: null, lv: [] };
+}
+function wwLevels() {
+  const c = wwCache(), key = (TWCUR && TWCUR.at) + '|' + WS.size + '|' + WW.length; if (c.at === key) return c.lv;
+  const byName = new Map(); WS.forEach(w => { const k = wwKey(w.n), v = w.lv === 'over' ? 2 : 1; if ((byName.get(k) || 0) < v) byName.set(k, v); });
+  const pts = typeof WW_PTS === 'function' ? WW_PTS() : [];
+  c.lv = WW.map(w => { let v = byName.get(wwKey(w.n)) || 0;
+    if (pts.length && v < 2) for (const p of pts) { if (p.lv <= v) continue; const kx = 111.3 * Math.cos(p.la * Math.PI / 180);
+      if (w.g.some(l => l.some(([la, lo]) => Math.abs(la - p.la) < .015 && Math.abs(lo - p.lo) < .015 && Math.hypot((la - p.la) * 110.6, (lo - p.lo) * kx) <= 1.5))) v = p.lv; }
+    return v; });
+  c.at = key; return c.lv;
+}
+const WWN = ['ปกติหรือไม่มีสถานี', 'มีสถานีน้ำมาก', 'มีสถานีล้นตลิ่ง'];
+const wwTip = i => esc((WW[i].n || (WW[i].t === 'canal' ? 'คลอง' : 'แม่น้ำ') + 'ไม่ระบุชื่อ') + ' · ' + WWN[wwLevels()[i]]);
+function wwTH(k) { const lv = wwLevels(), w = [.028, .045, .062]; return [0, 1, 2].map(L => wwCache().th.filter(([i]) => lv[i] === L).map(([i, d]) => `<path class="ww l${L}" d="${d}" stroke-width="${(w[L] / k).toFixed(4)}" data-tipt="${wwTip(i)}"/>`).join('')).join(''); }
+function wwBM() { const lv = wwLevels(); return [0, 1, 2].map(L => wwCache().bm.filter(([i]) => lv[i] === L).map(([i, d]) => `<path class="ww l${L}" d="${d}" vector-effect="non-scaling-stroke" data-tipt="${wwTip(i)}"/>`).join('')).join(''); }
+function renderTH(list) {
+  const k = tz.k(), on = new Set(list.map(p => p.i)), selRg = $('fRegion').value, selPv = $('fProv').value, w = GEO.win, u = v => (v / k).toFixed(3);
+  tz.set(); tsvg.classList.toggle('zoomed', k > 1.01); tsvg.style.setProperty('--k', k.toFixed(3));
+  const x1 = ix(w[1]), x2 = ix(w[3]), y1 = iy(w[2]), y2 = iy(w[0]), ym = (y1 + y2) / 2, X0 = 3.45, Y0 = 10.2;
+  const byPv = {}; P.forEach(p => { if (p.pv) (byPv[p.pv] = byPv[p.pv] || []).push(p); });
+  const top = Object.entries(byPv).sort((a, b) => b[1].length - a[1].length).slice(0, 6);
+  tsvg.innerHTML = TPATH.filter(x => x[0].g >= 0).map(([p, d]) => `<path class="tpv rg${p.g}${p.n === selPv ? ' sel' : ''}${selRg !== '' && String(p.g) !== selRg ? ' dim' : ''}" data-g="${p.g}" data-pv="${p.n}" d="${d}"/>`).join('') +
+    ZTPATH.map(([z, d]) => `<path class="tpv rg${z.g}${selRg !== '' && String(z.g) !== selRg ? ' dim' : ''}" data-g="${z.g}" d="${d}"/>`).join('') +
+    TPATH.filter(x => x[0].g < 0).map(([p, d]) => `<path class="tpv nb${p.n === selPv ? ' sel' : ''}" d="${d}"/>`).join('') +
+    RPATH.map((d, i) => `<path class="rgb${selRg === String(i) ? ' sel' : ''}" d="${d}" stroke-width="${u(selRg === String(i) ? .11 : .055)}"/>`).join('') +
+    wwTH(k) +
+    GEO.rg.map((r, i) => r.bk && k < 5 ? '' : `<text class="rgl" x="${ix(r.at[1]).toFixed(2)}" y="${(iy(r.at[0]) + .08).toFixed(2)}" font-size="${u(.25)}" stroke-width="${u(.08)}">${r.s}</text>`).join('') +
+    `<rect class="frame" x="${x1.toFixed(2)}" y="${y1.toFixed(2)}" width="${(x2 - x1).toFixed(2)}" height="${(y2 - y1).toFixed(2)}" stroke-width="${u(.06)}" pointer-events="none"/>` +
+    (k < 1.05 ? `<line class="lead" x1="${x2.toFixed(2)}" y1="${ym.toFixed(2)}" x2="8" y2="${ym.toFixed(2)}"/><path class="arrow" d="M8.25 ${ym.toFixed(2)}l-.3-.16v.32z"/>` +
+      `<text class="cap leadlab" x="8.2" y="${(ym - .32).toFixed(2)}" text-anchor="end">ภาพขยายพื้นที่ในกรอบ</text><text class="ttl" x="8.1" y=".85">ประเทศไทย</text>` +
+      `<text class="cap" x="${X0}" y="${Y0 - .62}">จังหวัดที่มีโครงการมากที่สุด</text>` +
+      top.map(([n, ps], i) => { const y = Y0 + i * .56, c = k2 => ps.filter(p => S[p.st].k === k2).length, pg = GEO.tp.find(t => t.n === n);
+        return `<rect class="tpv ${pg && pg.g >= 0 ? 'rg' + pg.g : 'nb'}" style="${pg && pg.g >= 0 ? '' : 'fill:var(--land);stroke-opacity:.6'}" x="${X0}" y="${(y - .26).toFixed(2)}" width=".3" height=".3" rx=".05" pointer-events="none"/><text class="rn" x="${X0 + .42}" y="${y.toFixed(2)}">${n.replace('พระนครศรี', '').replace('ประจวบคีรีขันธ์', 'ประจวบฯ')}</text><text class="rt" x="${(X0 + 2.75).toFixed(2)}" y="${y.toFixed(2)}">${ps.length}</text>` +
+          KEYS.slice(0, 5).map(k2 => [k2, c(k2)]).filter(x => x[1]).map(([k2, v], j) => `<g class="pill s-${k2}"><circle cx="${(X0 + 3.1 + j * .46).toFixed(2)}" cy="${(y - .1).toFixed(2)}" r=".2"/><text x="${(X0 + 3.1 + j * .46).toFixed(2)}" y="${(y - .02).toFixed(2)}">${v}</text></g>`).join(''); }).join('') : '') +
+    PINNED.filter(p => on.has(p.i) && ringOf(p)).map(p => `<circle class="tr ${ringOf(p)}" cx="${ix(p.lo).toFixed(3)}" cy="${iy(p.la).toFixed(3)}" r="${u(.15)}" stroke-width="${u(.035)}" pointer-events="none"/>`).join('') +
+    STN().map(([s, j]) => `<g class="stn s${s.sit}" data-sti="${j}" transform="translate(${ix(s.lo).toFixed(3)} ${iy(s.la).toFixed(3)}) scale(${(.012 / k).toFixed(5)})"><path d="M0-7L6.5 4.5H-6.5Z" stroke-width="1.4"/></g>`).join('') +
+    PINNED.map(p => `<circle class="tp s-${S[p.st].k}${on.has(p.i) ? '' : ' off'}" data-i="${p.i}" cx="${ix(p.lo).toFixed(3)}" cy="${iy(p.la).toFixed(3)}" r="${u(.075)}" stroke-width="${u(.022)}"/>`).join('');
+}
+$('tIn').onclick = () => tz.zoom(1.8); $('tOut').onclick = () => tz.zoom(1 / 1.8); $('tAll').onclick = () => tz.zoom(1, [4.15, 7.8]);
+
+const MP = { lon0: 100.14, lat1: 14.42, K: 900, C: 0.9707, W: 699, H: 873 };
+const proj = ([la, lo]) => [(lo - MP.lon0) * MP.C * MP.K, (MP.lat1 - la) * MP.K];
+const ringD = r => 'M' + r.map(p => proj(p).map(v => v.toFixed(1)).join(',')).join('L') + 'Z';
+const PIN = 'M0 0C-3.2-5-5-7.4-5-10.2A5 5 0 1 1 5-10.2C5-7.4 3.2-5 0 0Z';
+const INWIN = PINNED.filter(p => p.la >= GEO.win[0] && p.la <= GEO.win[2] && p.lo >= GEO.win[1] && p.lo <= GEO.win[3]).sort((a, b) => S[b.st].o - S[a.st].o || b.la - a.la);
+const psvg = $('pmap'), pz = zoomer(psvg, MP.W, MP.H, MP.W / 18, () => renderBMR(current()));
+const PVD = GEO.pv.filter(p => p.g >= 0).map(p => `<path class="pv rg${p.g}" data-g="${p.g}" d="${p.r.map(ringD).join('')}" vector-effect="non-scaling-stroke"/>`).join('');
+const PVN = GEO.pv.filter(p => p.g < 0).map(p => `<path class="pv nb" d="${p.r.map(ringD).join('')}" vector-effect="non-scaling-stroke"/>`).join('');
+const ZPD = GEO.zp.map(z => [z, z.r.map(ringD).join('')]);
+function fitBMR(rg) { const z = GEO.zp.find(x => String(x.g) === rg); if (!z) return pz.zoom(1, [MP.W / 2, MP.H / 2]);
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; z.r.forEach(r => r.forEach(q => { const [x, y] = proj(q); x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }));
+  pz.fit(x0, y0, x1, y1); }
+function renderBMR(list) {
+  const k = pz.k(), on = new Set(list.map(p => p.i)), u = v => (v / k).toFixed(2);
+  pz.set(); psvg.classList.toggle('zoomed', k > 1.01);
+  const selRg = $('fRegion').value;
+  psvg.innerHTML = PVD + ZPD.map(([z, d]) => `<path class="pv zn4 rg${z.g}${selRg === String(z.g) ? ' sel' : selRg !== '' ? ' dim' : ''}" data-g="${z.g}" d="${d}" vector-effect="non-scaling-stroke"/>`).join('') + PVN + wwBM() +
+    GEO.pv.filter(p => p.a > .02 && p.g >= 0).map(p => { const [x, y] = proj(p.at); return `<text class="pvlab" x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${u(11.5)}">${p.n}</text>`; }).join('') +
+    INWIN.map(p => { const [x, y] = proj([p.la, p.lo]), rg = on.has(p.i) ? ringOf(p) : ''; return `<g class="pp s-${S[p.st].k}${on.has(p.i) ? '' : ' off'}" data-i="${p.i}" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${(.85 / k).toFixed(4)})">${rg ? `<circle class="pr ${rg}" cy="-10.2" r="8.6"/>` : ''}<path d="${PIN}"/><circle cy="-10.2" r="1.7"/></g>`; }).join('') +
+    STN().filter(([s]) => s.la >= GEO.win[0] && s.la <= GEO.win[2] && s.lo >= GEO.win[1] && s.lo <= GEO.win[3]).map(([s, j]) => { const [x, y] = proj([s.la, s.lo]); return `<g class="stn s${s.sit}" data-sti="${j}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${(1 / k).toFixed(4)})"><path d="M0-8L7 5H-7Z" stroke-width="1.6"/></g>`; }).join('') +
+    GEO.zp.map(z => { const [x, y] = proj(z.at), r = GEO.rg[z.g]; return `<text class="zlab${selRg !== '' && selRg !== String(z.g) ? ' dim' : ''}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${u(12.5)}" stroke-width="${u(3.2)}">${r.s}</text>`; }).join('');
+}
+$('pIn').onclick = () => pz.zoom(1.6); $('pOut').onclick = () => pz.zoom(1 / 1.6);
+$('pBkk').onclick = () => pz.zoom(2.6, proj([13.77, 100.58])); $('pAll').onclick = () => pz.zoom(1, [MP.W / 2, MP.H / 2]);
+function renderLegends(list) {
+  const c = cntBy(list), on = new Set(list.map(p => p.i)), pin = PINNED.filter(p => on.has(p.i)), inw = INWIN.filter(p => on.has(p.i)), ws = $('fWs').value;
+  const nr = pin.filter(p => ringOf(p)).length;
+  $('plegend').innerHTML = `<span class="wwlg">ทางน้ำ <i class="l0"></i>ปกติ <i class="l1"></i>น้ำมาก <i class="l2"></i>ล้นตลิ่ง</span>` + ALLST.map(st => `<span><svg width="14" height="18" viewBox="-7 -17 14 18" class="s-${S[st].k}"><path d="${PIN}" fill="var(--c)" stroke="var(--line)"/></svg>${stName(st)} ${c[st] || 0}</span>`).join('') +
+    `<span><svg width="18" height="18" viewBox="-9 -9 18 18"><circle r="6.5" class="lgr over"/></svg>${ws ? 'อยู่ในรัศมีแหล่งน้ำที่เลือก' : 'อยู่ในรัศมีสถานีล้นตลิ่ง'} ${nr}</span>` +
+    (ws ? `<span><svg width="18" height="18" viewBox="-9 -9 18 18"><circle r="6.5" class="lgr high"/></svg>ในรัศมีสถานีน้ำมากของแหล่งน้ำนี้</span>` : '') +
+    (STN().length ? `<span><svg width="16" height="16" viewBox="-8 -9 16 16"><path class="lgs" d="M0-7L6.5 4.5H-6.5Z"/></svg>สถานีล้นตลิ่ง ${STN().filter(([s]) => s.sit === 5).length}</span><span><svg width="16" height="16" viewBox="-8 -9 16 16"><path class="lgs s4" d="M0-7L6.5 4.5H-6.5Z"/></svg>สถานีน้ำมาก ${STN().filter(([s]) => s.sit === 4).length}</span>` : '') +
+    `<span>ปักตามพิกัด ${pin.length} โครงการ อยู่ในภาพขยาย ${inw.length} ไม่มีพิกัด ${list.length - pin.length}</span>`;
+}
+
+/* ---------- project table ---------- */
+function chip(p, extra) { return `<button class="chip s-${S[p.st].k}" type="button" data-i="${p.i}">${esc(p.n)}${extra ? ` <small>${esc(extra)}</small>` : ''}</button>`; }
+function renderTable(list) {
+  const rows = [...list].sort((a, b) => S[a.st].o - S[b.st].o || A[a.tw.a].o - A[b.tw.a].o || a.n.localeCompare(b.n, 'th'));
+  $('tbody').innerHTML = rows.map(p => { const a = A[p.tw.a], d = wsDist(p);
+    return `<tr data-i="${p.i}" tabindex="0"><td data-v="${esc(p.n)}"><b>${esc(p.n)}</b></td><td>${esc(p.io)}</td><td>${esc(p.bu)}</td><td data-v="${p.g ?? 99}" data-csv="${esc(zShort(p.g))}">${esc(p.g != null && GEO.rg[p.g].bk ? 'กทม. ' + GEO.rg[p.g].no : zShort(p.g))}</td><td>${esc(p.d || '–')}</td><td>${esc(p.pv || '–')}</td>
+      <td data-v="${S[p.st].o}" data-csv="${stShort(p.st)}">${tag(p.st)}</td><td data-csv="${SRC[p.src]}">${p.src === 'ert' ? 'ERT Update' : p.src === 'calc' ? 'สูตรประกาศ' : p.src === 'river' ? 'ระยะแม่น้ำ' : 'ไม่มีข้อมูล'}</td><td data-v="${p.rep ? (p.rep === 'เฝ้าระวัง' ? 0 : 1) : ''}" data-csv="${p.rep || ''}">${p.rep ? (repWatch(p) ? '<span class="flag f-rep">เฝ้าระวัง</span>' : esc(p.rep)) : '–'}</td><td data-v="${a.o}" data-csv="${a.t}"><span class="lv l-${a.lv}">${a.s}</span></td><td>${esc(wsName(p) || '–')}</td><td class="n" data-v="${d ?? ''}">${d != null ? d.toFixed(1) : '–'}</td><td class="rvcol">${esc(p.rv && p.rv.near && p.rv.near[0] ? p.rv.near[0].n : p.rv && p.rv.rv ? p.rv.rv.n : '–')}</td><td class="n rvcol" data-v="${rvD(p) ?? ''}">${rvD(p) != null ? rvD(p).toFixed(1) : '–'}</td>${bmaCell(p)}</tr>`; }).join('');
+  $('empty').hidden = rows.length > 0; $('ptable').hidden = rows.length === 0; resort($('ptable'));
+}
+
+/* ---------- tooltip ---------- */
+const tip = $('tip');
+function tipHTML(p) {
+  const a = A[p.tw.a], tl = twLines(p);
+  return `<div class="tn">${esc(p.n)}</div><div class="dim">${esc(p.bu)} ${esc(area(p))} · ${esc(zShort(p.g))}</div>
+    <div class="row s-${S[p.st].k}"><span class="dot"></span><span><b>${stName(p.st)}</b> <span class="dim">${SRC[p.src]}</span></span></div>
+    ${p.rep && p.rep !== p.st ? `<div class="dim">หน้างานกรอกสถานะ ${p.rep}</div>` : ''}${inReg(p) ? `<div class="dim">ทะเบียนผลกระทบ: ${esc(regText(p))}</div>` : ''}
+    <hr><b>${a.t}</b>${tl.length ? `<ul>${tl.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}<div class="dim">กดเพื่อดูรายละเอียด</div>`;
+}
+function showTip(el) {
+  const d = el.dataset;
+  const html = d.sti != null ? stnTip(+d.sti) : d.tz != null ? zoneTip(+d.tz) : d.i != null && P[+d.i] ? tipHTML(P[+d.i]) : d.g != null ? zoneTip(+d.g, d.pv) : d.tipt ? `<div>${esc(d.tipt)}</div>` : '';
+  if (!html) return hideTip();
+  tip.innerHTML = html; tip.classList.add('on');
+  const r = el.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+  let x = Math.min(Math.max(12, r.left + r.width / 2 - 20), innerWidth - tw - 12), y = r.bottom + 8;
+  if (y + th > innerHeight - 8) y = Math.max(8, r.top - th - 8);
+  tip.style.left = x + 'px'; tip.style.top = y + 'px';
+}
+const hideTip = () => tip.classList.remove('on');
+const TIPSEL = '[data-sti],[data-tz],[data-tipt],.chip,.pp,.tp,path.tpv,path.pv', hoverable = matchMedia('(hover:hover)').matches;
+document.addEventListener('mouseover', e => { if (!hoverable || tz.busy() || pz.busy()) return; if (e.target.closest('dialog')) return hideTip(); const el = e.target.closest(TIPSEL); el ? showTip(el) : hideTip(); });
+document.addEventListener('focusin', e => { const el = e.target.closest('[data-tz],[data-tipt],.chip'); if (el && e.target.matches(':focus-visible')) showTip(el); else hideTip(); });
+addEventListener('scroll', hideTip, { passive: true });
+
+
+/* ---------- detail ---------- */
+function openDetail(i) {
+  const p = P[i], a = A[p.tw.a], t = p.tw, tl = twLines(p), kv = [];
+  const add = (k, v) => { if (v !== '' && v != null) kv.push(`<dt>${k}</dt><dd>${esc(v)}</dd>`); };
+  let h = `<p><span class="tag s-${S[p.st].k}">${stName(p.st)}</span> ${SRC[p.src]}</p><p class="note">${esc(p.why)}</p>`;
+  if (p.rep && p.rep !== p.st && p.src === 'calc') h += `<p class="note">หน้างานกรอกสถานะ <b>${esc(p.repraw)}</b> แต่ไม่มีตัวเลขระดับน้ำ สถานะตามสูตรจึงเป็น${esc(stName(p.st))}</p>`;
+  h += `<h4>ค่าที่ใช้กับสูตรประกาศ</h4><dl class="kv"><dt>น้ำหน้าถนนโครงการ</dt><dd>${p.road != null ? p.road + ' ซม.' : 'ยังไม่มีตัวเลข'}</dd><dt>ระดับน้ำบ่อในโครงการ</dt><dd>${p.pit != null ? p.pit + ' ซม.' : 'ยังไม่มีตัวเลข'}</dd><dt>น้ำในโครงการ</dt><dd>${p.inp != null ? p.inp + ' ซม.' : 'ยังไม่มีตัวเลข'}</dd><dt>ระบบไฟฟ้า</dt><dd>${p.pow != null ? (p.pow === 1 ? 'ใช้ไม่ได้' : 'ใช้ได้') : 'ยังไม่มีข้อมูล'}</dd></dl>`;
+  h += `<h4>สถานีวัดระดับน้ำ ThaiWater ในรัศมี (ข้อมูล ${esc(thDate(TWCUR.at))})</h4><div class="callout l-${a.lv}"><b>${a.t}</b>
+    ${t.nall != null ? `<span class="note"> สถานีในรัศมี ${t.nall} แห่ง ล้นตลิ่ง ${t.nov || 0} น้ำมาก ${t.nhi || 0}</span>` : ''}
+    ${tl.length ? `<ul>${tl.map(x => `<li>${x}</li>`).join('')}</ul>` : ''}
+    ${t.on && t.op != null ? `<p class="note" style="margin:8px 0 0">ระดับน้ำ ${(+t.op).toFixed(0)}% ของความจุลำน้ำ วัดเมื่อ ${esc(thShort(t.ot))}</p>` : ''}
+    ${p.la == null ? '<p class="note" style="margin:8px 0 0">โครงการนี้ไม่มีพิกัด จึงคำนวณสถานีในรัศมีไม่ได้</p>' : ''}</div>`;
+  if (p.rv) { const r = p.rv; h += `<h4>แม่น้ำและคลองใกล้โครงการ</h4><dl class="kv">${r.rv ? `<dt>แม่น้ำใกล้สุด</dt><dd>${esc(r.rv.n)} ${r.rv.d.toFixed(1)} กม.</dd>` : ''}${r.cn ? `<dt>คลองใกล้สุด</dt><dd>${esc(r.cn.n)} ${r.cn.d.toFixed(1)} กม.</dd>` : ''}${(r.near || []).length ? `<dt>ในรัศมี 6 กม.</dt><dd>${esc(r.near.map(x => x.n + ' ' + x.d.toFixed(1) + ' กม.').join(', '))}</dd>` : ''}</dl>`; }
+  h += bmaDetail(p);
+  if (hasEq(p) || rqText(p)) h += `<h4>อุปกรณ์และเสบียง (แบบสำรวจ)</h4><dl class="kv">${EQC.filter(([k]) => p.eq[k] != null).map(([k, l]) => `<dt>${l}</dt><dd>${nf(p.eq[k])}</dd>`).join('')}${p.eq.aid != null ? `<dt>ชุดปฐมพยาบาล</dt><dd>${p.eq.aid ? 'มี' : 'ไม่มี'}</dd>` : ''}${p.eq.safe != null ? `<dt>อุปกรณ์ Safety</dt><dd>${p.eq.safe ? 'มี' : 'ไม่มี'}</dd>` : ''}${rqText(p) ? `<dt>ขอสนับสนุนเพิ่ม</dt><dd>${esc(rqText(p))}</dd>` : ''}</dl>`;
+  add('สังกัด', p.bu); add('ประเภท', p.ty); add('โซน', p.g != null ? rgName(p.g) : ''); add('เขต/อำเภอ', p.d); add('จังหวัด', p.pv); add('พิกัด', p.la != null ? p.la + ', ' + p.lo : '');
+  h += `<h4>ข้อมูลโครงการ</h4><dl class="kv">${kv.join('')}</dl>`;
+  h += `<p style="margin-top:18px"><a class="fullbtn" href="${FULL}" target="_blank" rel="noopener">ดูข้อมูลเต็มในเวอร์ชันสำหรับทีมงาน ↗</a></p>`;
+  openSheet(p.n, [p.bu, p.io, p.ty].filter(Boolean).join(' / '), h, false);
+}
+$('dClose').onclick = () => $('dlg').close();
+/* ---------- notes ---------- */
+function renderNotes() {
+  const c = k => P.filter(p => p.src === k).length;
+  $('notes').innerHTML = [
+    'สถานะใช้สูตรประกาศ: ใช้สูตรเดิมก่อน และใช้สูตรเสริมเฉพาะกรณีที่สูตรเดิมได้ "ไม่ตรงเงื่อนไข" จาก 4 ค่า คือ น้ำหน้าถนนโครงการ ระดับน้ำบ่อในโครงการ น้ำในโครงการ และระบบไฟฟ้า ช่องที่เป็นข้อความหรือว่างนับเป็น 0',
+    `ข้อมูลสำรวจล่าสุดจากไฟล์ "คำตอบทั้งหมด" ${SV && SV.at ? 'อัปโหลดเมื่อ ' + d2th(SV.at) : 'ยังไม่มี'} สถานะตามสูตร ${c('calc')} โครงการ ตาม ERT Update ${c('ert')} โครงการ ไม่มีข้อมูล ${c('none')} โครงการ`,
+    `ระดับน้ำดึงจาก ThaiWater (api-v3.thaiwater.net) อัตโนมัติทุกชั่วโมง ชุดที่แสดงอยู่ดึงเมื่อ${thDate(TWCUR.at)} ${TWCUR.note ? '(' + TWCUR.note + ')' : ''} รัศมีเตือน แม่น้ำ/ลำน้ำ 10 กม. คลอง กทม. 3 กม. ไม่ใช้สถานีที่ข้อมูลเก่ากว่า 24 ชั่วโมง (คลอง กทม. 6 ชั่วโมง)`,
+    'กรุงเทพฯ และปริมณฑลแบ่งเป็น 4 โซน ฝั่งตะวันตกของแม่น้ำเจ้าพระยาเป็นโซน 4 ฝั่งตะวันออกแบ่งด้วยแนวถนนเพชรบุรี แนวอ่อนนุช และแนวลาดพร้าว–รามอินทรา ต่างจังหวัด 12 โซนเป็นการจัดกลุ่มจังหวัดที่ตั้งขึ้นสำหรับแดชบอร์ดนี้',
+    RVD ? `ระยะจากแม่น้ำและคลองคำนวณจาก OpenStreetMap เมื่อ${thDate(RVD.at)} โครงการที่ไม่มีตัวเลขระดับน้ำ ถ้าอยู่ห่างแม่น้ำไม่เกิน ${ZW2} กม. เป็นเฝ้าระวังพิเศษ ไม่เกิน ${ZW} กม. เป็นเฝ้าระวัง` : 'ยังไม่มีข้อมูลระยะจากแม่น้ำ ให้ผู้ดูแลรัน Actions › Rivers and canals หนึ่งครั้ง',
+    BM.at ? `ระดับน้ำคลอง กทม. จากเว็บสำนักการระบายน้ำ (weather.bangkok.go.th/water) ดึงอัตโนมัติทุกชั่วโมง ชุดล่าสุด ${thDate(BM.at)} หน่วย ม.รทก. ห่างตลิ่งคิดจากตลิ่งด้านที่ต่ำกว่า จุดวัดที่ไม่มีระดับตลิ่งใช้ระยะถึงระดับวิกฤตแทน ข้อมูลเก่ากว่า 3 ชั่วโมงถือว่าค้าง จุดวัดที่ไม่มีพิกัดจับคู่โครงการด้วยเขต จึงเป็นการจับคู่แบบหยาบ` : 'ยังไม่มีข้อมูลระดับน้ำคลอง กทม. ให้ผู้ดูแลรัน Actions › BMA canal levels hourly หนึ่งครั้ง',
+    'เว็บนี้เป็นฉบับสาธารณะ ไม่มีชื่อผู้รับผิดชอบ จำนวนผู้พักอาศัย และข้อมูลภายในอื่น ทีมงานดูข้อมูลเต็มได้จากปุ่ม "ดูเวอร์ชันเต็ม สำหรับทีมงาน"'
+  ].map(t => `<li>${esc(t)}</li>`).join('');
+}
+$('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });
+document.addEventListener('click', async e => {
+  const sb = e.target.closest('th .sb'); if (sb) { const th = sb.closest('th'); sortBy(th.closest('table'), th.cellIndex); return; }
+  const dl = e.target.closest('[data-dl]'); if (dl) { const tb = $(dl.dataset.dl); if (tb) saveFile(`${dl.dataset.fn || 'ข้อมูล'}_${todayStamp()}.csv`, tableCSV(tb)); return; }
+  const zdl = e.target.closest('[data-zdl]'); if (zdl) { saveFile(`โครงการ_${rgName(+zdl.dataset.zdl).replace(/[\\/:*?"<>|·]/g, '').replace(/\s+/g, ' ').trim()}_${todayStamp()}.csv`, zoneCSV(zdl.dataset.zdl)); return; }
+  const kp = e.target.closest('[data-kpi]'); if (kp) { const k = kp.dataset.kpi; if (k === 'over' || k === 'high') { $('fRisk').value = $('fRisk').value === k ? '' : k; apply(); } else if (k === 'aff') setSt(AFF); else if (k === 'repw') { $('fSrc').value = $('fSrc').value === 'repw' ? '' : 'repw'; apply(); } return; }
+  const stc = e.target.closest('.stc[data-st],.stc[data-fst]'); if (stc) { const st = stc.dataset.st || stc.dataset.fst; if (st === '__aff') setSt(AFF); else { F.st.has(st) ? F.st.delete(st) : F.st.add(st); apply(); } return; }
+  const un = e.target.closest('[data-unset]'); if (un) { const k = un.dataset.unset; if (k === 'rg') $('fRegion').value = ''; if (k === 'pv') $('fProv').value = ''; if (k === 'd') F.dist = ''; if (k === 'ws') $('fWs').value = ''; if (k === 'pick') { F.pick = null; $('q').value = ''; } apply(); return; }
+  const zo = e.target.closest('[data-zopen]'); if (zo) { openZone(zo.dataset.zopen); return; }
+  const wo = e.target.closest('[data-wsopen]'); if (wo) { openWs(wo.dataset.wsopen); return; }
+  const wm = e.target.closest('[data-wsmap]'); if (wm) { $('fWs').value = wm.dataset.wsmap; $('dlg').close(); apply(); $('hArea').scrollIntoView({ block: 'start', behavior: 'smooth' }); return; }
+  const dz = e.target.closest('[data-dfz],[data-pvz]'); if (dz) { $('fRegion').value = dz.dataset.g2; $('fProv').value = dz.dataset.pvz || ''; F.dist = dz.dataset.dfz || ''; $('dlg').close(); apply(); $('hArea').scrollIntoView({ block: 'start', behavior: 'smooth' }); return; }
+  const wr = e.target.closest('tr[data-ws]'); if (wr) { openWs(wr.dataset.ws); return; }
+  if (dragged) return;
+  if (e.target.closest('select,input,form')) return;
+  const el = e.target.closest('[data-i]'); if (el) return openDetail(+el.dataset.i);
+  const z = e.target.closest('[data-zk]'); if (z) return pickZone(z.dataset.zk);
+  const df = e.target.closest('[data-df]'); if (df) { F.dist = F.dist === df.dataset.df ? '' : df.dataset.df; return apply(); }
+  const pf = e.target.closest('[data-pvf]'); if (pf) { $('fProv').value = $('fProv').value === pf.dataset.pvf ? '' : pf.dataset.pvf; return apply(); }
+  const rg = e.target.closest('[data-g]'); if (rg) return pickRegion(rg.dataset.g);
+});
+document.addEventListener('keydown', e => { if (e.key !== 'Enter') return;
+  if (e.target.matches('tr[data-i]')) openDetail(+e.target.dataset.i); else if (e.target.matches('tr[data-zk]')) pickZone(e.target.dataset.zk);
+  else if (e.target.matches('tr[data-ws],tr[data-zopen],tr[data-dfz],tr[data-pvz]')) e.target.click(); });
+
+
+/* ---------- init ---------- */
+const opt = (id, vals, lab) => vals.forEach(v => $(id).insertAdjacentHTML('beforeend', `<option value="${esc(v)}">${esc(lab ? lab(v) : v)}</option>`));
+opt('fRegion', GEO.rg.map((r, i) => String(i)).sort((a, b) => (GEO.rg[b].bk ? 1 : 0) - (GEO.rg[a].bk ? 1 : 0) || a - b), v => rgName(+v));
+opt('fProv', [...new Set(P.map(p => p.pv).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'th')));
+FIDS.forEach(id => $(id).addEventListener('input', apply));
+['bmaScope', 'bmaQ'].forEach(id => $(id).addEventListener('input', () => renderBma(current())));
+document.addEventListener('click', e => { const r = e.target.closest('[data-bma]'); if (r && !e.target.closest('[data-i]')) { e.stopPropagation(); openBma(+r.dataset.bma); } }, true);
+document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches('tr[data-bma]')) openBma(+e.target.dataset.bma); });
+function setTab(t) {
+  TAB = t;
+  document.querySelectorAll('.tabs button').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  document.querySelectorAll('.page').forEach(p => { p.hidden = p.id !== 'pg-' + t; });
+  $('pg-' + t).querySelector('.fslot').appendChild($('filters'));
+  apply();
+}
+document.querySelectorAll('.tabs button').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+$('clear').onclick = () => { FIDS.forEach(id => $(id).value = ''); F.dist = ''; F.st.clear(); F.pick = null; apply(); };
+document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { F.lv = b.dataset.lv; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b)); $('ztable')._s = null; renderZones(); });
+$('asBma').textContent = BM.at ? thDate(BM.at) : 'ยังไม่มี';
+$('asSv').textContent = SV && SV.at ? thDate(SV.at) : 'ยังไม่มี';
+$('asErt').textContent = (() => { const a = Object.values(ERTI).map(e => e.at || '').sort().pop(); return a ? thDate(a) : 'ไม่มี'; })();
+sortInit(document);
+buildWS(); renderDaySel(); renderNotes(); apply();
+
+})();
+</script>
+</body>
+</html>
