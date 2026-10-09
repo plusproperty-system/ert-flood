@@ -696,6 +696,7 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
   <nav class="tabs" role="tablist" aria-label="หน้าของแดชบอร์ด">
     <button type="button" role="tab" id="tab-sit" data-tab="sit" aria-selected="true" aria-controls="pg-sit">สถานการณ์น้ำ</button>
     <button type="button" role="tab" id="tab-watch" data-tab="watch" aria-selected="false" aria-controls="pg-watch">อุปกรณ์และเสบียงของโครงการที่ต้องเฝ้าระวัง</button>
+    <button type="button" role="tab" id="tab-sup" data-tab="sup" aria-selected="false" aria-controls="pg-sup">อุปกรณ์และเสบียง</button>
   </nav>
   <p class="loadmsg" id="loadMsg">กำลังโหลดข้อมูล</p>
   <!-- ================= page 1 ================= -->
@@ -876,6 +877,43 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
     </div>
   </section>
   </div>
+  <div class="page" id="pg-sup" hidden>
+    <div class="fslot"></div>
+    <section class="sec first" aria-labelledby="hSup1">
+      <div class="sec-head"><h2 id="hSup1">ภาพรวมอุปกรณ์ช่วยเหลือ</h2><p>ตัวเลขตามตัวกรองด้านบน จากที่หน้างานกรอกในแบบสำรวจว่ามีอยู่และที่ขอสนับสนุนเพิ่ม</p></div>
+      <div class="tiles" id="supTiles"></div>
+    </section>
+    <section class="sec" aria-labelledby="hSup2">
+      <div class="sec-head"><h2 id="hSup2">อุปกรณ์แต่ละประเภท ที่มีอยู่เทียบกับที่ขอเพิ่ม</h2><button class="btn sm hdl" type="button" data-dl="eqTable" data-fn="อุปกรณ์รายประเภท">ดาวน์โหลด CSV</button></div>
+      <div class="tablebox">
+        <table id="eqTable" class="zt sortable" style="min-width:760px">
+          <thead><tr><th>รายการ</th><th class="n">มีอยู่รวม</th><th class="n">โครงการ<br>ที่รายงาน</th><th class="n">ในนี้<br>ไม่มีเลย</th><th class="n">ขอเพิ่มรวม</th><th class="n">โครงการ<br>ที่ขอ</th><th class="n">ขอจากโครงการ<br>ที่ท่วมแล้ว</th></tr></thead>
+          <tbody id="eqBody"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="sec" aria-labelledby="hSup3">
+      <div class="sec-head"><h2 id="hSup3">โครงการที่ควรจัดส่งก่อน</h2><button class="btn sm hdl" type="button" data-dl="prioTable" data-fn="โครงการที่ควรจัดส่งก่อน">ดาวน์โหลด CSV</button><p>โครงการสถานะเฝ้าระวังขึ้นไปที่ขอสนับสนุนเพิ่มหรือไม่มีปั๊มสูบน้ำ เรียงตามความรุนแรงของสถานะ กดที่แถวเพื่อเปิดข้อมูลโครงการ</p></div>
+      <div class="tablebox cap">
+        <table id="prioTable" style="min-width:760px" class="sortable">
+          <thead><tr><th>โครงการ</th><th>สถานะ</th><th>กระสอบทราย<br>มี / ขอเพิ่ม</th><th>ปั๊มสูบน้ำ<br>มี / ขอเพิ่ม</th><th>ขอเพิ่มอื่นๆ</th></tr></thead>
+          <tbody id="prioBody"></tbody>
+        </table>
+        <div class="empty" id="prioEmpty" hidden>ไม่มีโครงการที่เข้าเงื่อนไขตามตัวกรองนี้</div>
+      </div>
+      <p class="msg" id="prioNote"></p>
+    </section>
+    <section class="sec" aria-labelledby="hSup4">
+      <div class="sec-head"><h2 id="hSup4">โครงการที่ขออาหารและน้ำดื่ม</h2><button class="btn sm hdl" type="button" data-dl="foodTable" data-fn="โครงการที่ขออาหารและน้ำดื่ม">ดาวน์โหลด CSV</button><p>ตามที่หน้างานกรอกในแบบสำรวจ กดที่แถวเพื่อเปิดข้อมูลโครงการ</p></div>
+      <div class="tablebox cap">
+        <table id="foodTable" style="min-width:600px" class="sortable">
+          <thead><tr><th>โครงการ</th><th>สถานะ</th><th>เขต/อำเภอ จังหวัด</th><th>ขอเพิ่มอื่นๆ</th></tr></thead>
+          <tbody id="foodBody"></tbody>
+        </table>
+        <div class="empty" id="foodEmpty" hidden>ไม่มีโครงการที่ขออาหารและน้ำดื่มตามตัวกรองนี้</div>
+      </div>
+    </section>
+  </div>
 
   <footer>
     <h2>วิธีอ่านและข้อจำกัดของข้อมูล</h2>
@@ -917,8 +955,10 @@ const REPM = { 'คงที่': 'ปกติ', 'ลดลง': 'ปกติ'
 const MON = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
 const d2th = s => { const m = /^(\d{4})-(\d\d)-(\d\d)(?:[ T](\d\d:\d\d))?/.exec(String(s || '')); return m ? `${+m[3]} ${MON[+m[2] - 1]} ${+m[1] + 543}${m[4] ? ' ' + m[4] + ' น.' : ''}` : ''; };
 const SVR = SV && SV.rows ? SV.rows : {}, ERTI = ERTD && ERTD.items ? ERTD.items : {};
+/* public: drop head-counts (residents/workers) written into the free-text request */
+const rqClean = q => { if (typeof q.oth !== 'string') return q; const o = q.oth.replace(/(ช่วย)?\s*(ลูกบ้าน|ผู้พักอาศัย|คนงาน|ผู้เปราะบาง)\s*\d[\d,]*\s*คน/g, '').replace(/\s*\/\s*(?=\/|$)/g, '').replace(/^\s*\/\s*/, '').trim(); return { ...q, oth: o }; };
 const P = MST.projects.map((m, i) => {
-  const p = { ...m, i, sys: [], eq: (SV && SV.eq && SV.eq[m.k]) || {}, rq: (SV && SV.rq && SV.rq[m.k]) || {}, tw: (TWL.pj || {})[m.k] || { a: 'miss' }, bm: BM.pj[m.k] || null };
+  const p = { ...m, i, sys: [], eq: (SV && SV.eq && SV.eq[m.k]) || {}, rq: rqClean((SV && SV.rq && SV.rq[m.k]) || {}), tw: (TWL.pj || {})[m.k] || { a: 'miss' }, bm: BM.pj[m.k] || null };
   if (RVP[m.k]) p.rv = RVP[m.k];
   const r = SVR[m.k], e = ERTI[m.k];
   if (r) { p.pit = r.J ?? null; p.road = r.I ?? null; p.inp = r.K ?? null; p.pow = r.L ?? null; p.repraw = r.rep || ''; p.rep = REPM[String(r.rep || '').trim()] || ''; p.svat = r.at || ''; }
@@ -1240,6 +1280,7 @@ function apply() {
     if (rg !== lastRg || ws !== lastWs) { lastRg = rg; lastWs = ws; if (ws) fitWs(ws); else if (rg === '') { tz.zoom(1, [4.15, 7.8]); pz.zoom(1, [MP.W / 2, MP.H / 2]); } else { fitRegion(+rg); fitBMR(rg); } }
     renderDay(list); renderWs(); renderSelbar(); renderTH(list); renderBMR(list); renderLegends(list); renderZCards(list); renderZones(); renderTable(list); renderBma(list);
   } else if (TAB === 'watch') renderEqMon();
+  else if (TAB === 'sup') renderSupPub(list);
 }
 
 /* ---------- watch-list equipment monitor ---------- */
@@ -1594,6 +1635,46 @@ function renderTable(list) {
   $('empty').hidden = rows.length > 0; $('ptable').hidden = rows.length === 0; resort($('ptable'));
 }
 
+/* ---------- equipment and supplies (public: survey numbers only, no delivery log, no head-counts) ---------- */
+const EQP = [
+  { k: 'sand', n: 'กระสอบทราย', u: 'ใบ' }, { k: 'pump', n: 'ปั๊มสูบน้ำ', u: 'เครื่อง' }, { k: 'hp', n: 'เครื่องฉีดแรงดันน้ำ', u: 'เครื่อง' },
+  { k: 'mega', n: 'โทรโข่ง', u: 'ตัว' }, { k: 'light', n: 'ไฟฉายและอุปกรณ์แสงสว่าง', u: 'ชิ้น' }, { k: 'batt', n: 'แบตเตอรี่/Power box', u: 'ชุด' },
+  { k: 'fuel', n: 'น้ำมันสำรองสำหรับปั๊ม', u: 'ลิตร' }, { k: 'aid', n: 'ชุดปฐมพยาบาล', flag: 1 }, { k: 'safe', n: 'อุปกรณ์ Safety', flag: 1 },
+  { k: 'boat', n: 'เรือ', u: 'ลำ' }, { k: 'food', n: 'อาหารและน้ำดื่ม', rqOnly: 1 }
+];
+const RQFLAG = { safe: 1, food: 1 };
+const othOk = s => typeof s === 'string' && s.trim().length > 2 && !/^(-|ไม่มี|ยังไม่|วันนี้ยังไม่)/.test(s.trim());
+const rqOn = (p, k) => k === 'oth' ? othOk(p.rq.oth) : typeof p.rq[k] === 'number' && p.rq[k] > 0;
+const wantsHelpP = p => Object.keys(p.rq).some(k => rqOn(p, k));
+function renderSupPub(list) {
+  const aff = list.filter(isAffected), ask = list.filter(wantsHelpP);
+  const sumK = (ps, o, k) => ps.reduce((a, p) => a + (typeof p[o][k] === 'number' ? p[o][k] : 0), 0);
+  const noPump = aff.filter(p => p.eq.pump === 0), noSand = aff.filter(p => p.eq.sand === 0);
+  $('supTiles').innerHTML =
+    `<div class="tile"><b>${ask.length}</b><span>โครงการที่ขอสนับสนุนเพิ่ม</span><small>ในจำนวนนี้ท่วมแล้ว ${ask.filter(isFlooded).length} โครงการ และเฝ้าระวัง ${ask.filter(p => isAffected(p) && !isFlooded(p)).length} โครงการ</small></div>` +
+    `<div class="tile"><b>${nf(sumK(list, 'rq', 'sand'))}</b><span>กระสอบทรายที่ขอเพิ่ม (ใบ)</span><small>มีอยู่แล้ว ${nf(sumK(list, 'eq', 'sand'))} ใบ ใน ${list.filter(p => p.eq.sand > 0).length} โครงการ</small></div>` +
+    `<div class="tile"><b>${nf(sumK(list, 'rq', 'pump'))}</b><span>ปั๊มสูบน้ำที่ขอเพิ่ม (เครื่อง)</span><small>มีอยู่แล้ว ${nf(sumK(list, 'eq', 'pump'))} เครื่อง ใน ${list.filter(p => p.eq.pump > 0).length} โครงการ</small></div>` +
+    `<div class="tile"><b>${noPump.length}</b><span>โครงการเฝ้าระวังขึ้นไปที่ไม่มีปั๊มสูบน้ำ</span><small>ไม่มีกระสอบทราย ${noSand.length} โครงการ จากที่ได้รับผลกระทบ ${aff.length} โครงการ</small></div>`;
+  $('eqBody').innerHTML = EQP.map(e => {
+    const rep = e.rqOnly ? [] : list.filter(p => p.eq[e.k] != null), zero = rep.filter(p => p.eq[e.k] === 0).length;
+    const have = e.rqOnly ? '–' : e.flag ? nf(rep.length - zero) + ' โครงการ' : nf(sumK(list, 'eq', e.k)) + ' ' + e.u;
+    const rq = list.filter(p => rqOn(p, e.k)), rqn = sumK(list, 'rq', e.k), fl = rq.filter(isFlooded).length;
+    const want = !rq.length ? '0' : RQFLAG[e.k] ? rq.length + ' โครงการ' : nf(rqn) + ' ' + (e.u || '');
+    return `<tr><td><b>${e.n}</b></td><td class="n">${have}</td><td class="n">${e.rqOnly ? '–' : rep.length}</td><td class="n ${zero ? '' : 'z0'}">${e.rqOnly ? '–' : zero}</td>
+      <td class="n"><b style="background:none;border:0">${want}</b></td><td class="n">${rq.length}</td><td class="n ${fl ? 's-crit' : 'z0'}">${fl ? `<b>${fl}</b>` : '0'}</td></tr>`; }).join('');
+  const hv = (p, k) => `<span class="have">${p.eq[k] != null ? nf(p.eq[k]) : '<em>ไม่ระบุ</em>'} <em>/</em> <span class="want">${rqOn(p, k) ? '+' + nf(p.rq[k]) : '<em>–</em>'}</span></span>`;
+  const othTxt = p => { const a = ['safe', 'hp', 'boat', 'food'].filter(k => rqOn(p, k)).map(k => ({ safe: 'Safety', hp: 'ฉีดแรงดัน', boat: 'เรือ', food: 'อาหารและน้ำดื่ม' })[k] + (RQFLAG[k] ? '' : ' ' + nf(p.rq[k])));
+    if (othOk(p.rq.oth)) a.push(p.rq.oth.trim()); return a.join(' · '); };
+  const prio = aff.filter(p => wantsHelpP(p) || p.eq.pump === 0).sort((a, b) => S[a.st].o - S[b.st].o || (b.rq.pump || 0) - (a.rq.pump || 0) || (b.rq.sand || 0) - (a.rq.sand || 0));
+  $('prioBody').innerHTML = prio.map(p => `<tr data-i="${p.i}" tabindex="0"><td><b>${esc(p.n)}</b><small>${esc(p.bu)} ${esc(area(p))}</small></td><td data-v="${S[p.st].o}" data-csv="${stShort(p.st)}">${tag(p.st)}</td>
+      <td data-v="${p.eq.sand ?? ''}">${hv(p, 'sand')}</td><td data-v="${p.eq.pump ?? ''}">${hv(p, 'pump')}${p.eq.pump === 0 ? '<small>ไม่มีปั๊ม</small>' : ''}</td><td><small>${esc(othTxt(p).slice(0, 200)) || '–'}</small></td></tr>`).join('');
+  $('prioEmpty').hidden = prio.length > 0;
+  $('prioNote').textContent = prio.length ? `${prio.length} โครงการ ตัวเลขหลังเครื่องหมาย + คือจำนวนที่ขอเพิ่ม` : '';
+  const fd = list.filter(p => rqOn(p, 'food')).sort((a, b) => S[a.st].o - S[b.st].o);
+  $('foodBody').innerHTML = fd.map(p => `<tr data-i="${p.i}" tabindex="0"><td><b>${esc(p.n)}</b><small>${esc(p.bu)}</small></td><td data-v="${S[p.st].o}" data-csv="${stShort(p.st)}">${tag(p.st)}</td><td>${esc(area(p))}</td><td><small>${esc(othTxt(p).slice(0, 200)) || '–'}</small></td></tr>`).join('');
+  $('foodEmpty').hidden = fd.length > 0;
+  resort($('eqTable')); resort($('prioTable')); resort($('foodTable'));
+}
 /* ---------- tooltip ---------- */
 const tip = $('tip');
 function tipHTML(p) {
