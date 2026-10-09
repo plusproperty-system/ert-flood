@@ -133,8 +133,8 @@ def main():
     projects = json.load(open(os.path.join(DATA, 'master.json'), encoding='utf-8'))['projects']
     river = rows(fetch('waterlevel_load'))
     if not river: sys.exit('waterlevel_load returned no rows')
-    try: canal, ok = rows(fetch('canal_waterlevel')), True
-    except Exception as e: canal, ok = [], False; print('canal_waterlevel failed:', e)
+    try: canal_raw = fetch('canal_waterlevel'); canal, ok = rows(canal_raw), True
+    except Exception as e: canal_raw, canal, ok = None, [], False; print('canal_waterlevel failed:', e)
     snap = build(projects, river, canal, now, ok)
     wd = os.path.join(DATA, 'water'); os.makedirs(wd, exist_ok=True)
     day = snap['at'][:10]
@@ -147,7 +147,14 @@ def main():
     c = {}
     for t in snap['pj'].values(): c[t['a']] = c.get(t['a'], 0) + 1
     print(snap['at'], snap['note'], c)
-    return f"ข้อมูล {snap['at']} · {snap['note']}"
+    extra = ''
+    if ok and canal:   # Bangkok canal levels vs bank for the dashboard's canal table (the BMA website refuses GitHub's servers)
+        try:
+            import bma
+            extra = ' | คลอง กทม.: ' + bma.publish(bma.from_thaiwater(canal, now), 'https://www.thaiwater.net', 'ThaiWater (สถานีคลอง กทม.)', now, os.path.join(wd, 'canals.json'))
+        except Exception as e:
+            print('canal table failed:', e); extra = f' | ตารางคลอง กทม. ไม่สำเร็จ: {e}'
+    return f"ข้อมูล {snap['at']} · {snap['note']}{extra}"
 
 
 if __name__ == '__main__':

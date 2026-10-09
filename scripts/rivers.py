@@ -19,22 +19,38 @@ DATA = os.path.join(ROOT, 'docs', 'data')
 MAX_KM = 6.0
 PAD = 0.07                      # degrees around each tile (about 7.7 km) so waterways just outside a tile are seen
 TILE = 0.35                     # degrees per query tile
-ENDPOINTS = ['https://overpass-api.de/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.private.coffee/api/interpreter']
+ENDPOINTS = ['https://overpass-api.de/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
+             'https://overpass.private.coffee/api/interpreter', 'https://overpass.kumi.systems/api/interpreter', 'https://overpass.osm.jp/api/interpreter']
+# Overpass servers answer 406 to requests without a clear, non-browser User-Agent
+OP_HEADERS = {'User-Agent': 'pmr-ert-flood/1.2 (+https://github.com/plusproperty-system/ert-flood)', 'Accept': 'application/json, */*;q=0.5'}
 TH = datetime.timezone(datetime.timedelta(hours=7))
 
 
+def _op(url, q, post):
+    if post:
+        req = urllib.request.Request(url, data=urllib.parse.urlencode({'data': q}).encode(), headers={**OP_HEADERS, 'Content-Type': 'application/x-www-form-urlencoded'})
+    else:
+        req = urllib.request.Request(url + '?' + urllib.parse.urlencode({'data': q}), headers=OP_HEADERS)
+    with urllib.request.urlopen(req, timeout=200) as r:
+        d = json.loads(r.read().decode('utf-8'))
+    if d.get('remark') and 'error' in d['remark'].lower(): raise RuntimeError(d['remark'][:200])
+    return d.get('elements', [])
+
+
 def overpass(bbox):
+    """one tile; tries every server, POST then GET, with growing pauses. Returns None when every attempt failed."""
     s, w, n, e = bbox
-    q = f'[out:json][timeout:180];(way["waterway"~"^(river|canal)$"]({s:.4f},{w:.4f},{n:.4f},{e:.4f}););out tags geom;'
-    body = urllib.parse.urlencode({'data': q}).encode()
-    last = None
-    for attempt in range(6):
-        url = ENDPOINTS[attempt % len(ENDPOINTS)]
-        try:
-            return json.loads(net.get(url, data=body, headers={'Content-Type': 'application/x-www-form-urlencoded'}, timeout=240).decode('utf-8')).get('elements', [])
-        except Exception as ex:
-            last = ex; print('  retry', attempt + 1, url, ex); time.sleep(10 * (attempt + 1))
-    raise RuntimeError(f'Overpass failed for {bbox}: {last}')
+    q = f'[out:json][timeout:150];way["waterway"~"^(river|canal)$"]({s:.4f},{w:.4f},{n:.4f},{e:.4f});out tags geom qt;'
+    for rnd in range(2):
+        for url in ENDPOINTS:
+            for post in (True, False):
+                try:
+                    els = _op(url, q, post); print(f'    {url} {"POST" if post else "GET"} ok'); return els
+                except Exception as ex:
+                    print(f'    {url} {"POST" if post else "GET"} failed: {str(ex)[:160]}'); net.TRIED.append(f'{url.split("/")[2]} {"POST" if post else "GET"}: {str(ex)[:120]}')
+                    time.sleep(3)
+        time.sleep(30)
+    return None
 
 
 def name_of(tags):
@@ -112,7 +128,7 @@ def main():
     projects = json.load(open(os.path.join(DATA, 'master.json'), encoding='utf-8'))['projects']
     pts = [p for p in projects if p.get('la') is not None]
     fixture = os.environ.get('RIVERS_FIXTURE')
-    elements = {}
+    elements, failed = {}, []
     if fixture:
         for el in json.load(open(fixture, encoding='utf-8'))['elements']: elements[el['id']] = el
         src = 'fixture ' + os.path.basename(fixture)
@@ -123,16 +139,25 @@ def main():
         for i, (key, ps) in enumerate(sorted(tiles.items())):
             bbox = (min(p['la'] for p in ps) - PAD, min(p['lo'] for p in ps) - PAD, max(p['la'] for p in ps) + PAD, max(p['lo'] for p in ps) + PAD)
             els = overpass(bbox)
+            if els is None:
+                failed += ps; print(f'  tile {i + 1}/{len(tiles)} {len(ps)} projects: FAILED, skipped'); continue
             for el in els: elements[el['id']] = el
             print(f'  tile {i + 1}/{len(tiles)} {len(ps)} projects, {len(els)} ways')
             time.sleep(3)
+        if len(failed) == len(pts): raise RuntimeError('ดึงข้อมูลจาก OpenStreetMap ไม่ได้ทุกพื้นที่ (เซิร์ฟเวอร์ Overpass ตอบ error) ลองกด Re-run jobs อีกครั้งภายหลัง')
         src = 'OpenStreetMap (Overpass API)'
     ways = []
     for el in elements.values():
         g = [(pt['lat'], pt['lon']) for pt in el.get('geometry', []) if pt]
         t = el.get('tags', {}).get('waterway')
         if g and t in ('river', 'canal'): ways.append({'t': t, 'n': name_of(el.get('tags', {})), 'g': g})
-    pj = compute(pts, ways)
+    bad = {p['k'] for p in failed}
+    pj = compute([p for p in pts if p['k'] not in bad], ways)
+    old_p = os.path.join(DATA, 'rivers.json')
+    if bad and os.path.exists(old_p):   # keep last month's values for areas that could not be fetched this time
+        old = json.load(open(old_p, encoding='utf-8')).get('pj', {})
+        for k in bad:
+            if k in old: pj[k] = old[k]
     now = datetime.datetime.now(TH).strftime('%Y-%m-%d %H:%M')
     json.dump({'at': now, 'src': src, 'zones': {'watch2': 3, 'watch': 6}, 'ways': len(ways), 'pj': pj},
               open(os.path.join(DATA, 'rivers.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
@@ -140,7 +165,7 @@ def main():
     json.dump({'at': now, 'src': src, 'ways': layer}, open(os.path.join(DATA, 'waterways.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     print('map layer:', len(layer), 'waterways,', os.path.getsize(os.path.join(DATA, 'waterways.json')) // 1024, 'KB')
     n3 = sum(1 for r in pj.values() if r.get('rv') and r['rv']['d'] <= 3); n6 = sum(1 for r in pj.values() if r.get('rv') and 3 < r['rv']['d'] <= 6)
-    msg = f'ข้อมูล {now} · ทางน้ำ {len(ways)} เส้น · {len(pj)} โครงการ · ห่างแม่น้ำไม่เกิน 3 กม. {n3} · 3–6 กม. {n6}'
+    msg = f'ข้อมูล {now} · ทางน้ำ {len(ways)} เส้น · {len(pj)} โครงการ · ห่างแม่น้ำไม่เกิน 3 กม. {n3} · 3–6 กม. {n6}' + (f' · ดึงไม่ได้ {len(bad)} โครงการ (รันใหม่ภายหลังเพื่อเติม)' if bad else '')
     print(now, len(ways), 'ways;', len(pj), 'projects; river <=3 km:', n3, '3-6 km:', n6)
     return msg
 

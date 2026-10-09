@@ -873,14 +873,16 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
 (async () => {
 const MS_SKIP = ['om'];
 const RV_HINT = 'ยังไม่มีข้อมูลระยะแม่น้ำ ผู้ดูแลต้องรัน Actions › Rivers and canals ใน GitHub';
-const EXTRA_COND = [{ k: 'bma', t: 'ใกล้จุดวัดคลอง กทม. ที่วิกฤตหรือล้นตลิ่ง', d: 'จุดวัดของสำนักการระบายน้ำ กทม. ที่จับคู่กับโครงการ', f: p => !!(p.bm && p.bm.lv >= 4) }];   /* no OM names on the public site */
+const EXTRA_COND = [{ k: 'bma', t: 'ใกล้จุดวัดคลอง กทม. ที่วิกฤตหรือล้นตลิ่ง', d: 'จุดวัดระดับน้ำคลอง กทม. ที่จับคู่กับโครงการ', d0: 'จุดวัดของสำนักการระบายน้ำ กทม. ที่จับคู่กับโครงการ', f: p => !!(p.bm && p.bm.lv >= 4) }];   /* no OM names on the public site */
 const FULL = 'https://claude.ai/artifact/VrNYxGs4fTu9fnT2JEVnrD';
 const bust = Math.floor(Date.now() / 6e4);
 const get = (u, opt) => fetch(u + '?v=' + bust).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); }).catch(e => { if (opt) return null; throw e; });
 let DATA;
-try { DATA = await Promise.all([get('data/master.json'), get('data/geo.json'), get('data/ert.json', 1), get('data/survey.json', 1), get('data/water/index.json', 1), get('data/water/latest.json', 1), get('data/rivers.json', 1), get('data/bma/latest.json', 1), get('data/waterways.json', 1)]); }
+try { DATA = await Promise.all([get('data/master.json'), get('data/geo.json'), get('data/ert.json', 1), get('data/survey.json', 1), get('data/water/index.json', 1), get('data/water/latest.json', 1), get('data/rivers.json', 1), get('data/bma/latest.json', 1), get('data/waterways.json', 1), get('data/water/canals.json', 1)]); }
 catch (e) { document.getElementById('loadMsg').textContent = 'โหลดข้อมูลไม่สำเร็จ ลองโหลดหน้าใหม่อีกครั้ง'; return; }
-const [MST, GEO, ERTD, SV, TWI, TWL0, RVD, BMAD, WWD] = DATA;
+const [MST, GEO, ERTD, SV, TWI, TWL0, RVD, BMAD0, WWD, CAN] = DATA;
+/* canal levels: BMA website table when available, otherwise ThaiWater's Bangkok canal stations (whichever is newer) */
+const BMAD = [BMAD0, CAN].filter(x => x && x.stations && x.stations.length).sort((a, b) => String(b.at).localeCompare(String(a.at)))[0] || null;
 if (WWD && WWD.ways && WWD.ways.length) { GEO.ww = WWD.ways; GEO.wwsrc = 'OpenStreetMap ' + (WWD.at || ''); }
 /* alert points that darken nearby waterways: ThaiWater alert stations + BMA canal gauges with coordinates */
 const WW_PTS = () => [...(TWCUR.stations || []).filter(s => s.la && s.sit >= 4).map(s => ({ la: s.la, lo: s.lo, lv: s.sit === 5 ? 2 : 1 })),
@@ -1063,7 +1065,7 @@ function bmaCell(p) {
 function renderBma(list) {
   const S0 = BM.stations, pm = bmaProj(list), scope = $('bmaScope').value, q = $('bmaQ').value.trim().toLowerCase();
   if (!S0.length) { $('bmaSub').textContent = 'ยังไม่มีข้อมูล ให้ผู้ดูแลรัน Actions › BMA canal levels hourly หนึ่งครั้ง'; $('bmaT').hidden = true; $('bmaTiles').innerHTML = ''; return; }
-  $('bmaSub').textContent = `ข้อมูลจากสำนักการระบายน้ำ กทม. ดึงเมื่อ ${thDate(BM.at)} · ${S0.length} จุดวัด · ห่างตลิ่ง = ตลิ่งด้านที่ต่ำกว่า ลบ ระดับน้ำด้านใน (ค่าติดลบคือล้นตลิ่ง) · จับคู่โครงการในรัศมี ${BM.radius} กม. เมื่อจุดวัดมีพิกัด (${BM.withxy} จุด) ที่เหลือจับคู่กับโครงการในเขตเดียวกัน · กดแถวเพื่อดูโครงการ`;
+  $('bmaSub').textContent = `ข้อมูลจาก ${BM.srcname || 'สำนักการระบายน้ำ กทม.'} ดึงเมื่อ ${thDate(BM.at)} · ${S0.length} จุดวัด · ห่างตลิ่ง = ตลิ่งด้านที่ต่ำกว่า ลบ ระดับน้ำด้านใน (ค่าติดลบคือล้นตลิ่ง) · จับคู่โครงการในรัศมี ${BM.radius} กม. เมื่อจุดวัดมีพิกัด (${BM.withxy} จุด) ที่เหลือจับคู่กับโครงการในเขตเดียวกัน · กดแถวเพื่อดูโครงการ`;
   const rows = S0.map((s, j) => [s, j]).filter(([s, j]) => (scope === 'all' || pm.has(j)) && (!q || (s.n + ' ' + s.k + ' ' + s.d + ' ' + s.c).toLowerCase().includes(q)));
   const near = [...pm.keys()].map(j => S0[j]);
   const t = (n, lab, sm) => `<div class="tile"><b>${n}</b><span>${lab}</span><small>${sm}</small></div>`;
@@ -1085,8 +1087,8 @@ function openBma(j) {
     <dt>ผิวน้ำห่างตลิ่ง</dt><dd>${s.g != null ? (s.g < 0 ? `ล้นตลิ่ง ${-s.g} ซม.` : `${s.g} ซม.`) : 'ไม่มีระดับตลิ่ง'}</dd><dt>เตือนภัย / วิกฤต</dt><dd>${m2(s.w)} / ${m2(s.cr)} ม.รทก.${s.gc != null ? ` (ห่างระดับวิกฤต ${cm(s.gc)} ซม.)` : ''}</dd>
     <dt>พิกัดจุดวัด</dt><dd>${s.la != null ? `${s.la}, ${s.ln}${s.cs === 'auto' ? ' (จับคู่ชื่อกับ ThaiWater อัตโนมัติ)' : ''}` : 'ไม่มี จับคู่โครงการด้วยเขต'}</dd></dl>`;
   h += `<h4>โครงการที่จับคู่ ${ps.length} โครงการ (ตามตัวกรอง)</h4>` + (ps.length ? `<div class="blist">${ps.map(([p, x]) => `<button type="button" class="brow" data-i="${p.i}"><b>${esc(p.n)}</b>${tag(p.st)}<small>${bmaHow(x)}</small></button>`).join('')}</div>` : '<p class="note">ไม่มีโครงการในรัศมีหรือในเขตเดียวกัน</p>');
-  h += `<p class="note">ที่มา: <a href="${s.id ? 'https://weather.bangkok.go.th/water/StationDetail?id=' + s.id : 'https://weather.bangkok.go.th/water/'}" target="_blank" rel="noopener">weather.bangkok.go.th/water ↗</a></p>`;
-  openSheet(s.n, `${s.c} · สำนักการระบายน้ำ กทม.`, h, false);
+  h += s.cs === 'thaiwater' ? `<p class="note">ที่มา: <a href="https://www.thaiwater.net" target="_blank" rel="noopener">ThaiWater ↗</a> (สถานีคลอง กทม.)</p>` : `<p class="note">ที่มา: <a href="${s.id ? 'https://weather.bangkok.go.th/water/StationDetail?id=' + s.id : 'https://weather.bangkok.go.th/water/'}" target="_blank" rel="noopener">weather.bangkok.go.th/water ↗</a></p>`;
+  openSheet(s.n, `${s.c} · ${BM.srcname || 'สำนักการระบายน้ำ กทม.'}`, h, false);
 }
 function bmaDetail(p) {
   const b = p.bm; if (!b) return '';
@@ -1613,7 +1615,7 @@ function renderNotes() {
     `ระดับน้ำดึงจาก ThaiWater (api-v3.thaiwater.net) อัตโนมัติทุกชั่วโมง ชุดที่แสดงอยู่ดึงเมื่อ${thDate(TWCUR.at)} ${TWCUR.note ? '(' + TWCUR.note + ')' : ''} รัศมีเตือน แม่น้ำ/ลำน้ำ 10 กม. คลอง กทม. 3 กม. ไม่ใช้สถานีที่ข้อมูลเก่ากว่า 24 ชั่วโมง (คลอง กทม. 6 ชั่วโมง)`,
     'กรุงเทพฯ และปริมณฑลแบ่งเป็น 4 โซน ฝั่งตะวันตกของแม่น้ำเจ้าพระยาเป็นโซน 4 ฝั่งตะวันออกแบ่งด้วยแนวถนนเพชรบุรี แนวอ่อนนุช และแนวลาดพร้าว–รามอินทรา ต่างจังหวัด 12 โซนเป็นการจัดกลุ่มจังหวัดที่ตั้งขึ้นสำหรับแดชบอร์ดนี้',
     RVD ? `ระยะจากแม่น้ำและคลองคำนวณจาก OpenStreetMap เมื่อ${thDate(RVD.at)} โครงการที่ไม่มีตัวเลขระดับน้ำ ถ้าอยู่ห่างแม่น้ำไม่เกิน ${ZW2} กม. เป็นเฝ้าระวังพิเศษ ไม่เกิน ${ZW} กม. เป็นเฝ้าระวัง` : 'ยังไม่มีข้อมูลระยะจากแม่น้ำ ให้ผู้ดูแลรัน Actions › Rivers and canals หนึ่งครั้ง',
-    BM.at ? `ระดับน้ำคลอง กทม. จากเว็บสำนักการระบายน้ำ (weather.bangkok.go.th/water) ดึงอัตโนมัติทุกชั่วโมง ชุดล่าสุด ${thDate(BM.at)} หน่วย ม.รทก. ห่างตลิ่งคิดจากตลิ่งด้านที่ต่ำกว่า จุดวัดที่ไม่มีระดับตลิ่งใช้ระยะถึงระดับวิกฤตแทน ข้อมูลเก่ากว่า 3 ชั่วโมงถือว่าค้าง จุดวัดที่ไม่มีพิกัดจับคู่โครงการด้วยเขต จึงเป็นการจับคู่แบบหยาบ` : 'ยังไม่มีข้อมูลระดับน้ำคลอง กทม. ให้ผู้ดูแลรัน Actions › BMA canal levels hourly หนึ่งครั้ง',
+    BM.at ? `ระดับน้ำคลอง กทม. จาก ${BM.srcname || 'เว็บสำนักการระบายน้ำ (weather.bangkok.go.th/water)'} ดึงอัตโนมัติทุกชั่วโมง ชุดล่าสุด ${thDate(BM.at)} หน่วย ม.รทก. ห่างตลิ่งคิดจากตลิ่งด้านที่ต่ำกว่า จุดวัดที่ไม่มีระดับตลิ่งใช้ระยะถึงระดับวิกฤตแทน ข้อมูลเก่ากว่า 3 ชั่วโมงถือว่าค้าง จุดวัดที่ไม่มีพิกัดจับคู่โครงการด้วยเขต จึงเป็นการจับคู่แบบหยาบ` : 'ยังไม่มีข้อมูลระดับน้ำคลอง กทม. ให้ผู้ดูแลรัน Actions › BMA canal levels hourly หนึ่งครั้ง',
     'เว็บนี้เป็นฉบับสาธารณะ ไม่มีชื่อผู้รับผิดชอบ จำนวนผู้พักอาศัย และข้อมูลภายในอื่น ทีมงานดูข้อมูลเต็มได้จากปุ่ม "ดูเวอร์ชันเต็ม สำหรับทีมงาน"'
   ].map(t => `<li>${esc(t)}</li>`).join('');
 }

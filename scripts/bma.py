@@ -234,7 +234,12 @@ def main():
     fx = os.environ.get('BMA_FIXTURE')
     if fx: page = open(fx, encoding='utf-8').read()
     else:
-        page = net.get(URL, headers={'Accept-Language': 'th,en;q=0.8', 'Accept': 'text/html'}).decode('utf-8', 'replace')
+        try:
+            page = net.get(URL, headers={'Accept-Language': 'th,en;q=0.8', 'Accept': 'text/html'}).decode('utf-8', 'replace')
+        except RuntimeError as e:
+            if '403' in str(e):   # the BMA site refuses GitHub's servers; ThaiWater hourly fills docs/data/bma from its canal stations instead
+                return 'เว็บ กทม. ไม่อนุญาตให้เครื่องของ GitHub เข้า (403) ระบบใช้ระดับน้ำคลอง กทม. จาก ThaiWater แทน (อัปเดตพร้อม ThaiWater hourly) ไม่ต้องแก้อะไร'
+            raise
     stations = parse(page)
     if not stations:
         os.makedirs(os.path.join(ROOT, 'debug'), exist_ok=True)
@@ -243,9 +248,6 @@ def main():
     coords = load_coords()
     added = match_coords(stations, coords, thaiwater_canals())
     save_coords(coords)
-    dists = json.load(open(os.path.join(HERE, 'bkk_districts.json'), encoding='utf-8'))
-    projects = json.load(open(os.path.join(DATA, 'master.json'), encoding='utf-8'))['projects']
-
     S = []
     for st in stations:
         lv, lab, gap, gc, bank = level_of(st, now)
@@ -255,7 +257,14 @@ def main():
                   't': st['time'].strftime('%Y-%m-%d %H:%M') if st['time'] else None, 'site': st['site'], 'lv': lv, 's': lab,
                   'l': st['li'], 'lo': st['lo'], 'b': bank, 'bl': st['bl'], 'br': st['br'], 'w': st['wi'], 'cr': st['ci'],
                   'g': gap, 'gc': gc, 'la': la, 'ln': lo, 'cs': (c.get('source') or '').split(' ')[0] or None})
+    print('matched coordinates now:', added)
+    return publish(S, URL, 'สำนักการระบายน้ำ กทม.', now)
 
+
+def publish(S, src, srcname, now, out_file=None):
+    """map stations to projects and write docs/data/bma/*.json"""
+    dists = json.load(open(os.path.join(HERE, 'bkk_districts.json'), encoding='utf-8'))
+    projects = json.load(open(os.path.join(DATA, 'master.json'), encoding='utf-8'))['projects']
     pj = {}
     for p in projects:
         d = dnorm(p.get('d'))
@@ -277,8 +286,11 @@ def main():
         pj[p['k']] = {'lv': top['lv'], 'g': min(gaps) if gaps else None, 'dist': d, 'st': [list(h) for h in hits[:8]], 'n': len(hits)}
 
     lvc = {k: sum(1 for s in S if s['lv'] == k) for k in (5, 4, 3, 1, 0)}
-    out = {'at': now.strftime('%Y-%m-%d %H:%M'), 'src': URL, 'radius': RADIUS, 'n': len(S),
+    out = {'at': now.strftime('%Y-%m-%d %H:%M'), 'src': src, 'srcname': srcname, 'radius': RADIUS, 'n': len(S),
            'withxy': sum(1 for s in S if s['la'] is not None), 'lvc': lvc, 'stations': S, 'pj': pj}
+    if out_file:   # single file (used by ThaiWater hourly, which commits docs/data/water only)
+        json.dump(out, open(out_file, 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
+        return f"{len(S)} จุดวัด · จับคู่โครงการ {len(pj)} · ล้นตลิ่ง {lvc[5]} วิกฤต {lvc[4]} เตือนภัย {lvc[3]}"
     os.makedirs(os.path.join(DATA, 'bma'), exist_ok=True)
     for fn in ('latest.json', now.strftime('%Y-%m-%d') + '.json'):
         json.dump(out, open(os.path.join(DATA, 'bma', fn), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
@@ -287,8 +299,43 @@ def main():
     day = now.strftime('%Y-%m-%d'); idx['days'] = [x for x in idx['days'] if x['day'] != day] + [{'day': day, 'at': out['at']}]
     json.dump(idx, open(idx_p, 'w', encoding='utf-8'), ensure_ascii=False)
     msg = f"ข้อมูล {out['at']} · {len(S)} จุดวัด · มีพิกัด {out['withxy']} · จับคู่โครงการ {len(pj)} · ล้นตลิ่ง {lvc[5]} วิกฤต {lvc[4]} เตือนภัย {lvc[3]}"
-    print(out['at'], len(S), 'stations;', out['withxy'], 'with coordinates (+', added, 'matched now);', len(pj), 'projects mapped; levels', lvc)
+    print(out['at'], srcname, len(S), 'stations;', out['withxy'], 'with coordinates;', len(pj), 'projects mapped; levels', lvc)
     return msg
+
+
+def from_thaiwater(raw, now, max_age_h=6):
+    """same table built from ThaiWater's Bangkok canal stations (they carry bank levels and coordinates)"""
+    data = raw if isinstance(raw, list) else raw.get('data', []) if isinstance(raw, dict) else []
+    f = lambda v: None if v in (None, '') else float(v)
+    S = []
+    for r in data:
+        st = r.get('station') or {}
+        n = st.get('canal_name'); n = (n.get('th') or n.get('en')) if isinstance(n, dict) else n
+        try: la, lo = float(st.get('canal_lat')), float(st.get('canal_long'))
+        except (TypeError, ValueError): la = lo = None
+        try: lv_, bank, w, crit = f(r.get('canal_value')), f(st.get('bank')), f(st.get('warning_level')), f(st.get('critical_level'))
+        except ValueError: continue
+        t = parse_time_iso(r.get('canal_datetime'))
+        age = (now - t).total_seconds() / 3600 if t else None
+        gap = round((bank - lv_) * 100) if lv_ is not None and bank is not None else None
+        gc = round((crit - lv_) * 100) if lv_ is not None and crit is not None else None
+        if lv_ is None: lv, lab = 0, 'ไม่มีข้อมูล'
+        elif age is not None and age > max_age_h: lv, lab = 0, f'ข้อมูลค้าง {int(age)} ชม.'
+        elif gap is not None and gap <= 0: lv, lab = 5, 'ล้นตลิ่ง'
+        elif crit is not None and lv_ >= crit: lv, lab = 4, 'วิกฤต'
+        elif w is not None and lv_ >= w: lv, lab = 3, 'เตือนภัย'
+        else: lv, lab = 1, 'ปกติ'
+        name = (n or st.get('canal_oldcode') or '').strip()
+        S.append({'c': st.get('canal_oldcode') or '', 'id': None, 'n': name, 'k': canal_of(name) or name, 'd': '',
+                  't': t.strftime('%Y-%m-%d %H:%M') if t else None, 'site': None, 'lv': lv, 's': lab, 'l': lv_, 'lo': None,
+                  'b': bank, 'bl': bank, 'br': None, 'w': w, 'cr': crit, 'g': gap, 'gc': gc, 'la': la, 'ln': lo, 'cs': 'thaiwater'})
+    return S
+
+
+def parse_time_iso(t):
+    if not isinstance(t, str) or len(t) < 16: return None
+    try: return datetime.datetime(int(t[0:4]), int(t[5:7]), int(t[8:10]), int(t[11:13]), int(t[14:16]))
+    except ValueError: return None
 
 
 if __name__ == '__main__':
