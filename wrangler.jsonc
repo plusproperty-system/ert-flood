@@ -1,0 +1,9 @@
+{
+  // Cloudflare Workers: serve the dashboard in docs/ as a static site (no build step)
+  "name": "pmr-flood",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./docs",
+    "not_found_handling": "404-page"
+  }
+}
