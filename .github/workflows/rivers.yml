@@ -1,0 +1,38 @@
+name: Rivers and canals
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 20 1 * *'   # 1st of every month, 03:00 Thai time
+  push:
+    paths:
+      - 'docs/data/master.json'   # recompute when the project list changes
+
+permissions:
+  contents: write
+
+concurrency:
+  group: rivers
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Distance from each project to the nearest river and canal (OpenStreetMap)
+        run: python scripts/rivers.py
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add docs/data/rivers.json docs/data/waterways.json
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -m "Rivers and canals $(TZ=Asia/Bangkok date '+%Y-%m-%d')"
+          git pull --rebase --autostash
+          git push
