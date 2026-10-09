@@ -651,6 +651,17 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
 .maptitle{position:absolute;top:10px;left:10px;z-index:3;max-width:calc(100% - 110px);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:15px;color:var(--ink);box-shadow:var(--shadow);pointer-events:none;line-height:1.35}
 .maptitle b{font-weight:700}
 
+/* v15 collapsible filters */
+.fhead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.fht{font-weight:700;font-size:15px}
+.fsum{font-size:13px;color:var(--muted)}
+.fsum.on{color:var(--ink);font-weight:600;background:var(--water-soft,#e8f2f6);border-radius:99px;padding:2px 10px}
+.ftog{margin-left:auto;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:5px 12px;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;min-height:34px}
+.ftog:hover{background:var(--water-soft,#e8f2f6)}
+.ftog i{font-style:normal;font-size:12px;color:var(--muted)}
+.filters.collapsed .fhead{margin-bottom:6px}
+.filters.collapsed .fstat{border-top:0;margin-top:0;padding-top:0}
+
 .fullbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ink);border-radius:8px;padding:6px 12px;color:var(--ink);text-decoration:none;font-weight:600;font-size:14px;background:var(--surface);margin-top:6px}
 .fullbtn:hover{background:var(--water-soft)}
 .auto{font-size:13px;color:var(--muted)}
@@ -674,7 +685,6 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
     <div>
       <h1>สถานการณ์น้ำท่วมโครงการในความดูแล PMR</h1>
       <p>สถานะรายโครงการตามสูตรประกาศ และระดับน้ำรอบโครงการจาก ThaiWater</p>
-      <a class="fullbtn" href="https://claude.ai/artifact/VrNYxGs4fTu9fnT2JEVnrD" target="_blank" rel="noopener">ดูเวอร์ชันเต็ม สำหรับทีมงาน ↗</a>
     </div>
     <div class="asof">
       <span>ข้อมูลสำรวจล่าสุด <b id="asSv"></b></span>
@@ -692,6 +702,9 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
   <div class="page" id="pg-sit" hidden>
   <div class="fslot">
   <div class="filters" role="search" id="filters" aria-label="ตัวกรอง">
+    <div class="fhead"><span class="fht">ตัวกรอง</span><span class="fsum" id="fSum"></span>
+      <button type="button" class="ftog" id="fToggle" aria-expanded="true" aria-controls="fBody"><span>ย่อตัวกรอง</span><i aria-hidden="true">▴</i></button></div>
+    <div class="fbody" id="fBody">
     <div class="fgrid fsv" id="fSv" role="group" aria-label="ตัวกรองโครงการแบบ Site Visit"></div>
     <div class="fgrid">
       <div class="fl fproj"><label for="q">ชื่อโครงการ</label>
@@ -703,6 +716,7 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
       <div class="fl"><label for="fRisk">ThaiWater ในรัศมี</label><select id="fRisk"><option value="">ทั้งหมด</option><option value="over">มีสถานีล้นตลิ่ง</option><option value="high">มีสถานีน้ำมาก</option><option value="norm">สถานีปกติ</option><option value="none">ไม่มีสถานี</option><option value="nocoord">ไม่มีพิกัด</option><option value="miss">ไม่มีในข้อมูล ThaiWater</option></select></div>
       <div class="fl rvf"><label for="fRiv">ระยะจากแม่น้ำ/คลอง</label><select id="fRiv"><option value="">ทั้งหมด</option><option value="3">ไม่เกิน 3 กม.</option><option value="6">3–6 กม.</option><option value="far">เกิน 6 กม.</option><option value="na">ไม่มีข้อมูล</option></select></div>
       <div class="fl"><label for="fSrc">ที่มาและข้อสังเกต</label><select id="fSrc"><option value="">ทั้งหมด</option><option value="ert">สถานะตาม ERT Update</option><option value="calc">สถานะตามสูตรประกาศ</option><option value="river">สถานะตามระยะจากแม่น้ำ</option><option value="none">ไม่มีข้อมูล</option><option value="repw">หน้างานกรอกสถานะเฝ้าระวัง</option></select></div>
+    </div>
     </div>
     <div class="fstat"><span class="fslab" id="fStLab">สถานะ</span><div class="fsts" id="fSt" role="group" aria-labelledby="fStLab"></div>
       <div class="fend"><span class="count" id="count" aria-live="polite"></span><button class="linkbtn" id="clear" type="button">ล้างตัวกรอง</button></div></div>
@@ -879,7 +893,6 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
 const MS_SKIP = ['om'];
 const RV_HINT = 'ยังไม่มีข้อมูลระยะแม่น้ำ/คลอง ผู้ดูแลต้องรัน Actions › Rivers and canals ใน GitHub';
 const EXTRA_COND = [{ k: 'bma', t: 'ใกล้จุดวัดคลอง กทม. ที่วิกฤตหรือล้นตลิ่ง', d: 'จุดวัดระดับน้ำคลอง กทม. ที่จับคู่กับโครงการ', d0: 'จุดวัดของสำนักการระบายน้ำ กทม. ที่จับคู่กับโครงการ', f: p => !!(p.bm && p.bm.lv >= 4) }];   /* no OM names on the public site */
-const FULL = 'https://claude.ai/artifact/VrNYxGs4fTu9fnT2JEVnrD';
 const bust = Math.floor(Date.now() / 6e4);
 const get = (u, opt) => fetch(u + '?v=' + bust).then(r => { if (!r.ok) throw new Error(u + ' ' + r.status); return r.json(); }).catch(e => { if (opt) return null; throw e; });
 let DATA;
@@ -1157,6 +1170,19 @@ $('fSv').addEventListener('change', e => {
 document.addEventListener('click', e => { if (!e.target.closest('.ms')) msClose(); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && document.querySelector('.ms .msd:not([hidden])')) { msClose(); } });
 $('clear').addEventListener('click', () => { F.ms = {}; F.cond = ''; msClose(); });
+/* collapsible filter panel (status chips stay visible) */
+function fSumUpd() {
+  const n = FIDS.filter(id => $(id) && $(id).value).length + Object.values(F.ms).filter(s => s && s.size).length + (F.st.size ? 1 : 0) + (F.cond ? 1 : 0) + (F.dist ? 1 : 0);
+  $('fSum').textContent = n ? `กำลังกรอง ${n} รายการ` : 'ยังไม่ได้กรอง';
+  $('fSum').classList.toggle('on', n > 0);
+}
+function fSet(open) {
+  $('fBody').hidden = !open; $('fToggle').setAttribute('aria-expanded', String(open));
+  $('fToggle').querySelector('span').textContent = open ? 'ย่อตัวกรอง' : 'แสดงตัวกรอง'; $('fToggle').querySelector('i').textContent = open ? '▴' : '▾';
+  $('filters').classList.toggle('collapsed', !open); try { localStorage.setItem('ertFilters', open ? '1' : '0'); } catch (e) {}
+}
+$('fToggle').addEventListener('click', () => fSet($('fBody').hidden));
+try { if (localStorage.getItem('ertFilters') === '0') fSet(false); } catch (e) {}
 $('sumBig').addEventListener('click', e => { const b = e.target.closest('[data-cond]'); if (b) { e.stopPropagation(); F.cond = ''; apply(); } });
 $('kpis').addEventListener('click', e => { const b = e.target.closest('[data-cond]'); if (!b || b.disabled) return; e.stopPropagation(); F.cond = F.cond === b.dataset.cond ? '' : b.dataset.cond; apply(); });
 function current(o = {}) {
@@ -1209,7 +1235,7 @@ let lastWs = '';
 function apply() {
   const list = current(), rg = $('fRegion').value, ws = $('fWs').value;
   $('count').textContent = `แสดง ${list.length} จาก ${P.length} โครงการ`;
-  renderFst(); msSync();
+  renderFst(); msSync(); fSumUpd();
   if (TAB === 'sit') {
     if (rg !== lastRg || ws !== lastWs) { lastRg = rg; lastWs = ws; if (ws) fitWs(ws); else if (rg === '') { tz.zoom(1, [4.15, 7.8]); pz.zoom(1, [MP.W / 2, MP.H / 2]); } else { fitRegion(+rg); fitBMR(rg); } }
     renderDay(list); renderWs(); renderSelbar(); renderTH(list); renderBMR(list); renderLegends(list); renderZCards(list); renderZones(); renderTable(list); renderBma(list);
@@ -1611,7 +1637,6 @@ function openDetail(i) {
   if (hasEq(p) || rqText(p)) h += `<h4>อุปกรณ์และเสบียง (แบบสำรวจ)</h4><dl class="kv">${EQC.filter(([k]) => p.eq[k] != null).map(([k, l]) => `<dt>${l}</dt><dd>${nf(p.eq[k])}</dd>`).join('')}${p.eq.aid != null ? `<dt>ชุดปฐมพยาบาล</dt><dd>${p.eq.aid ? 'มี' : 'ไม่มี'}</dd>` : ''}${p.eq.safe != null ? `<dt>อุปกรณ์ Safety</dt><dd>${p.eq.safe ? 'มี' : 'ไม่มี'}</dd>` : ''}${rqText(p) ? `<dt>ขอสนับสนุนเพิ่ม</dt><dd>${esc(rqText(p))}</dd>` : ''}</dl>`;
   add('สังกัด', p.bu); add('ประเภท', p.ty); add('โซน', p.g != null ? rgName(p.g) : ''); add('เขต/อำเภอ', p.d); add('จังหวัด', p.pv); add('พิกัด', p.la != null ? p.la + ', ' + p.lo : '');
   h += `<h4>ข้อมูลโครงการ</h4><dl class="kv">${kv.join('')}</dl>`;
-  h += `<p style="margin-top:18px"><a class="fullbtn" href="${FULL}" target="_blank" rel="noopener">ดูข้อมูลเต็มในเวอร์ชันสำหรับทีมงาน ↗</a></p>`;
   openSheet(p.n, [p.bu, p.io, p.ty].filter(Boolean).join(' / '), h, false);
 }
 $('dClose').onclick = () => $('dlg').close();
@@ -1625,7 +1650,7 @@ function renderNotes() {
     'กรุงเทพฯ และปริมณฑลแบ่งเป็น 4 โซน ฝั่งตะวันตกของแม่น้ำเจ้าพระยาเป็นโซน 4 ฝั่งตะวันออกแบ่งด้วยแนวถนนเพชรบุรี แนวอ่อนนุช และแนวลาดพร้าว–รามอินทรา ต่างจังหวัด 12 โซนเป็นการจัดกลุ่มจังหวัดที่ตั้งขึ้นสำหรับแดชบอร์ดนี้',
     RVD ? `ระยะจากแม่น้ำและคลองคำนวณจาก OpenStreetMap เมื่อ${thDate(RVD.at)} โครงการที่ไม่มีตัวเลขระดับน้ำ ถ้าอยู่ห่างแม่น้ำหรือคลองที่มีชื่อไม่เกิน ${ZW2} กม. เป็นเฝ้าระวังพิเศษ ไม่เกิน ${ZW} กม. เป็นเฝ้าระวัง` : 'ยังไม่มีข้อมูลระยะจากแม่น้ำ ให้ผู้ดูแลรัน Actions › Rivers and canals หนึ่งครั้ง',
     BM.at ? `ระดับน้ำคลอง กทม. จาก ${BM.srcname || 'เว็บสำนักการระบายน้ำ (weather.bangkok.go.th/water)'} ดึงอัตโนมัติทุกชั่วโมง ชุดล่าสุด ${thDate(BM.at)} หน่วย ม.รทก. ห่างตลิ่งคิดจากตลิ่งด้านที่ต่ำกว่า จุดวัดที่ไม่มีระดับตลิ่งใช้ระยะถึงระดับวิกฤตแทน ข้อมูลเก่ากว่า 3 ชั่วโมงถือว่าค้าง จุดวัดที่ไม่มีพิกัดจับคู่โครงการด้วยเขต จึงเป็นการจับคู่แบบหยาบ` : 'ยังไม่มีข้อมูลระดับน้ำคลอง กทม. ให้ผู้ดูแลรัน Actions › BMA canal levels hourly หนึ่งครั้ง',
-    'เว็บนี้เป็นฉบับสาธารณะ ไม่มีชื่อผู้รับผิดชอบ จำนวนผู้พักอาศัย และข้อมูลภายในอื่น ทีมงานดูข้อมูลเต็มได้จากปุ่ม "ดูเวอร์ชันเต็ม สำหรับทีมงาน"'
+    'เว็บนี้เป็นฉบับสาธารณะ ไม่มีชื่อผู้รับผิดชอบ จำนวนผู้พักอาศัย และข้อมูลภายในอื่น'
   ].map(t => `<li>${esc(t)}</li>`).join('');
 }
 $('dlg').addEventListener('click', e => { if (e.target === $('dlg')) $('dlg').close(); });
