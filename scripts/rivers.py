@@ -12,6 +12,7 @@ Writes docs/data/rivers.json and docs/data/waterways.json (simplified lines for 
 Testing without network: RIVERS_FIXTURE=<overpass-style json> python scripts/rivers.py
 """
 import json, math, os, sys, time, datetime, urllib.request, urllib.parse
+import net
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'docs', 'data')
@@ -30,9 +31,7 @@ def overpass(bbox):
     for attempt in range(6):
         url = ENDPOINTS[attempt % len(ENDPOINTS)]
         try:
-            req = urllib.request.Request(url, data=body, headers={'User-Agent': 'pmr-ert-flood/1.0 (github.com/plusproperty-system/ert-flood)'})
-            with urllib.request.urlopen(req, timeout=240) as r:
-                return json.loads(r.read().decode('utf-8')).get('elements', [])
+            return json.loads(net.get(url, data=body, headers={'Content-Type': 'application/x-www-form-urlencoded'}, timeout=240).decode('utf-8')).get('elements', [])
         except Exception as ex:
             last = ex; print('  retry', attempt + 1, url, ex); time.sleep(10 * (attempt + 1))
     raise RuntimeError(f'Overpass failed for {bbox}: {last}')
@@ -141,8 +140,10 @@ def main():
     json.dump({'at': now, 'src': src, 'ways': layer}, open(os.path.join(DATA, 'waterways.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))
     print('map layer:', len(layer), 'waterways,', os.path.getsize(os.path.join(DATA, 'waterways.json')) // 1024, 'KB')
     n3 = sum(1 for r in pj.values() if r.get('rv') and r['rv']['d'] <= 3); n6 = sum(1 for r in pj.values() if r.get('rv') and 3 < r['rv']['d'] <= 6)
+    msg = f'ข้อมูล {now} · ทางน้ำ {len(ways)} เส้น · {len(pj)} โครงการ · ห่างแม่น้ำไม่เกิน 3 กม. {n3} · 3–6 กม. {n6}'
     print(now, len(ways), 'ways;', len(pj), 'projects; river <=3 km:', n3, '3-6 km:', n6)
+    return msg
 
 
 if __name__ == '__main__':
-    main()
+    net.run(main, 'คำนวณระยะแม่น้ำและคลอง')

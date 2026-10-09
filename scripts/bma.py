@@ -16,6 +16,7 @@ Offline test: BMA_FIXTURE=<saved html> [BMA_TW_FIXTURE=<thaiwater canal json>] p
 """
 import csv, datetime, difflib, html, json, math, os, re, sys, urllib.request
 from html.parser import HTMLParser
+import net
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'docs', 'data')
@@ -194,8 +195,7 @@ def thaiwater_canals():
         if fx: raw = json.load(open(fx, encoding='utf-8'))
         elif os.environ.get('BMA_FIXTURE'): return []
         else:
-            req = urllib.request.Request(TW_CANAL, headers={'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json'})
-            with urllib.request.urlopen(req, timeout=90) as r: raw = json.loads(r.read().decode('utf-8'))
+            raw = json.loads(net.get(TW_CANAL, headers={'Accept': 'application/json'}).decode('utf-8'))
     except Exception as ex:
         print('ThaiWater canal list not available:', ex); return []
     data = raw if isinstance(raw, list) else raw.get('data', []) if isinstance(raw, dict) else []
@@ -234,13 +234,12 @@ def main():
     fx = os.environ.get('BMA_FIXTURE')
     if fx: page = open(fx, encoding='utf-8').read()
     else:
-        req = urllib.request.Request(URL, headers={'User-Agent': 'Mozilla/5.0 (pmr-ert-flood; github.com/plusproperty-system/ert-flood)', 'Accept-Language': 'th'})
-        with urllib.request.urlopen(req, timeout=90) as r: page = r.read().decode('utf-8', 'replace')
+        page = net.get(URL, headers={'Accept-Language': 'th,en;q=0.8', 'Accept': 'text/html'}).decode('utf-8', 'replace')
     stations = parse(page)
     if not stations:
         os.makedirs(os.path.join(ROOT, 'debug'), exist_ok=True)
         open(os.path.join(ROOT, 'debug', 'bma_page.html'), 'w', encoding='utf-8').write(page)
-        sys.exit('no station rows found on the page (saved to debug/bma_page.html)')
+        sys.exit(f'เปิดเว็บได้แต่ไม่พบตารางจุดวัด (หน้าเว็บยาว {len(page)} ตัวอักษร เก็บไว้ใน Artifacts ชื่อ bma-page)')
     coords = load_coords()
     added = match_coords(stations, coords, thaiwater_canals())
     save_coords(coords)
@@ -287,8 +286,10 @@ def main():
     idx = json.load(open(idx_p, encoding='utf-8')) if os.path.exists(idx_p) else {'days': []}
     day = now.strftime('%Y-%m-%d'); idx['days'] = [x for x in idx['days'] if x['day'] != day] + [{'day': day, 'at': out['at']}]
     json.dump(idx, open(idx_p, 'w', encoding='utf-8'), ensure_ascii=False)
+    msg = f"ข้อมูล {out['at']} · {len(S)} จุดวัด · มีพิกัด {out['withxy']} · จับคู่โครงการ {len(pj)} · ล้นตลิ่ง {lvc[5]} วิกฤต {lvc[4]} เตือนภัย {lvc[3]}"
     print(out['at'], len(S), 'stations;', out['withxy'], 'with coordinates (+', added, 'matched now);', len(pj), 'projects mapped; levels', lvc)
+    return msg
 
 
 if __name__ == '__main__':
-    main()
+    net.run(main, 'ดึงระดับน้ำคลอง กทม.')

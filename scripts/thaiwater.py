@@ -11,6 +11,7 @@ Writes docs/data/water/latest.json, docs/data/water/<YYYY-MM-DD>.json (last run 
 and docs/data/water/index.json. Run: python scripts/thaiwater.py
 """
 import json, math, os, sys, datetime, urllib.request
+import net
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'docs', 'data')
@@ -20,9 +21,7 @@ TH = datetime.timezone(datetime.timedelta(hours=7))
 
 
 def fetch(name):
-    req = urllib.request.Request(BASE + name, headers={'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json'})
-    with urllib.request.urlopen(req, timeout=90) as r:
-        return json.loads(r.read().decode('utf-8'))
+    return json.loads(net.get(BASE + name, headers={'Accept': 'application/json'}).decode('utf-8'))
 
 
 def rows(raw):
@@ -148,7 +147,8 @@ def main():
     c = {}
     for t in snap['pj'].values(): c[t['a']] = c.get(t['a'], 0) + 1
     print(snap['at'], snap['note'], c)
+    return f"ข้อมูล {snap['at']} · {snap['note']}"
 
 
 if __name__ == '__main__':
-    main()
+    net.run(main, 'ดึงระดับน้ำ ThaiWater')
