@@ -647,6 +647,10 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
 .wwlg i{display:inline-block;width:20px;height:4px;border-radius:2px;margin-left:4px}
 .wwlg i.l0{background:var(--ww0)} .wwlg i.l1{background:var(--ww1);height:5px} .wwlg i.l2{background:var(--ww2);height:6px}
 
+/* v14 right-map title */
+.maptitle{position:absolute;top:10px;left:10px;z-index:3;max-width:calc(100% - 110px);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:15px;color:var(--ink);box-shadow:var(--shadow);pointer-events:none;line-height:1.35}
+.maptitle b{font-weight:700}
+
 .fullbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ink);border-radius:8px;padding:6px 12px;color:var(--ink);text-decoration:none;font-weight:600;font-size:14px;background:var(--surface);margin-top:6px}
 .fullbtn:hover{background:var(--water-soft)}
 .auto{font-size:13px;color:var(--muted)}
@@ -697,7 +701,7 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
       <div class="fl"><label for="fProv">จังหวัด</label><select id="fProv"><option value="">ทุกจังหวัด</option></select></div>
       <div class="fl"><label for="fWs">แหล่งน้ำที่เตือน</label><select id="fWs"><option value="">ทุกแหล่งน้ำ</option></select></div>
       <div class="fl"><label for="fRisk">ThaiWater ในรัศมี</label><select id="fRisk"><option value="">ทั้งหมด</option><option value="over">มีสถานีล้นตลิ่ง</option><option value="high">มีสถานีน้ำมาก</option><option value="norm">สถานีปกติ</option><option value="none">ไม่มีสถานี</option><option value="nocoord">ไม่มีพิกัด</option><option value="miss">ไม่มีในข้อมูล ThaiWater</option></select></div>
-      <div class="fl rvf"><label for="fRiv">ระยะจากแม่น้ำ</label><select id="fRiv"><option value="">ทั้งหมด</option><option value="3">ไม่เกิน 3 กม.</option><option value="6">3–6 กม.</option><option value="far">เกิน 6 กม.</option><option value="na">ไม่มีข้อมูล</option></select></div>
+      <div class="fl rvf"><label for="fRiv">ระยะจากแม่น้ำ/คลอง</label><select id="fRiv"><option value="">ทั้งหมด</option><option value="3">ไม่เกิน 3 กม.</option><option value="6">3–6 กม.</option><option value="far">เกิน 6 กม.</option><option value="na">ไม่มีข้อมูล</option></select></div>
       <div class="fl"><label for="fSrc">ที่มาและข้อสังเกต</label><select id="fSrc"><option value="">ทั้งหมด</option><option value="ert">สถานะตาม ERT Update</option><option value="calc">สถานะตามสูตรประกาศ</option><option value="river">สถานะตามระยะจากแม่น้ำ</option><option value="none">ไม่มีข้อมูล</option><option value="repw">หน้างานกรอกสถานะเฝ้าระวัง</option></select></div>
     </div>
     <div class="fstat"><span class="fslab" id="fStLab">สถานะ</span><div class="fsts" id="fSt" role="group" aria-labelledby="fStLab"></div>
@@ -739,6 +743,7 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
           </div>
           <div class="dwrap">
             <div style="position:relative">
+              <div class="maptitle" id="pTitle" aria-live="polite">ภาพขยายโซน กทม. และปริมณฑล</div>
               <svg id="pmap" role="img" aria-label="ภาพขยายกรุงเทพฯ ปริมณฑล และอยุธยา ปักหมุดโครงการตามพิกัดจริงและสีตามสถานะ"></svg>
               <div class="mapctl">
                 <button type="button" id="pIn" aria-label="ขยายภาพขยายกรุงเทพฯ และปริมณฑล">+</button>
@@ -872,7 +877,7 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
 <script>
 (async () => {
 const MS_SKIP = ['om'];
-const RV_HINT = 'ยังไม่มีข้อมูลระยะแม่น้ำ ผู้ดูแลต้องรัน Actions › Rivers and canals ใน GitHub';
+const RV_HINT = 'ยังไม่มีข้อมูลระยะแม่น้ำ/คลอง ผู้ดูแลต้องรัน Actions › Rivers and canals ใน GitHub';
 const EXTRA_COND = [{ k: 'bma', t: 'ใกล้จุดวัดคลอง กทม. ที่วิกฤตหรือล้นตลิ่ง', d: 'จุดวัดระดับน้ำคลอง กทม. ที่จับคู่กับโครงการ', d0: 'จุดวัดของสำนักการระบายน้ำ กทม. ที่จับคู่กับโครงการ', f: p => !!(p.bm && p.bm.lv >= 4) }];   /* no OM names on the public site */
 const FULL = 'https://claude.ai/artifact/VrNYxGs4fTu9fnT2JEVnrD';
 const bust = Math.floor(Date.now() / 6e4);
@@ -888,6 +893,7 @@ if (WWD && WWD.ways && WWD.ways.length) { GEO.ww = WWD.ways; GEO.wwsrc = 'OpenSt
 const WW_PTS = () => [...(TWCUR.stations || []).filter(s => s.la && s.sit >= 4).map(s => ({ la: s.la, lo: s.lo, lv: s.sit === 5 ? 2 : 1 })),
   ...((BM && BM.stations) || []).filter(s => s.la != null && s.lv >= 3).map(s => ({ la: s.la, lo: s.ln, lv: s.lv >= 4 ? 2 : 1 }))];
 const BM = BMAD && BMAD.stations ? BMAD : { at: '', stations: [], pj: {}, radius: 3 };
+const rvNear0 = r => { const c = [r && r.rv, r && r.cn].filter(Boolean); return c.length ? c.reduce((a, b) => b.d < a.d ? b : a) : null; };
 const RVP = RVD && RVD.pj ? RVD.pj : {}, ZW2 = RVD && RVD.zones ? RVD.zones.watch2 : 3, ZW = RVD && RVD.zones ? RVD.zones.watch : 6;
 const TWL = TWL0 || { at: '', note: '', stations: [], pj: {} };
 /* the announcement formula as set by the user: original formula first, extra rule only where it says "ไม่ตรงเงื่อนไข"; blank and text = 0 */
@@ -910,7 +916,7 @@ const P = MST.projects.map((m, i) => {
     p.why = has ? `ข้อมูลสำรวจ ${d2th(r.at)}: น้ำหน้าถนน ${r.I != null ? r.I + ' ซม.' : 'ไม่ได้กรอก'} ระดับน้ำบ่อ ${r.J != null ? r.J + ' ซม.' : 'ไม่ได้กรอก'} น้ำในโครงการ ${r.K != null ? r.K + ' ซม.' : 'ไม่ได้กรอก'} ระบบไฟฟ้า${r.L === 1 ? 'ใช้งานไม่ได้' : r.L === 0 ? 'ใช้งานได้' : 'ไม่ได้กรอก'}`
       : `ข้อมูลสำรวจ ${d2th(r.at)} ยังไม่มีตัวเลขระดับน้ำ ค่าว่างนับเป็น 0 สูตรประกาศจึงให้สถานะปกติ`;
     /* no water-level numbers: a river within 3 km = เฝ้าระวังพิเศษ, within 6 km = เฝ้าระวัง (the more severe of this and the formula wins) */
-    const rv = p.rv && p.rv.rv;
+    const rv = rvNear0(p.rv);
     if (![r.I, r.J, r.K].some(v => v != null) && rv) {
       const z = rv.d <= ZW2 ? 'เฝ้าระวังพิเศษ' : rv.d <= ZW ? 'เฝ้าระวัง' : null, ord = ['วิกฤตรุนแรง', 'วิกฤต', 'เฝ้าระวังพิเศษ', 'เฝ้าระวัง', 'ปกติ'];
       if (z && ord.indexOf(z) < ord.indexOf(p.st)) { p.st = z; p.src = 'river'; p.why = `ข้อมูลสำรวจ ${d2th(r.at)} ยังไม่มีตัวเลขระดับน้ำ และโครงการอยู่ห่าง${rv.n} ${rv.d.toFixed(1)} กม. (ไม่เกิน ${rv.d <= ZW2 ? ZW2 : ZW} กม.) จึงเป็น${z}`; }
@@ -931,7 +937,7 @@ const ORDER = ['วิกฤตรุนแรง','วิกฤต','เฝ้�
 const ALLST = [...ORDER, 'ไม่ระบุ'];
 const KEYS = ['xcrit','crit','watch2','watch','ok','na'];
 const A = { over:{t:'มีสถานีล้นตลิ่งในรัศมี',s:'ล้นตลิ่ง',lv:'hi',o:0}, high:{t:'มีสถานีน้ำมากในรัศมี',s:'น้ำมาก',lv:'mid',o:1}, norm:{t:'สถานีในรัศมีปกติ',s:'ปกติ',lv:'low',o:2}, none:{t:'ไม่มีสถานีในรัศมี',s:'ไม่มีสถานี',lv:'low',o:3}, nocoord:{t:'ไม่มีพิกัด',s:'ไม่มีพิกัด',lv:'low',o:4}, miss:{t:'ไม่มีในไฟล์ ThaiWater',s:'ไม่มีข้อมูล',lv:'low',o:5} };
-const SRC = { ert:'ตาม ERT Update', calc:'ตามสูตรประกาศ', river:'ตามระยะจากแม่น้ำ', none:'ไม่มีข้อมูล' };
+const SRC = { ert:'ตาม ERT Update', calc:'ตามสูตรประกาศ', river:'ตามระยะจากแม่น้ำ/คลอง', none:'ไม่มีข้อมูล' };
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf = n => (+n || 0).toLocaleString('en-US');
@@ -941,7 +947,7 @@ const isAffected = p => S[p.st].o <= 4, isFlooded = p => S[p.st].o <= 2;
 const rgName = g => g == null ? 'ไม่ทราบจังหวัด' : (GEO.rg[g].bk ? 'กทม. ' + GEO.rg[g].no + ' · ' : '') + GEO.rg[g].n;
 const repWatch = p => p.rep === 'เฝ้าระวัง' && p.st === 'ปกติ', inReg = p => !!p.reg, isWatch = p => S[p.st].o === 3 || S[p.st].o === 4;
 const regText = p => p.fm0 || [p.imp ? p.impt : '', p.sys.length ? 'งานระบบได้รับผลกระทบ: ' + p.sys.join(', ') : ''].filter(Boolean).join('; ');
-const srcMatch = (p, v) => v === 'repw' ? repWatch(p) : v === 'reg' ? inReg(p) : v === 'rkh' ? p.rk === 'สูง' : v === 'rkm' ? p.rk === 'กลาง' : p.src === v;
+const srcMatch = (p, v) => v === 'dq' ? dqNotes(p).length > 0 : v === 'repw' ? repWatch(p) : v === 'reg' ? inReg(p) : v === 'rkh' ? p.rk === 'สูง' : v === 'rkm' ? p.rk === 'กลาง' : p.src === v;
 const flags = p => (repWatch(p) ? '<span class="flag f-rep">หน้างานกรอกเฝ้าระวัง</span>' : '') + (inReg(p) ? '<span class="flag f-reg">ทะเบียนผลกระทบ</span>' : '');
 const area = p => [p.d, p.pv].filter(Boolean).join(' ') || 'ไม่ทราบจังหวัด';
 const km = v => (+v).toFixed(1) + ' กม.';
@@ -1099,7 +1105,9 @@ function bmaDetail(p) {
 F.st = new Set(); F.pick = null;
 let HAS_RV = P.some(p => p.rv);
 document.body.classList.toggle('norv', !HAS_RV);
-const rvD = p => p.rv && p.rv.rv ? p.rv.rv.d : null;
+/* nearest named river (แม่น้ำ…) or canal (คลอง…) — both count for the watch zones */
+const rvNear = r => { const c = [r && r.rv, r && r.cn].filter(Boolean); return c.length ? c.reduce((a, b) => b.d < a.d ? b : a) : null; };
+const rvD = p => { const n = rvNear(p.rv); return n ? n.d : null; };
 const FIDS = ['q', 'fRegion', 'fProv', 'fRisk', 'fSrc', 'fWs', 'fRiv'];
 /* project filters matching the PMR Site Visit dashboard (multi-select, "ทั้งหมด" = no filter) */
 const svf = k => p => { const v = p.sv && p.sv[k]; return v == null || v === '' || v === '-' ? 'ไม่ระบุ' : v; };
@@ -1261,8 +1269,8 @@ $('eqDl').onclick = () => { const { ps, by } = eqRows();
 const zShort = g => g == null ? 'ไม่ทราบจังหวัด' : GEO.rg[g].bk ? 'กทม. ' + GEO.rg[g].no + ' ' + GEO.rg[g].n : GEO.rg[g].n;
 /* summary: how many projects are selected, then which conditions they meet */
 const COND = [
-  { k: 'rv3', t: 'อยู่ห่างแม่น้ำไม่เกิน 3 กม.', d: 'วัดจากที่ตั้งโครงการถึงแม่น้ำสายที่ใกล้ที่สุด', rv: 1, f: p => rvD(p) != null && rvD(p) <= 3 },
-  { k: 'rv6', t: 'อยู่ห่างแม่น้ำ 3–6 กม.', d: 'ไกลกว่า 3 กม. แต่ไม่เกิน 6 กม.', rv: 1, f: p => rvD(p) != null && rvD(p) > 3 && rvD(p) <= 6 },
+  { k: 'rv3', t: 'อยู่ห่างแม่น้ำหรือคลองไม่เกิน 3 กม.', d: 'วัดจากที่ตั้งโครงการถึงแม่น้ำหรือคลองที่มีชื่อและใกล้ที่สุด', rv: 1, f: p => rvD(p) != null && rvD(p) <= 3 },
+  { k: 'rv6', t: 'อยู่ห่างแม่น้ำหรือคลอง 3–6 กม.', d: 'ไกลกว่า 3 กม. แต่ไม่เกิน 6 กม.', rv: 1, f: p => rvD(p) != null && rvD(p) > 3 && rvD(p) <= 6 },
   { k: 'over', t: 'ใกล้สถานีวัดน้ำที่ล้นตลิ่ง', d: 'สถานี ThaiWater ล้นตลิ่ง ห่างไม่เกิน 10 กม. (คลอง กทม. 3 กม.)', f: p => p.tw.a === 'over' },
   { k: 'high', t: 'ใกล้สถานีวัดน้ำที่น้ำมาก', d: 'ยังไม่ล้นตลิ่ง แต่ระดับน้ำสูงเกินเกณฑ์เตือน', f: p => p.tw.a === 'high' },
   ...(typeof EXTRA_COND !== 'undefined' ? EXTRA_COND : []),
@@ -1285,7 +1293,7 @@ function renderDay(list) {
     const off = cd.rv && !HAS_RV, x = off ? 0 : base.filter(cd.f).length, on = F.cond === cd.k;
     return `<button type="button" class="cond${off ? ' off' : ''}${x ? '' : ' zero'}" data-cond="${cd.k}" aria-pressed="${on}"${off ? ' disabled' : ''}>
       <span class="ct">${cd.t}</span><span class="cn"><b>${off ? '–' : nf(x)}</b>${off ? '' : ` <small>โครงการ · ${pct(x)}%</small>`}</span>
-      <span class="cbar"><i style="width:${off ? 0 : pct(x)}%"></i></span><span class="cd">${off ? (typeof RV_HINT !== 'undefined' ? RV_HINT : 'ยังไม่มีข้อมูลระยะแม่น้ำ กดปุ่ม "นำเข้าระยะแม่น้ำ"') : cd.d}</span></button>`;
+      <span class="cbar"><i style="width:${off ? 0 : pct(x)}%"></i></span><span class="cd">${off ? (typeof RV_HINT !== 'undefined' ? RV_HINT : 'ยังไม่มีข้อมูลระยะแม่น้ำ/คลอง กดปุ่ม "นำเข้าระยะแม่น้ำ"') : cd.d}</span></button>`;
   }).join('');
   $('twStale').hidden = age <= 24;
   $('twStale').textContent = `ข้อมูลระดับน้ำที่แสดงเป็นของวันที่ ${thDate(TWCUR.at)} ผ่านมาแล้ว ${age >= 48 ? Math.floor(age / 24) + ' วัน' : Math.round(age) + ' ชั่วโมง'} ระบบดึงข้อมูลใหม่ทุกชั่วโมง ถ้ายังไม่อัปเดต ให้ผู้ดูแลตรวจหน้า Actions ใน GitHub`;
@@ -1531,11 +1539,12 @@ function renderBMR(list) {
   const k = pz.k(), on = new Set(list.map(p => p.i)), u = v => (v / k).toFixed(2);
   pz.set(); psvg.classList.toggle('zoomed', k > 1.01);
   const selRg = $('fRegion').value;
+  $('pTitle').innerHTML = selRg !== '' && GEO.rg[+selRg] && GEO.rg[+selRg].bk ? `ภาพขยายโซน <b>${esc(rgName(+selRg))}</b>` : 'ภาพขยายโซน <b>กทม. 1–4 และปริมณฑล</b>';
   psvg.innerHTML = PVD + ZPD.map(([z, d]) => `<path class="pv zn4 rg${z.g}${selRg === String(z.g) ? ' sel' : selRg !== '' ? ' dim' : ''}" data-g="${z.g}" d="${d}" vector-effect="non-scaling-stroke"/>`).join('') + PVN + wwBM() +
     GEO.pv.filter(p => p.a > .02 && p.g >= 0).map(p => { const [x, y] = proj(p.at); return `<text class="pvlab" x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${u(11.5)}">${p.n}</text>`; }).join('') +
     INWIN.map(p => { const [x, y] = proj([p.la, p.lo]), rg = on.has(p.i) ? ringOf(p) : ''; return `<g class="pp s-${S[p.st].k}${on.has(p.i) ? '' : ' off'}" data-i="${p.i}" transform="translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${(.85 / k).toFixed(4)})">${rg ? `<circle class="pr ${rg}" cy="-10.2" r="8.6"/>` : ''}<path d="${PIN}"/><circle cy="-10.2" r="1.7"/></g>`; }).join('') +
     STN().filter(([s]) => s.la >= GEO.win[0] && s.la <= GEO.win[2] && s.lo >= GEO.win[1] && s.lo <= GEO.win[3]).map(([s, j]) => { const [x, y] = proj([s.la, s.lo]); return `<g class="stn s${s.sit}" data-sti="${j}" transform="translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${(1 / k).toFixed(4)})"><path d="M0-8L7 5H-7Z" stroke-width="1.6"/></g>`; }).join('') +
-    GEO.zp.map(z => { const [x, y] = proj(z.at), r = GEO.rg[z.g]; return `<text class="zlab${selRg !== '' && selRg !== String(z.g) ? ' dim' : ''}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${u(12.5)}" stroke-width="${u(3.2)}">${r.s}</text>`; }).join('');
+    GEO.zp.map(z => { const [x, y] = proj(z.at), r = GEO.rg[z.g]; return `<text class="zlab${selRg !== '' && selRg !== String(z.g) ? ' dim' : ''}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" font-size="${u(19)}" stroke-width="${u(4.6)}">${r.s}</text>`; }).join('');
 }
 $('pIn').onclick = () => pz.zoom(1.6); $('pOut').onclick = () => pz.zoom(1 / 1.6);
 $('pBkk').onclick = () => pz.zoom(2.6, proj([13.77, 100.58])); $('pAll').onclick = () => pz.zoom(1, [MP.W / 2, MP.H / 2]);
@@ -1555,7 +1564,7 @@ function renderTable(list) {
   const rows = [...list].sort((a, b) => S[a.st].o - S[b.st].o || A[a.tw.a].o - A[b.tw.a].o || a.n.localeCompare(b.n, 'th'));
   $('tbody').innerHTML = rows.map(p => { const a = A[p.tw.a], d = wsDist(p);
     return `<tr data-i="${p.i}" tabindex="0"><td data-v="${esc(p.n)}"><b>${esc(p.n)}</b></td><td>${esc(p.io)}</td><td>${esc(p.bu)}</td><td data-v="${p.g ?? 99}" data-csv="${esc(zShort(p.g))}">${esc(p.g != null && GEO.rg[p.g].bk ? 'กทม. ' + GEO.rg[p.g].no : zShort(p.g))}</td><td>${esc(p.d || '–')}</td><td>${esc(p.pv || '–')}</td>
-      <td data-v="${S[p.st].o}" data-csv="${stShort(p.st)}">${tag(p.st)}</td><td data-csv="${SRC[p.src]}">${p.src === 'ert' ? 'ERT Update' : p.src === 'calc' ? 'สูตรประกาศ' : p.src === 'river' ? 'ระยะแม่น้ำ' : 'ไม่มีข้อมูล'}</td><td data-v="${p.rep ? (p.rep === 'เฝ้าระวัง' ? 0 : 1) : ''}" data-csv="${p.rep || ''}">${p.rep ? (repWatch(p) ? '<span class="flag f-rep">เฝ้าระวัง</span>' : esc(p.rep)) : '–'}</td><td data-v="${a.o}" data-csv="${a.t}"><span class="lv l-${a.lv}">${a.s}</span></td><td>${esc(wsName(p) || '–')}</td><td class="n" data-v="${d ?? ''}">${d != null ? d.toFixed(1) : '–'}</td><td class="rvcol">${esc(p.rv && p.rv.near && p.rv.near[0] ? p.rv.near[0].n : p.rv && p.rv.rv ? p.rv.rv.n : '–')}</td><td class="n rvcol" data-v="${rvD(p) ?? ''}">${rvD(p) != null ? rvD(p).toFixed(1) : '–'}</td>${bmaCell(p)}</tr>`; }).join('');
+      <td data-v="${S[p.st].o}" data-csv="${stShort(p.st)}">${tag(p.st)}</td><td data-csv="${SRC[p.src]}">${p.src === 'ert' ? 'ERT Update' : p.src === 'calc' ? 'สูตรประกาศ' : p.src === 'river' ? 'ระยะแม่น้ำ/คลอง' : 'ไม่มีข้อมูล'}</td><td data-v="${p.rep ? (p.rep === 'เฝ้าระวัง' ? 0 : 1) : ''}" data-csv="${p.rep || ''}">${p.rep ? (repWatch(p) ? '<span class="flag f-rep">เฝ้าระวัง</span>' : esc(p.rep)) : '–'}</td><td data-v="${a.o}" data-csv="${a.t}"><span class="lv l-${a.lv}">${a.s}</span></td><td>${esc(wsName(p) || '–')}</td><td class="n" data-v="${d ?? ''}">${d != null ? d.toFixed(1) : '–'}</td><td class="rvcol">${esc(p.rv && p.rv.near && p.rv.near[0] ? p.rv.near[0].n : p.rv && p.rv.rv ? p.rv.rv.n : '–')}</td><td class="n rvcol" data-v="${rvD(p) ?? ''}">${rvD(p) != null ? rvD(p).toFixed(1) : '–'}</td>${bmaCell(p)}</tr>`; }).join('');
   $('empty').hidden = rows.length > 0; $('ptable').hidden = rows.length === 0; resort($('ptable'));
 }
 
@@ -1614,7 +1623,7 @@ function renderNotes() {
     `ข้อมูลสำรวจล่าสุดจากไฟล์ "คำตอบทั้งหมด" ${SV && SV.at ? 'อัปโหลดเมื่อ ' + d2th(SV.at) : 'ยังไม่มี'} สถานะตามสูตร ${c('calc')} โครงการ ตาม ERT Update ${c('ert')} โครงการ ไม่มีข้อมูล ${c('none')} โครงการ`,
     `ระดับน้ำดึงจาก ThaiWater (api-v3.thaiwater.net) อัตโนมัติทุกชั่วโมง ชุดที่แสดงอยู่ดึงเมื่อ${thDate(TWCUR.at)} ${TWCUR.note ? '(' + TWCUR.note + ')' : ''} รัศมีเตือน แม่น้ำ/ลำน้ำ 10 กม. คลอง กทม. 3 กม. ไม่ใช้สถานีที่ข้อมูลเก่ากว่า 24 ชั่วโมง (คลอง กทม. 6 ชั่วโมง)`,
     'กรุงเทพฯ และปริมณฑลแบ่งเป็น 4 โซน ฝั่งตะวันตกของแม่น้ำเจ้าพระยาเป็นโซน 4 ฝั่งตะวันออกแบ่งด้วยแนวถนนเพชรบุรี แนวอ่อนนุช และแนวลาดพร้าว–รามอินทรา ต่างจังหวัด 12 โซนเป็นการจัดกลุ่มจังหวัดที่ตั้งขึ้นสำหรับแดชบอร์ดนี้',
-    RVD ? `ระยะจากแม่น้ำและคลองคำนวณจาก OpenStreetMap เมื่อ${thDate(RVD.at)} โครงการที่ไม่มีตัวเลขระดับน้ำ ถ้าอยู่ห่างแม่น้ำไม่เกิน ${ZW2} กม. เป็นเฝ้าระวังพิเศษ ไม่เกิน ${ZW} กม. เป็นเฝ้าระวัง` : 'ยังไม่มีข้อมูลระยะจากแม่น้ำ ให้ผู้ดูแลรัน Actions › Rivers and canals หนึ่งครั้ง',
+    RVD ? `ระยะจากแม่น้ำและคลองคำนวณจาก OpenStreetMap เมื่อ${thDate(RVD.at)} โครงการที่ไม่มีตัวเลขระดับน้ำ ถ้าอยู่ห่างแม่น้ำหรือคลองที่มีชื่อไม่เกิน ${ZW2} กม. เป็นเฝ้าระวังพิเศษ ไม่เกิน ${ZW} กม. เป็นเฝ้าระวัง` : 'ยังไม่มีข้อมูลระยะจากแม่น้ำ ให้ผู้ดูแลรัน Actions › Rivers and canals หนึ่งครั้ง',
     BM.at ? `ระดับน้ำคลอง กทม. จาก ${BM.srcname || 'เว็บสำนักการระบายน้ำ (weather.bangkok.go.th/water)'} ดึงอัตโนมัติทุกชั่วโมง ชุดล่าสุด ${thDate(BM.at)} หน่วย ม.รทก. ห่างตลิ่งคิดจากตลิ่งด้านที่ต่ำกว่า จุดวัดที่ไม่มีระดับตลิ่งใช้ระยะถึงระดับวิกฤตแทน ข้อมูลเก่ากว่า 3 ชั่วโมงถือว่าค้าง จุดวัดที่ไม่มีพิกัดจับคู่โครงการด้วยเขต จึงเป็นการจับคู่แบบหยาบ` : 'ยังไม่มีข้อมูลระดับน้ำคลอง กทม. ให้ผู้ดูแลรัน Actions › BMA canal levels hourly หนึ่งครั้ง',
     'เว็บนี้เป็นฉบับสาธารณะ ไม่มีชื่อผู้รับผิดชอบ จำนวนผู้พักอาศัย และข้อมูลภายในอื่น ทีมงานดูข้อมูลเต็มได้จากปุ่ม "ดูเวอร์ชันเต็ม สำหรับทีมงาน"'
   ].map(t => `<li>${esc(t)}</li>`).join('');

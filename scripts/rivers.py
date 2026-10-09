@@ -2,10 +2,10 @@
 
 Rivers and canals rarely change, so this runs once a month or on demand (Actions > Rivers > Run workflow).
 For each project it keeps:
-  rv   nearest waterway=river   {n: name, d: km}
-  cn   nearest waterway=canal   {n: name, d: km}
+  rv   nearest river (name starts with แม่น้ำ) {n: name, d: km}
+  cn   nearest other named waterway (คลอง…) {n: name, d: km}
   near up to 3 named rivers or canals within 6 km, nearest first [{n, t: 'river'|'canal', d}]
-The dashboard uses rv.d for the watch zones (<= 3 km เฝ้าระวังพิเศษ, <= 6 km เฝ้าระวัง) when a project
+The dashboard uses the nearer of rv and cn for the watch zones (<= 3 km เฝ้าระวังพิเศษ, <= 6 km เฝ้าระวัง) when a project
 has no water-level numbers, and near[0] to group projects by the waterway next to them.
 
 Writes docs/data/rivers.json and docs/data/waterways.json (simplified lines for the maps). Run: python scripts/rivers.py
@@ -24,6 +24,7 @@ ENDPOINTS = ['https://overpass-api.de/api/interpreter', 'https://maps.mail.ru/os
 # Overpass servers answer 406 to requests without a clear, non-browser User-Agent
 OP_HEADERS = {'User-Agent': 'pmr-ert-flood/1.2 (+https://github.com/plusproperty-system/ert-flood)', 'Accept': 'application/json, */*;q=0.5'}
 TH = datetime.timezone(datetime.timedelta(hours=7))
+DEADLINE = time.time() + 40 * 60   # stop asking Overpass after 40 min and save what we have (the job is killed at 60 min)
 
 
 def _op(url, q, post):
@@ -31,7 +32,7 @@ def _op(url, q, post):
         req = urllib.request.Request(url, data=urllib.parse.urlencode({'data': q}).encode(), headers={**OP_HEADERS, 'Content-Type': 'application/x-www-form-urlencoded'})
     else:
         req = urllib.request.Request(url + '?' + urllib.parse.urlencode({'data': q}), headers=OP_HEADERS)
-    with urllib.request.urlopen(req, timeout=200) as r:
+    with urllib.request.urlopen(req, timeout=max(20, min(120, DEADLINE - time.time()))) as r:
         d = json.loads(r.read().decode('utf-8'))
     if d.get('remark') and 'error' in d['remark'].lower(): raise RuntimeError(d['remark'][:200])
     return d.get('elements', [])
@@ -44,13 +45,21 @@ def overpass(bbox):
     for rnd in range(2):
         for url in ENDPOINTS:
             for post in (True, False):
+                if time.time() > DEADLINE: return None
                 try:
                     els = _op(url, q, post); print(f'    {url} {"POST" if post else "GET"} ok'); return els
                 except Exception as ex:
                     print(f'    {url} {"POST" if post else "GET"} failed: {str(ex)[:160]}'); net.TRIED.append(f'{url.split("/")[2]} {"POST" if post else "GET"}: {str(ex)[:120]}')
                     time.sleep(3)
-        time.sleep(30)
+        if time.time() < DEADLINE - 60: time.sleep(30)
     return None
+
+
+def kind(name):
+    """OSM tags many Bangkok khlongs as waterway=river, so the type comes from the Thai name:
+    แม่น้ำ… = river (used for the watch zones), any other name = canal, no name = stream (map only)"""
+    if name.startswith('แม่น้ำ'): return 'river'
+    return 'canal' if name else 'stream'
 
 
 def name_of(tags):
@@ -83,13 +92,14 @@ def map_layer(ways):
     """rivers and named canals, simplified (~150 m) for drawing on the dashboard maps"""
     out = []
     for w in ways:
-        if w['t'] == 'canal' and not w['n']: continue
+        if w['t'] == 'stream' and len(w['g']) < 4: continue
         g = [[round(a, 4), round(b, 4)] for a, b in rdp(w['g'], 0.0015)]
         if len(g) >= 2: out.append({'n': w['n'], 't': w['t'], 'g': [g]})
     return out
 
 
 def compute(projects, ways):
+    ways = [w for w in ways if w['t'] in ('river', 'canal')]
     """ways: list of {t: 'river'|'canal', n: name, g: [(lat, lon), ...]}"""
     # precompute bounding boxes
     for w in ways:
@@ -150,7 +160,9 @@ def main():
     for el in elements.values():
         g = [(pt['lat'], pt['lon']) for pt in el.get('geometry', []) if pt]
         t = el.get('tags', {}).get('waterway')
-        if g and t in ('river', 'canal'): ways.append({'t': t, 'n': name_of(el.get('tags', {})), 'g': g})
+        if g and t in ('river', 'canal'):
+            n = name_of(el.get('tags', {}))
+            ways.append({'t': kind(n), 'n': n, 'g': g})
     bad = {p['k'] for p in failed}
     pj = compute([p for p in pts if p['k'] not in bad], ways)
     old_p = os.path.join(DATA, 'rivers.json')
