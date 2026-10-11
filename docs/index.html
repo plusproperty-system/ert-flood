@@ -661,6 +661,20 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
 .ftog i{font-style:normal;font-size:12px;color:var(--muted)}
 .filters.collapsed .fhead{margin-bottom:6px}
 .filters.collapsed .fstat{border-top:0;margin-top:0;padding-top:0}
+/* v18 entry-error status */
+:root{--err:#C2185B;--err-bg:#FCE4EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--err:#F48FB1;--err-bg:#4A1426}}
+:root[data-theme="dark"]{--err:#F48FB1;--err-bg:#4A1426}
+.s-err{--c:var(--err);--cbg:var(--err-bg)}
+.chip.s-err{background:var(--cbg);border-color:var(--c);border-style:dashed}
+/* v19 เฝ้าระวังพิเศษจากแหล่งน้ำ: lighter orange with a dashed edge */
+:root{--watch2r:#F59E3B;--watch2r-bg:#FFF0DC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--watch2r:#FFB866;--watch2r-bg:#3D2A12}}
+:root[data-theme="dark"]{--watch2r:#FFB866;--watch2r-bg:#3D2A12}
+.s-watch2r{--c:var(--watch2r);--cbg:var(--watch2r-bg)}
+.chip.s-watch2r{background:var(--cbg);border-color:var(--watch2);border-style:dashed}
+.tag.s-watch2r,.stc.s-watch2r{border-style:dashed;border-color:var(--watch2)}
+#thmap .pill.s-watch2r text{fill:#10262F}
 
 .fullbtn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--ink);border-radius:8px;padding:6px 12px;color:var(--ink);text-decoration:none;font-weight:600;font-size:14px;background:var(--surface);margin-top:6px}
 .fullbtn:hover{background:var(--water-soft)}
@@ -832,7 +846,7 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
     </div>
     <div class="tablebox zbox">
       <table class="zt sortable" id="ztable">
-        <thead><tr><th id="zHead">โซน</th><th class="n">โครงการ</th><th class="n">วิกฤต<br>รุนแรง</th><th class="n">วิกฤต</th><th class="n">เฝ้าระวัง<br>พิเศษ</th><th class="n">เฝ้าระวัง</th><th class="n">ปกติ</th><th class="n">ไม่มี<br>ข้อมูล</th><th class="n">ในรัศมี<br>สถานีล้นตลิ่ง</th><th class="n">ในรัศมี<br>สถานีน้ำมาก</th><th class="n">หน้างานกรอก<br>เฝ้าระวัง</th></tr></thead>
+        <thead><tr><th id="zHead">โซน</th><th class="n">โครงการ</th><th class="n">วิกฤต<br>รุนแรง</th><th class="n">วิกฤต</th><th class="n">เฝ้าระวัง<br>พิเศษ</th><th class="n">เฝ้าระวังพิเศษ<br>จากแหล่งน้ำ</th><th class="n">เฝ้าระวัง</th><th class="n">ปกติ</th><th class="n">กรอกข้อมูล<br>ผิดพลาด</th><th class="n">ไม่มี<br>ข้อมูล</th><th class="n">ในรัศมี<br>สถานีล้นตลิ่ง</th><th class="n">ในรัศมี<br>สถานีน้ำมาก</th><th class="n">หน้างานกรอก<br>เฝ้าระวัง</th></tr></thead>
         <tbody id="zbody"></tbody>
       </table>
     </div>
@@ -948,7 +962,7 @@ const rvNear0 = r => { const c = [r && r.rv, r && r.cn].filter(Boolean); return 
 const RVP = RVD && RVD.pj ? RVD.pj : {}, ZW2 = RVD && RVD.zones ? RVD.zones.watch2 : 3, ZW = RVD && RVD.zones ? RVD.zones.watch : 6;
 const TWL = TWL0 || { at: '', note: '', stations: [], pj: {} };
 /* the announcement formula as set by the user: original formula first, extra rule only where it says "ไม่ตรงเงื่อนไข"; blank and text = 0 */
-const comb = (I, J, K, L) => { const i = +I || 0, j = +J || 0, k = +K || 0, l = L === 1 ? 1 : 0;
+const comb = (I, J, K, L) => { if ([I, J, K].some(x => x != null && x !== '' && +x < 0)) return 'กรอกข้อมูลผิดพลาด'; const i = +I || 0, j = +J || 0, k = +K || 0, l = L === 1 ? 1 : 0;
   if (i === 15 && j === 50) return 'เฝ้าระวังพิเศษ'; if (l === 1 || k >= 60) return 'วิกฤตรุนแรง'; if (k > 0 || i >= 15) return 'วิกฤต';
   if (i <= 0 && (j === 0 || j > 50)) return 'ปกติ'; if (j >= 30) return 'เฝ้าระวัง'; return 'วิกฤต'; };
 const REPM = { 'คงที่': 'ปกติ', 'ลดลง': 'ปกติ', 'ปกติ': 'ปกติ', 'เฝ้าระวัง': 'เฝ้าระวัง', 'วิกฤต': 'วิกฤต', 'สูงขึ้น': 'เฝ้าระวัง' };
@@ -960,8 +974,9 @@ const rqClean = q => { if (typeof q.oth !== 'string') return q; const o = q.oth.
 const P = MST.projects.map((m, i) => {
   const p = { ...m, i, sys: [], eq: (SV && SV.eq && SV.eq[m.k]) || {}, rq: rqClean((SV && SV.rq && SV.rq[m.k]) || {}), tw: (TWL.pj || {})[m.k] || { a: 'miss' }, bm: BM.pj[m.k] || null };
   if (RVP[m.k]) p.rv = RVP[m.k];
-  const r = SVR[m.k], e = ERTI[m.k];
+  const r = SVR[m.k]; let e = ERTI[m.k];
   if (r) { p.pit = r.J ?? null; p.road = r.I ?? null; p.inp = r.K ?? null; p.pow = r.L ?? null; p.repraw = r.rep || ''; p.rep = REPM[String(r.rep || '').trim()] || ''; p.svat = r.at || ''; }
+  if (e && r && String(r.at || '') > String(e.at || '')) { p.ertold = e; p.ert = e.note || ''; e = null; }   /* a survey answer newer than the ERT Update wins */
   if (e) { p.st = e.st; p.src = 'ert'; p.ert = e.note || ''; p.why = 'ERT Update ' + d2th(e.at) + (e.note ? ': ' + e.note : ''); }
   else if (r) {
     p.st = comb(r.I, r.J, r.K, r.L); p.src = 'calc';
@@ -971,8 +986,8 @@ const P = MST.projects.map((m, i) => {
     /* no water-level numbers: a river within 3 km = เฝ้าระวังพิเศษ, within 6 km = เฝ้าระวัง (the more severe of this and the formula wins) */
     const rv = rvNear0(p.rv);
     if (![r.I, r.J, r.K].some(v => v != null) && rv) {
-      const z = rv.d <= ZW2 ? 'เฝ้าระวังพิเศษ' : rv.d <= ZW ? 'เฝ้าระวัง' : null, ord = ['วิกฤตรุนแรง', 'วิกฤต', 'เฝ้าระวังพิเศษ', 'เฝ้าระวัง', 'ปกติ'];
-      if (z && ord.indexOf(z) < ord.indexOf(p.st)) { p.st = z; p.src = 'river'; p.why = `ข้อมูลสำรวจ ${d2th(r.at)} ยังไม่มีตัวเลขระดับน้ำ และโครงการอยู่ห่าง${rv.n} ${rv.d.toFixed(1)} กม. (ไม่เกิน ${rv.d <= ZW2 ? ZW2 : ZW} กม.) จึงเป็น${z}`; }
+      const z = rv.d <= ZW2 ? 'เฝ้าระวังพิเศษจากแหล่งน้ำ' : rv.d <= ZW ? 'เฝ้าระวัง' : null, ord = ['วิกฤตรุนแรง', 'วิกฤต', 'เฝ้าระวังพิเศษ', 'เฝ้าระวัง', 'ปกติ'], rk = s => ord.indexOf(s === 'เฝ้าระวังพิเศษจากแหล่งน้ำ' ? 'เฝ้าระวังพิเศษ' : s);
+      if (z && rk(z) >= 0 && rk(z) < rk(p.st)) { p.st = z; p.src = 'river'; p.why = `ข้อมูลสำรวจ ${d2th(r.at)} ยังไม่มีตัวเลขระดับน้ำ และโครงการอยู่ห่าง${rv.n} ${rv.d.toFixed(1)} กม. (ไม่เกิน ${rv.d <= ZW2 ? ZW2 : ZW} กม.) จึงเป็น${z}`; }
     }
   } else { p.st = 'ไม่ระบุ'; p.src = 'none'; p.why = 'ยังไม่มีข้อมูลของโครงการนี้ในแบบสำรวจ'; }
   return p;
@@ -981,14 +996,16 @@ document.getElementById('loadMsg').remove(); document.getElementById('pg-sit').h
 const S = {
   'วิกฤตรุนแรง':{k:'xcrit',o:1,rule:'ระบบไฟฟ้าใช้ไม่ได้ หรือน้ำในโครงการตั้งแต่ 60 ซม.'},
   'วิกฤต':{k:'crit',o:2,rule:'มีน้ำในโครงการ หรือน้ำหน้าถนนตั้งแต่ 15 ซม. หรือผิวน้ำห่างปากท่อน้อยกว่า 30 ซม. (ท่อ 0 และถนนแห้งนับเป็นปกติ)'},
-  'เฝ้าระวังพิเศษ':{k:'watch2',o:3,rule:'น้ำหน้าถนน 15 ซม. พอดี และผิวน้ำห่างปากท่อ 50 ซม. พอดี'},
+  'เฝ้าระวังพิเศษ':{k:'watch2',o:3,rule:'จากสูตร: น้ำหน้าถนน 15 ซม. พอดี และผิวน้ำห่างปากท่อ 50 ซม. พอดี'},
+  'เฝ้าระวังพิเศษจากแหล่งน้ำ':{k:'watch2r',o:3,rule:'ยังไม่มีตัวเลขระดับน้ำ และโครงการอยู่ห่างแม่น้ำหรือคลองที่มีชื่อไม่เกิน 3 กม.'},
   'เฝ้าระวัง':{k:'watch',o:4,rule:'ผิวน้ำห่างปากท่อ 30–50 ซม. หรือน้ำหน้าถนน 1–14 ซม. โดยท่อยังห่างตั้งแต่ 30 ซม.'},
   'ปกติ':{k:'ok',o:5,rule:'ถนนแห้ง ไม่มีน้ำในโครงการ ไฟฟ้าใช้ได้ และผิวน้ำห่างปากท่อเกิน 50 ซม. หรือไม่ได้กรอกค่า'},
-  'ไม่ระบุ':{k:'na',o:6,rule:''}
+  'กรอกข้อมูลผิดพลาด':{k:'err',o:6,rule:'กรอกระดับน้ำ (ถนน บ่อ หรือในโครงการ) เป็นค่าติดลบ ให้หน้างานแก้ตัวเลขในแบบสำรวจ'},
+  'ไม่ระบุ':{k:'na',o:7,rule:''}
 };
-const ORDER = ['วิกฤตรุนแรง','วิกฤต','เฝ้าระวังพิเศษ','เฝ้าระวัง','ปกติ'];
-const ALLST = [...ORDER, 'ไม่ระบุ'];
-const KEYS = ['xcrit','crit','watch2','watch','ok','na'];
+const ORDER = ['วิกฤตรุนแรง','วิกฤต','เฝ้าระวังพิเศษ','เฝ้าระวังพิเศษจากแหล่งน้ำ','เฝ้าระวัง','ปกติ'];
+const ALLST = [...ORDER, 'กรอกข้อมูลผิดพลาด', 'ไม่ระบุ'];
+const KEYS = ['xcrit','crit','watch2','watch2r','watch','ok','err','na'];
 const A = { over:{t:'มีสถานีล้นตลิ่งในรัศมี',s:'ล้นตลิ่ง',lv:'hi',o:0}, high:{t:'มีสถานีน้ำมากในรัศมี',s:'น้ำมาก',lv:'mid',o:1}, norm:{t:'สถานีในรัศมีปกติ',s:'ปกติ',lv:'low',o:2}, none:{t:'ไม่มีสถานีในรัศมี',s:'ไม่มีสถานี',lv:'low',o:3}, nocoord:{t:'ไม่มีพิกัด',s:'ไม่มีพิกัด',lv:'low',o:4}, miss:{t:'ไม่มีในไฟล์ ThaiWater',s:'ไม่มีข้อมูล',lv:'low',o:5} };
 const SRC = { ert:'ตาม ERT Update', calc:'ตามสูตรประกาศ', river:'ตามระยะจากแม่น้ำ/คลอง', none:'ไม่มีข้อมูล' };
 const $ = id => document.getElementById(id);
@@ -1583,7 +1600,7 @@ function renderTH(list) {
       `<text class="cap" x="${X0}" y="${Y0 - .62}">จังหวัดที่มีโครงการมากที่สุด</text>` +
       top.map(([n, ps], i) => { const y = Y0 + i * .56, c = k2 => ps.filter(p => S[p.st].k === k2).length, pg = GEO.tp.find(t => t.n === n);
         return `<rect class="tpv ${pg && pg.g >= 0 ? 'rg' + pg.g : 'nb'}" style="${pg && pg.g >= 0 ? '' : 'fill:var(--land);stroke-opacity:.6'}" x="${X0}" y="${(y - .26).toFixed(2)}" width=".3" height=".3" rx=".05" pointer-events="none"/><text class="rn" x="${X0 + .42}" y="${y.toFixed(2)}">${n.replace('พระนครศรี', '').replace('ประจวบคีรีขันธ์', 'ประจวบฯ')}</text><text class="rt" x="${(X0 + 2.75).toFixed(2)}" y="${y.toFixed(2)}">${ps.length}</text>` +
-          KEYS.slice(0, 5).map(k2 => [k2, c(k2)]).filter(x => x[1]).map(([k2, v], j) => `<g class="pill s-${k2}"><circle cx="${(X0 + 3.1 + j * .46).toFixed(2)}" cy="${(y - .1).toFixed(2)}" r=".2"/><text x="${(X0 + 3.1 + j * .46).toFixed(2)}" y="${(y - .02).toFixed(2)}">${v}</text></g>`).join(''); }).join('') : '') +
+          KEYS.slice(0, 6).map(k2 => [k2, c(k2)]).filter(x => x[1]).map(([k2, v], j) => `<g class="pill s-${k2}"><circle cx="${(X0 + 3.1 + j * .46).toFixed(2)}" cy="${(y - .1).toFixed(2)}" r=".2"/><text x="${(X0 + 3.1 + j * .46).toFixed(2)}" y="${(y - .02).toFixed(2)}">${v}</text></g>`).join(''); }).join('') : '') +
     PINNED.filter(p => on.has(p.i) && ringOf(p)).map(p => `<circle class="tr ${ringOf(p)}" cx="${ix(p.lo).toFixed(3)}" cy="${iy(p.la).toFixed(3)}" r="${u(.15)}" stroke-width="${u(.035)}" pointer-events="none"/>`).join('') +
     STN().map(([s, j]) => `<g class="stn s${s.sit}" data-sti="${j}" transform="translate(${ix(s.lo).toFixed(3)} ${iy(s.la).toFixed(3)}) scale(${(.012 / k).toFixed(5)})"><path d="M0-7L6.5 4.5H-6.5Z" stroke-width="1.4"/></g>`).join('') +
     PINNED.map(p => `<circle class="tp s-${S[p.st].k}${on.has(p.i) ? '' : ' off'}" data-i="${p.i}" cx="${ix(p.lo).toFixed(3)}" cy="${iy(p.la).toFixed(3)}" r="${u(.075)}" stroke-width="${u(.022)}"/>`).join('');
