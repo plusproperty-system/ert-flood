@@ -702,7 +702,6 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
     </div>
     <div class="asof">
       <span>ข้อมูลสำรวจล่าสุด <b id="asSv"></b></span>
-      <span>ERT Update <b id="asErt"></b></span>
       <span>ระดับน้ำ ThaiWater <b id="asTw"></b></span>
       <span>คลอง กทม. <b id="asBma"></b></span>
     </div>
@@ -1797,7 +1796,6 @@ $('clear').onclick = () => { FIDS.forEach(id => $(id).value = ''); F.dist = ''; 
 document.querySelectorAll('.seg button').forEach(b => b.onclick = () => { F.lv = b.dataset.lv; document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', x === b)); $('ztable')._s = null; renderZones(); });
 $('asBma').textContent = BM.at ? thDate(BM.at) : 'ยังไม่มี';
 $('asSv').textContent = SV && SV.at ? thDate(SV.at) : 'ยังไม่มี';
-$('asErt').textContent = (() => { const a = Object.values(ERTI).map(e => e.at || '').sort().pop(); return a ? thDate(a) : 'ไม่มี'; })();
 sortInit(document);
 buildWS(); renderDaySel(); renderNotes(); apply();
 
