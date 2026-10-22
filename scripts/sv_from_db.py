@@ -2,7 +2,8 @@
 
 python3 scripts/sv_from_db.py <dir with the sv/*.json documents saved by ArtifactData list/query out_dir>
 Prints NEW <at> when it wrote a newer survey, SAME <at> when the repo already has it.
-Only numbers, status and equipment go public: no resident counts (gen), no site notes (chk), no staff.
+Only numbers, status, equipment and building facts (fx: level vs road, basement, automated parking) go public:
+no resident counts, no site notes (chk), no staff.
 """
 import glob, json, os, sys
 
@@ -35,7 +36,9 @@ pj = {}
 for d in mine: pj.update(json.loads(d['json']))
 
 master = {m['io'] + '|' + m['n']: m['k'] for m in json.load(open(os.path.join(ROOT, 'docs', 'data', 'master.json'), encoding='utf-8'))['projects']}
-rows, eq, rq = {}, {}, {}
+rows, eq, rq, fx = {}, {}, {}, {}
+# building facts for the 6-category risk export: basement, basement parking/plant room/lift, automated parking
+FX = {'bsm': 'bs', 'bpark': 'bp', 'broom': 'br', 'blift': 'bl', 'apark': 'ap'}
 for key, o in pj.items():
     k = master.get(key, key)
     if 'I' in o:
@@ -44,11 +47,18 @@ for key, o in pj.items():
         rows[k] = r
     if o.get('eq'):
         eq[k], rq[k] = o['eq'], o.get('rq') or {}
-at = max([r.get('at', '') for r in rows.values()] + [mine[0].get('at', '')])
+    g, f = o.get('gen') or {}, {}
+    if isinstance(g.get('elev'), (int, float)) and not isinstance(g.get('elev'), bool): f['e'] = g['elev']   # project level vs road (cm)
+    for src, dst in FX.items():
+        v = str(g.get(src) or '').strip()
+        if v.startswith('มี'): f[dst] = 1
+        elif v.startswith('ไม่'): f[dst] = 0
+    if f: fx[k] = f
+at =max([r.get('at', '') for r in rows.values()] + [mine[0].get('at', '')])
 old = json.load(open(OUT, encoding='utf-8')) if os.path.exists(OUT) else {}
 if str(old.get('at', '')) >= at:
     print('SAME', old.get('at')); sys.exit(0)
-s = json.dumps({'at': at, 'file': mine[0].get('file', ''), 'rows': rows, 'eq': eq, 'rq': rq}, ensure_ascii=False, separators=(',', ':'))
+s = json.dumps({'at': at, 'file': mine[0].get('file', ''), 'rows': rows, 'eq': eq, 'rq': rq, 'fx': fx}, ensure_ascii=False, separators=(',', ':'))
 for bad in ('"gen"', '"chk"', '"res"', '"vul"'): assert bad not in s, bad
 open(OUT, 'w', encoding='utf-8').write(s)
 print('NEW', at)

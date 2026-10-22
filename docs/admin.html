@@ -163,13 +163,33 @@ function parseEq(wb, tm, num) {
   });
   return { sheet: sh, eq, rq };
 }
+/* building facts for the 6-category risk export (ข้อมูลทั่วไป): level vs road, basement items, automated parking. No head-counts. */
+function parseFx(wb, tm, num) {
+  const sh = wb.SheetNames.find(n => n.includes('ข้อมูลทั่วไป')); if (!sh) return null;
+  const aoa = XLSX.utils.sheet_to_json(wb.Sheets[sh], { header: 1, raw: true, defval: null });
+  const hi = aoa.findIndex(r => r && r.some(c => String(c ?? '').trim() === 'โครงการ')); if (hi < 0) return null;
+  const H = aoa[hi].map(h => String(h ?? '').replace(/\s+/g, ' ').trim()), g = pre => H.findIndex(h => h.startsWith(pre));
+  const at = g('วันที่ตอบ'), nm = H.indexOf('โครงการ');
+  const C = { e: g('ระดับของโครงการ'), bs: g('โครงการ มีชั้นใต้ดิน'), bp: g('โครงการมีลานจอดรถชั้นใต้ดิน'), br: g('โครงการ มีห้องเครื่องชั้นใต้'), bl: g('โครงการมี ลิฟต์โดยสารใต้ดิน'), ap: g('โครงการ มี Automated') };
+  const yn = v => { const s = String(v ?? '').trim(); return s.startsWith('มี') ? 1 : s.startsWith('ไม่') ? 0 : null; };
+  const fx = {}, best = {};
+  aoa.slice(hi + 1).forEach(r => {
+    if (!r || !r[nm]) return; const p = BYN.get(norm(r[nm])); if (!p) return;
+    const a = at >= 0 ? tm(r[at]) : '', f = {};
+    for (const [k, i] of Object.entries(C)) { if (i < 0) continue; const v = k === 'e' ? num(r[i]) : yn(r[i]); if (v != null) f[k] = v; }
+    const has = Object.keys(f).length > 0, b = best[p.k];
+    if (b && (b.has && !has || b.has === has && b.a >= a)) return;
+    best[p.k] = { a, has }; if (has) fx[p.k] = f; else delete fx[p.k];
+  });
+  return fx;
+}
 async function readSv(file) {
   const msg = $('svMsg'); msg.className = 'msg'; msg.textContent = 'กำลังอ่านไฟล์'; $('svDl').disabled = true; $('svOut').innerHTML = ''; SV = null;
   try {
     if (!window.XLSX) await load('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
     const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' }), r = parse(wb), eqr = parseEq(wb, r.tm, r.num);
     const vals = Object.values(r.rows), cnt = {}; vals.forEach(v => { cnt[v.st] = (cnt[v.st] || 0) + 1; });
-    SV = { at: r.at, file: file.name, rows: r.rows, eq: eqr ? eqr.eq : {}, rq: eqr ? eqr.rq : {} };
+    SV = { at: r.at, file: file.name, rows: r.rows, eq: eqr ? eqr.eq : {}, rq: eqr ? eqr.rq : {}, fx: parseFx(wb, r.tm, r.num) || {} };
     $('svOut').innerHTML = `<dl><dt>ชีตที่ใช้</dt><dd>${esc(r.sheet)}</dd><dt>คำตอบในไฟล์</dt><dd>${r.n} แถว</dd><dt>จับคู่โครงการได้</dt><dd>${vals.length} จาก ${PJ.length} โครงการ (ใช้คำตอบล่าสุดของแต่ละโครงการ)</dd>
       <dt>คำตอบล่าสุด</dt><dd>${esc(r.at)}</dd><dt>สถานะตามสูตร</dt><dd>${Object.entries(cnt).map(([k, v]) => esc(k) + ' ' + v).join(' · ')}</dd>
       <dt>ช่องระดับน้ำที่เป็นข้อความ</dt><dd>${r.text} ช่อง นับเป็นค่าว่าง</dd><dt>อุปกรณ์และเสบียง</dt><dd>${eqr ? `${Object.keys(eqr.eq).length} โครงการ ขอสนับสนุน ${Object.keys(eqr.rq).length} โครงการ (ชีต ${esc(eqr.sheet)})` : 'ไม่พบชีตสำรวจอุปกรณ์'}</dd></dl>` +

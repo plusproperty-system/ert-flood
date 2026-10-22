@@ -691,6 +691,7 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
 .brow{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;text-align:left;border:1px solid var(--line,#d7dde3);border-radius:10px;padding:8px 12px;background:var(--surface);color:var(--ink);font:inherit;font-size:14px;cursor:pointer}
 .brow:hover{background:var(--water-soft)}
 .brow small{flex-basis:100%;color:var(--muted);font-size:12.5px}
+.riskdl{margin-top:12px}.riskdl .note{font-size:12.5px;color:var(--muted);max-width:80ch}
 </style>
 </head>
 <body>
@@ -750,6 +751,8 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
       <div class="sumbig" id="sumBig"></div>
       <div class="sumcond"><h3 class="sumh">ในจำนวนนี้ เข้าเงื่อนไขอะไรบ้าง</h3><p class="sumsub">หนึ่งโครงการเข้าได้หลายเงื่อนไข กดการ์ดเพื่อดูเฉพาะโครงการกลุ่มนั้น กดซ้ำเพื่อยกเลิก</p><div class="conds" id="kpis"></div></div>
     </div>
+    <div class="acts riskdl"><button class="btn sm" type="button" id="riskXlsx">ดาวน์โหลด Excel สรุปความเสี่ยง 6 ประเภท</button>
+      <span class="note">ใกล้คลอง/แม่น้ำ · ต่ำกว่าถนน · มีใต้ดิน/เครื่องจักรใต้ดิน · ประวัติน้ำท่วม · Automated Parking · เขตทางผ่านน้ำ — ชีตสรุปและชีตรายละเอียดทุกโครงการ จากข้อมูลล่าสุดของเว็บ</span></div>
   </section>
 
   <section class="sec" aria-labelledby="hArea">
@@ -1798,6 +1801,88 @@ $('asBma').textContent = BM.at ? thDate(BM.at) : 'ยังไม่มี';
 $('asSv').textContent = SV && SV.at ? thDate(SV.at) : 'ยังไม่มี';
 sortInit(document);
 buildWS(); renderDaySel(); renderNotes(); apply();
+
+/* ---------- Excel: projects by 6 flood-risk categories (summary + detail; thresholds and floodway list editable in the file) ---------- */
+const RISK_KM = 1, RISK_ELEV = 0;
+/* proposed from the 2011 flood path; edit here or in the downloaded file */
+const FW_AREAS = [['จังหวัด', 'ปทุมธานี'], ['จังหวัด', 'นนทบุรี'], ['จังหวัด', 'พระนครศรีอยุธยา'], ['จังหวัด', 'นครปฐม'],
+  ...['ดอนเมือง', 'สายไหม', 'บางเขน', 'หลักสี่', 'คลองสามวา', 'หนองจอก', 'มีนบุรี', 'ลาดกระบัง', 'ทวีวัฒนา', 'ตลิ่งชัน', 'บางแค', 'หนองแขม', 'ภาษีเจริญ', 'บางบอน'].map(d => ['เขต กทม.', d])];
+const loadXLSX = () => window.XLSX ? Promise.resolve() : new Promise((ok, no) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = ok; s.onerror = () => no(new Error('load')); document.head.appendChild(s); });
+function riskBook() {
+  const X = XLSX, FXD = (SV && SV.fx) || {}, yn = v => v === 1 ? 'มี' : v === 0 ? 'ไม่มี' : '';
+  const put = (ws, r, c, v, f) => { if ((v == null || v === '') && !f) return; const o = { t: typeof v === 'number' ? 'n' : 's', v: v ?? '' }; if (f) o.f = f; ws[X.utils.encode_cell({ r: r - 1, c: c - 1 })] = o; };
+  const fin = (ws, r, c, cols) => { ws['!ref'] = X.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: r - 1, c: c - 1 } }); ws['!cols'] = cols.map(w => ({ wch: w })); return ws; };
+  const fwP = new Set(FW_AREAS.filter(a => a[0] === 'จังหวัด').map(a => a[1])), fwD = new Set(FW_AREAS.filter(a => a[0] === 'เขต กทม.').map(a => a[1]));
+  const R = P.map(p => {
+    const f = FXD[p.k] || p.fx0 || {}, n = rvNear0(p.rv), e = typeof f.e === 'number' ? f.e : null;
+    const c = [!!n && n.d <= RISK_KM, e != null && e < RISK_ELEV, [f.bs, f.bp, f.br, f.bl].includes(1), !!p.fl, f.ap === 1, fwP.has(p.pv) || (p.pv === 'กรุงเทพฯ' && fwD.has(p.d))];
+    return { p, f, n, e, z: zShort(p.g), c };
+  }).sort((a, b) => (a.p.g ?? 99) - (b.p.g ?? 99) || a.p.n.localeCompare(b.p.n, 'th'));
+  const N = R.length, L = N + 1;
+  /* detail */
+  const D = {}, H = ['IO Code', 'โครงการ', 'สังกัด', 'ประเภทอาคาร', 'โซน', 'เขต/อำเภอ', 'จังหวัด', 'แม่น้ำ/คลองใกล้สุด', 'ระยะถึงแม่น้ำ/คลอง (กม.)', 'ระดับโครงการเทียบถนน (ซม.)',
+    'ชั้นใต้ดิน', 'ลานจอดรถใต้ดิน', 'ห้องเครื่องใต้ดิน', 'ลิฟต์โดยสารใต้ดิน', 'Automated Parking', 'ทะเบียนผลกระทบ 2569 (แท็บ FM)',
+    '1 ใกล้คลอง/แม่น้ำ', '2 ต่ำกว่าถนน', '3 มีใต้ดิน/เครื่องจักรใต้ดิน', '4 ประวัติน้ำเคยท่วม', '5 มี Automated Parking', '6 เขตทางผ่านของน้ำ', 'จำนวนประเภทที่เข้า'];
+  H.forEach((h, j) => put(D, 1, j + 1, h));
+  const S1 = "'สรุป'!";
+  R.forEach(({ p, f, n, e, z, c }, k) => {
+    const i = k + 2, y = b => b ? 'ใช่' : '';
+    [p.io, p.n, p.bu, p.ty, z, p.d || '', p.pv || '', n ? n.n : '', n ? Math.round(n.d * 100) / 100 : null, e, yn(f.bs), yn(f.bp), yn(f.br), yn(f.bl), yn(f.ap), p.fl || ''].forEach((v, j) => put(D, i, j + 1, v));
+    put(D, i, 17, y(c[0]), `IF(AND(I${i}<>"",I${i}<=${S1}$C$4),"ใช่","")`);
+    put(D, i, 18, y(c[1]), `IF(AND(J${i}<>"",J${i}<${S1}$C$5),"ใช่","")`);
+    put(D, i, 19, y(c[2]), `IF(COUNTIF(K${i}:N${i},"มี")>0,"ใช่","")`);
+    put(D, i, 20, y(c[3]), `IF(P${i}<>"","ใช่","")`);
+    put(D, i, 21, y(c[4]), `IF(O${i}="มี","ใช่","")`);
+    put(D, i, 22, y(c[5]), `IF(COUNTIFS(${S1}$K$4:$K$40,"จังหวัด",${S1}$L$4:$L$40,G${i})+IF(G${i}="กรุงเทพฯ",COUNTIFS(${S1}$K$4:$K$40,"เขต กทม.",${S1}$L$4:$L$40,F${i}),0)>0,"ใช่","")`);
+    put(D, i, 23, c.filter(Boolean).length, `COUNTIF(Q${i}:V${i},"ใช่")`);
+  });
+  fin(D, L, 23, [11, 34, 11, 14, 24, 14, 13, 26, 11, 12, 9, 9, 9, 9, 10, 30, 10, 9, 12, 10, 11, 10, 9]);
+  D['!autofilter'] = { ref: 'A1:W' + L };
+  /* summary */
+  const S = {}, FC = ['Q', 'R', 'S', 'T', 'U', 'V'];
+  const CAT = [['1 ใกล้คลอง ใกล้แม่น้ำ', 'ระยะจากพิกัดโครงการถึงแม่น้ำหรือคลองที่มีชื่อใกล้สุด (OpenStreetMap) ไม่เกินค่าในช่อง C4'],
+    ['2 โครงการที่ต่ำกว่าถนน', 'ระดับโครงการเทียบพื้นถนน (แบบสำรวจข้อมูลทั่วไป) น้อยกว่าค่าในช่อง C5'],
+    ['3 มีใต้ดิน / ระบบเครื่องจักรใต้ดิน', 'มีชั้นใต้ดิน ลานจอดรถใต้ดิน ห้องเครื่องใต้ดิน หรือลิฟต์โดยสารใต้ดิน อย่างใดอย่างหนึ่ง'],
+    ['4 ประวัติน้ำเคยท่วม', 'อยู่ในทะเบียนผลกระทบ 2569 (แท็บ FM): น้ำท่วมเข้าโครงการ หรือท่วมล้อมรอบ (ยังไม่มีข้อมูลย้อนหลังปีก่อน)'],
+    ['5 มี Automated Parking', 'แบบสำรวจข้อมูลทั่วไปตอบว่ามี'],
+    ['6 อยู่ในเขตทางผ่านของน้ำ', 'จังหวัด/เขตตามรายการในคอลัมน์ K:L (เสนอจากแนวน้ำผ่านปี 2554 แก้รายการได้)']];
+  const cnt = j => R.filter(x => x.c[j]).length, any = R.filter(x => x.c.some(Boolean)).length;
+  put(S, 1, 1, 'สรุปโครงการตามประเภทความเสี่ยงน้ำท่วม 6 ประเภท');
+  put(S, 2, 1, `ดาวน์โหลดจากเว็บ ERT Flood ${thDate(new Date().toISOString().slice(0, 10) + ' ' + new Date().toTimeString().slice(0, 5))} · ข้อมูลสำรวจ ${SV && SV.at ? thDate(SV.at) : '-'} · ระยะแม่น้ำ/คลอง ${RVD && RVD.at ? thDate(RVD.at) : '-'}`);
+  put(S, 3, 1, 'เกณฑ์ที่ปรับได้'); put(S, 4, 1, 'ใกล้คลอง/แม่น้ำ: ระยะไม่เกิน (กม.)'); put(S, 4, 3, RISK_KM); put(S, 5, 1, 'ต่ำกว่าถนน: ระดับเทียบถนนน้อยกว่า (ซม.)'); put(S, 5, 3, RISK_ELEV);
+  const r0 = 7, tot = r0 + 8, pct = r => `IF($C$${tot}=0,0,C${r}/$C$${tot})`;
+  ['ประเภท', 'วิธีนับ', 'จำนวนโครงการ', '% ของทั้งหมด'].forEach((h, j) => put(S, r0, j + 1, h));
+  CAT.forEach(([t, d], k) => { const r = r0 + 1 + k; put(S, r, 1, t); put(S, r, 2, d); put(S, r, 3, cnt(k), `COUNTIF('รายละเอียด'!${FC[k]}2:${FC[k]}${L},"ใช่")`); put(S, r, 4, N ? cnt(k) / N : 0, pct(r)); });
+  put(S, r0 + 7, 1, 'เข้าอย่างน้อย 1 ประเภท'); put(S, r0 + 7, 3, any, `COUNTIF('รายละเอียด'!W2:W${L},">0")`); put(S, r0 + 7, 4, N ? any / N : 0, pct(r0 + 7));
+  put(S, tot, 1, 'โครงการทั้งหมด'); put(S, tot, 3, N, `COUNTA('รายละเอียด'!A2:A${L})`);
+  for (let r = r0 + 1; r <= r0 + 7; r++) { const a = S[X.utils.encode_cell({ r: r - 1, c: 3 })]; if (a) a.z = '0.0%'; }
+  let r = r0 + 10; put(S, r, 1, 'ความครบของข้อมูล');
+  [['มีระยะถึงแม่น้ำ/คลอง', R.filter(x => x.n).length, `COUNT('รายละเอียด'!I2:I${L})`], ['กรอกระดับเทียบถนน', R.filter(x => x.e != null).length, `COUNT('รายละเอียด'!J2:J${L})`],
+    ['ระดับเท่ากับถนน (0 ซม.)', R.filter(x => x.e === 0).length, `COUNTIF('รายละเอียด'!J2:J${L},0)`]].forEach(([t, v, f], k) => { put(S, r + 1 + k, 1, t); put(S, r + 1 + k, 3, v, f); });
+  const table = (top, title, key, col, list) => {
+    put(S, top - 1, 1, title); [key, 'ทั้งหมด', ...CAT.map(c => c[0].replace(/^\d /, ''))].forEach((h, j) => put(S, top, j + 1, h));
+    list.forEach((g, k) => { const rr = top + 1 + k, inG = R.filter(x => (key === 'โซน' ? x.z : x.p.bu) === g);
+      put(S, rr, 1, g); put(S, rr, 2, inG.length, `COUNTIF('รายละเอียด'!$${col}$2:$${col}$${L},$A${rr})`);
+      FC.forEach((fc, j) => put(S, rr, 3 + j, inG.filter(x => x.c[j]).length, `COUNTIFS('รายละเอียด'!$${col}$2:$${col}$${L},$A${rr},'รายละเอียด'!$${fc}$2:$${fc}$${L},"ใช่")`)); });
+    const rt = top + 1 + list.length; put(S, rt, 1, 'รวม');
+    for (let j = 2; j <= 8; j++) { const c = X.utils.encode_col(j - 1), v = j === 2 ? N : cnt(j - 3); put(S, rt, j, v, `SUM(${c}${top + 1}:${c}${rt - 1})`); }
+    return rt;
+  };
+  const zones = [...new Set(R.map(x => x.z))], bus = Object.entries(R.reduce((m, x) => (m[x.p.bu] = (m[x.p.bu] || 0) + 1, m), {})).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+  const rz = table(r + 6, 'แยกตามโซน', 'โซน', 'E', zones), rb = table(rz + 3, 'แยกตามสังกัด', 'สังกัด', 'C', bus);
+  put(S, 3, 11, 'พื้นที่ทางผ่านของน้ำ (แก้/เพิ่มได้ถึงแถว 40)');
+  FW_AREAS.forEach(([t, n], k) => { put(S, 4 + k, 11, t); put(S, 4 + k, 12, n); });
+  put(S, 41, 11, 'ประเภท: "จังหวัด" หรือ "เขต กทม." · ชื่อต้องตรงกับคอลัมน์จังหวัด/เขตในชีตรายละเอียด');
+  fin(S, Math.max(rb, 41), 12, [30, 58, 13, 12, 14, 13, 14, 14, 3, 3, 12, 20]);
+  const wb = X.utils.book_new(); X.utils.book_append_sheet(wb, S, 'สรุป'); X.utils.book_append_sheet(wb, D, 'รายละเอียด');
+  return wb;
+}
+$('riskXlsx').onclick = async () => {
+  const b = $('riskXlsx'); b.disabled = true;
+  try { await loadXLSX(); XLSX.writeFile(riskBook(), `ERT_สรุปความเสี่ยง6ประเภท_${todayStamp()}.xlsx`); }
+  catch (e) { console.error(e); flash(e && e.message === 'load' ? 'โหลดตัวสร้างไฟล์ Excel ไม่สำเร็จ ตรวจอินเทอร์เน็ตแล้วลองอีกครั้ง' : 'สร้างไฟล์ไม่สำเร็จ ลองอีกครั้ง'); }
+  b.disabled = false;
+};
 
 })();
 </script>
