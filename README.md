@@ -8,9 +8,9 @@
 | `docs/data/master.json` | รายชื่อโครงการ โซน เขต จังหวัด พิกัด (`fl` = ผลกระทบตามทะเบียนผลกระทบ 2569) ไม่รวมโครงการสถานะ Reject/Terminate | แก้เมื่อมีโครงการใหม่ |
 | `docs/data/survey.json` | ไฟล์ "คำตอบทั้งหมด" (3 ชีต) แปลงผ่าน `admin.html` (ตัวเลขระดับน้ำ สถานะ อุปกรณ์ และข้อมูลอาคาร `fx`: ระดับเทียบถนน ชั้นใต้ดิน/ห้องเครื่อง/ลิฟต์ใต้ดิน Automated Parking ไม่มีจำนวนคน) | ผู้ดูแล อัปโหลดเอง หรือซิงก์จากแดชบอร์ด |
 | `docs/data/ert.json` | สถานะตาม ERT Update | ผู้ดูแล ผ่าน `admin.html` |
-| `docs/data/water/*.json` | ระดับน้ำ ThaiWater และสถานีในรัศมีของแต่ละโครงการ | GitHub Actions ทุกชั่วโมง |
+| `docs/data/water/*.json` | ระดับน้ำ ThaiWater และสถานีในรัศมีของแต่ละโครงการ | GitHub Actions เมื่อกดปุ่มอัปเดตข้อมูลน้ำ (Update water data) |
 | `docs/data/rivers.json` | ระยะจากโครงการถึงแม่น้ำและคลองที่ใกล้ที่สุด (OpenStreetMap) | GitHub Actions เดือนละครั้ง และเมื่อแก้ master.json |
-| `docs/data/bma/*.json` | ระดับน้ำคลอง กทม. เทียบตลิ่ง จากเว็บสำนักการระบายน้ำ (weather.bangkok.go.th/water) | GitHub Actions ทุกชั่วโมง |
+| `docs/data/bma/*.json` | ระดับน้ำคลอง กทม. เทียบตลิ่ง จากเว็บสำนักการระบายน้ำ (weather.bangkok.go.th/water) | GitHub Actions เมื่อกดปุ่มอัปเดตข้อมูลน้ำ (Update water data) |
 | `docs/data/waterways.json` | เส้นแม่น้ำและคลองสำหรับวาดบนแผนที่ (OpenStreetMap) | GitHub Actions พร้อมกับ rivers.json |
 | `docs/data/geo.json` | ขอบเขตโซนและจังหวัดสำหรับแผนที่ | ไม่ต้องแก้ |
 
@@ -32,7 +32,7 @@
 
 ## ระดับน้ำ ThaiWater
 `scripts/thaiwater.py` ใช้เกณฑ์เดียวกับไฟล์ PMR_ThaiWater_Mapping_PowerQuery.xlsx: รัศมีแม่น้ำ/ลำน้ำ 10 กม. คลอง กทม. 3 กม. ไม่ใช้สถานีที่ข้อมูลเก่ากว่า 24 ชม. (คลอง 6 ชม.)
-ดึงทันทีได้ที่ Actions › ThaiWater hourly › Run workflow
+ไม่ดึงอัตโนมัติแล้ว กดปุ่ม "อัปเดตข้อมูลน้ำ" บนหน้าเว็บ (เปิด Actions › Update water data) แล้วกด Run workflow สคริปต์จะดึงทั้ง ThaiWater และคลอง กทม. ในครั้งเดียว
 
 ## ระยะจากแม่น้ำ
 `scripts/rivers.py` ดึงแม่น้ำ (waterway=river) และคลอง (waterway=canal) จาก OpenStreetMap ผ่าน Overpass API แล้ววัดระยะจากพิกัดโครงการ
@@ -45,7 +45,7 @@
 หน้าภาพรวมมีตารางโครงการสถานะเฝ้าระวังขึ้นไป พร้อมจำนวนกระสอบทราย เครื่องสูบน้ำ ฯลฯ จากชีต "สำรวจอุปกรณ์" จัดกลุ่มตามแม่น้ำ/คลองที่ใกล้ที่สุด กดแถวกลุ่มเพื่อดูรายโครงการ และดาวน์โหลด CSV ได้
 
 ## ระดับน้ำคลอง กทม. (สำนักการระบายน้ำ)
-`scripts/bma.py` อ่านตารางจุดวัดจาก https://weather.bangkok.go.th/water/ ทุกชั่วโมง (Actions › BMA canal levels hourly)
+`scripts/bma.py` อ่านตารางจุดวัดจาก https://weather.bangkok.go.th/water/ เมื่อกดปุ่มอัปเดตข้อมูลน้ำ (Actions › Update water data)
 - ผิวน้ำห่างตลิ่ง (ซม.) = ตลิ่งด้านที่ต่ำกว่า (ซ้าย/ขวา) − ระดับน้ำด้านใน ค่าติดลบคือล้นตลิ่ง จุดที่ไม่มีระดับตลิ่งแสดงระยะถึงระดับวิกฤตแทน
 - ข้อมูลเก่ากว่า 3 ชั่วโมงถือว่าค้าง
 - เว็บต้นทางไม่มีพิกัดจุดวัด สคริปต์จับคู่ชื่อจุดวัดกับสถานีคลองของ ThaiWater เพื่อเอาพิกัด แล้วบันทึกใน `scripts/bma_coords.csv`

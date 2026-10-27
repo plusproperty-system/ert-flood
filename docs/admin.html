@@ -77,7 +77,7 @@ code{background:var(--sunk);padding:1px 6px;border-radius:5px;font-size:13px}
 
   <section class="card" aria-labelledby="h3">
     <h2 id="h3">3. ระดับน้ำ ThaiWater</h2>
-    <p class="muted">ระบบดึงอัตโนมัติทุกชั่วโมง ถ้าต้องการดึงทันที เปิด <a id="actLink" target="_blank" rel="noopener">หน้า Actions</a> เลือก <b>ThaiWater hourly</b> แล้วกด <b>Run workflow</b></p>
+    <p class="muted">ระบบไม่ดึงอัตโนมัติแล้ว ถ้าต้องการข้อมูลใหม่ เปิด <a id="actLink" target="_blank" rel="noopener">หน้า Update water data</a> แล้วกด <b>Run workflow</b> (ดึงทั้ง ThaiWater และคลอง กทม.)</p>
     <p class="muted" id="twInfo"></p>
   </section>
 </div>
@@ -87,7 +87,7 @@ code{background:var(--sunk);padding:1px 6px;border-radius:5px;font-size:13px}
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const REPO = (() => { const h = location.hostname, seg = location.pathname.split('/').filter(Boolean); return h.endsWith('github.io') ? `https://github.com/${h.split('.')[0]}/${seg[0] || ''}` : 'https://github.com/plusproperty-system/ert-flood'; })();
-$('upLink').href = REPO + '/upload/main/docs/data'; $('actLink').href = REPO + '/actions';
+$('upLink').href = REPO + '/upload/main/docs/data'; $('actLink').href = REPO + '/actions/workflows/water.yml';
 const get = u => fetch(u + '?v=' + Date.now()).then(r => r.ok ? r.json() : null).catch(() => null);
 const [MST, ERT0, TWL] = await Promise.all([get('data/master.json'), get('data/ert.json'), get('data/water/latest.json')]);
 if (!MST) { $('svMsg').className = 'msg err'; $('svMsg').textContent = 'โหลดรายชื่อโครงการไม่สำเร็จ'; return; }

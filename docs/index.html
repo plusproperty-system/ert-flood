@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>สถานการณ์น้ำท่วมโครงการ PMR</title>
-<meta name="description" content="สถานการณ์น้ำท่วมและระดับน้ำรอบโครงการในความดูแลของ PMR อัปเดตระดับน้ำจาก ThaiWater ทุกชั่วโมง">
+<meta name="description" content="สถานการณ์น้ำท่วมและระดับน้ำรอบโครงการในความดูแลของ PMR ระดับน้ำจาก ThaiWater และคลอง กทม. อัปเดตเมื่อกดปุ่มอัปเดตข้อมูลน้ำ">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpath d=%22M16 3C11 10 7 15 7 20a9 9 0 0 0 18 0c0-5-4-10-9-17z%22 fill=%22%231B6F8F%22/%3E%3C/svg%3E">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&display=swap">
 <style>
@@ -743,7 +743,8 @@ dialog.modal{margin:auto;height:auto;max-height:calc(100dvh - 32px);width:min(56
       <h2 id="hDay">สรุปสถานการณ์น้ำประจำวัน</h2>
       <div class="daybar">
         <label>ข้อมูลระดับน้ำ ThaiWater <select id="twDay" aria-label="วันที่ของข้อมูลระดับน้ำ"></select></label>
-        <span class="auto" id="twAuto">ดึงจาก ThaiWater อัตโนมัติทุกชั่วโมง</span>
+        <a class="btn sm" id="twRun" target="_blank" rel="noopener" href="https://github.com/plusproperty-system/ert-flood/actions/workflows/water.yml" style="text-decoration:none;display:inline-flex;align-items:center">อัปเดตข้อมูลน้ำ</a>
+        <span class="auto" id="twAuto">เปิดหน้า GitHub แล้วกด Run workflow รอประมาณ 2–3 นาที แล้วรีเฟรชหน้านี้ (ต้องล็อกอิน GitHub ที่มีสิทธิ์แก้ repo)</span>
       </div>
     </div>
     <p class="stale" id="twStale" hidden></p>
@@ -1124,7 +1125,7 @@ $('twDay').addEventListener('change', async e => {
 });
 const twAgeH = () => { const d = tsParse(TWCUR.at); return d ? (Date.now() - d) / 36e5 : 0; };
 
-/* ---------- BMA drainage department canal levels (weather.bangkok.go.th/water, hourly via GitHub Actions) ---------- */
+/* ---------- BMA drainage department canal levels (weather.bangkok.go.th/water, GitHub Actions on demand) ---------- */
 const BLV = { 5: ['ล้นตลิ่ง', 'hi'], 4: ['วิกฤต', 'hi'], 3: ['เตือนภัย', 'mid'], 1: ['ปกติ', 'low'], 0: ['ไม่มีข้อมูล', 'low'] };
 const bLab = s => `<span class="lv l-${BLV[s.lv][1]}">${esc(s.lv === 0 ? (s.s || 'ไม่มีข้อมูล') : BLV[s.lv][0])}</span>`;
 const cm = v => v == null ? '–' : (v < 0 ? '−' : '') + Math.abs(v);
@@ -1142,7 +1143,7 @@ function bmaCell(p) {
 }
 function renderBma(list) {
   const S0 = BM.stations, pm = bmaProj(list), scope = $('bmaScope').value, q = $('bmaQ').value.trim().toLowerCase();
-  if (!S0.length) { $('bmaSub').textContent = 'ยังไม่มีข้อมูล ให้ผู้ดูแลรัน Actions › BMA canal levels hourly หนึ่งครั้ง'; $('bmaT').hidden = true; $('bmaTiles').innerHTML = ''; return; }
+  if (!S0.length) { $('bmaSub').textContent = 'ยังไม่มีข้อมูล กดปุ่ม อัปเดตข้อมูลน้ำ หนึ่งครั้ง'; $('bmaT').hidden = true; $('bmaTiles').innerHTML = ''; return; }
   $('bmaSub').textContent = `ข้อมูลจาก ${BM.srcname || 'สำนักการระบายน้ำ กทม.'} ดึงเมื่อ ${thDate(BM.at)} · ${S0.length} จุดวัด · ห่างตลิ่ง = ตลิ่งด้านที่ต่ำกว่า ลบ ระดับน้ำด้านใน (ค่าติดลบคือล้นตลิ่ง) · จับคู่โครงการในรัศมี ${BM.radius} กม. เมื่อจุดวัดมีพิกัด (${BM.withxy} จุด) ที่เหลือจับคู่กับโครงการในเขตเดียวกัน · กดแถวเพื่อดูโครงการ`;
   const rows = S0.map((s, j) => [s, j]).filter(([s, j]) => (scope === 'all' || pm.has(j)) && (!q || (s.n + ' ' + s.k + ' ' + s.d + ' ' + s.c).toLowerCase().includes(q)));
   const near = [...pm.keys()].map(j => S0[j]);
@@ -1382,7 +1383,7 @@ function renderDay(list) {
       <span class="cbar"><i style="width:${off ? 0 : pct(x)}%"></i></span><span class="cd">${off ? (typeof RV_HINT !== 'undefined' ? RV_HINT : 'ยังไม่มีข้อมูลระยะแม่น้ำ/คลอง กดปุ่ม "นำเข้าระยะแม่น้ำ"') : cd.d}</span></button>`;
   }).join('');
   $('twStale').hidden = age <= 24;
-  $('twStale').textContent = `ข้อมูลระดับน้ำที่แสดงเป็นของวันที่ ${thDate(TWCUR.at)} ผ่านมาแล้ว ${age >= 48 ? Math.floor(age / 24) + ' วัน' : Math.round(age) + ' ชั่วโมง'} ระบบดึงข้อมูลใหม่ทุกชั่วโมง ถ้ายังไม่อัปเดต ให้ผู้ดูแลตรวจหน้า Actions ใน GitHub`;
+  $('twStale').textContent = `ข้อมูลระดับน้ำที่แสดงเป็นของวันที่ ${thDate(TWCUR.at)} ผ่านมาแล้ว ${age >= 48 ? Math.floor(age / 24) + ' วัน' : Math.round(age) + ' ชั่วโมง'} กดปุ่ม อัปเดตข้อมูลน้ำ เพื่อดึงข้อมูลใหม่`;
 }
 
 /* ---------- water sources table and popup ---------- */
@@ -1413,7 +1414,7 @@ function openWs(k) {
   const inL = new Set(current({ ws: true }).map(p => p.i)), ps = [...w.ps.values()].filter(x => inL.has(x.p.i)), zs = wsZones(ps);
   const nIn = s => ps.filter(x => x.s === s.n).length;
   let h = `<div class="dacts"><button class="btn" type="button" data-wsmap="${esc(k)}">แสดงบนแผนที่และกรองทั้งหน้า</button><button class="btn sm" type="button" data-dl="dWsP" data-fn="โครงการในรัศมี ${esc(w.n)}">ดาวน์โหลด CSV</button></div>`;
-  h += `<p class="note">ข้อมูล ThaiWater ${esc(thDate(TWCUR.at))} รัศมีเตือน แม่น้ำ/ลำน้ำ 10 กม. คลอง กทม. 3 กม. ดึงอัตโนมัติทุกชั่วโมง</p>`;
+  h += `<p class="note">ข้อมูล ThaiWater ${esc(thDate(TWCUR.at))} รัศมีเตือน แม่น้ำ/ลำน้ำ 10 กม. คลอง กทม. 3 กม. ดึงเมื่อกดปุ่มอัปเดตข้อมูลน้ำ</p>`;
   h += `<h4>สถานีวัดระดับน้ำที่เตือน ${w.st.size} สถานี</h4><div class="tablebox"><table class="sortable mini2"><thead><tr><th>สถานี</th><th>ระดับ</th><th class="n">ระดับน้ำ (ม.รทก.)</th><th class="n">ระดับตลิ่ง (ม.รทก.)</th><th class="n">เทียบตลิ่ง (ม.)</th><th class="n">% ความจุลำน้ำ</th><th>เวลาวัด</th><th class="n">โครงการในรัศมี</th></tr></thead><tbody>` +
     [...w.st.values()].map(s => `<tr><td><b>${esc(s.n)}</b>${s.c ? ` <small>${esc(s.c)}</small>` : ''}</td><td data-v="${s.lv === 'over' ? 0 : 1}" data-csv="${s.lv === 'over' ? 'ล้นตลิ่ง' : 'น้ำมาก'}">${lvTag(s.lv)}</td><td class="n">${s.l != null ? s.l.toFixed(2) : '–'}</td><td class="n">${s.b != null ? s.b.toFixed(2) : '–'}</td><td class="n" data-v="${s.x ?? ''}">${xFmt(s.x)}</td><td class="n">${s.pc != null ? s.pc.toFixed(0) + '%' : '–'}</td><td data-v="${esc(s.t || '')}">${esc(thShort(s.t))}</td><td class="n">${nIn(s)}</td></tr>`).join('') + '</tbody></table></div>';
   h += `<h4>โซนที่เกี่ยวข้อง</h4><div class="tablebox"><table class="sortable mini2"><thead><tr><th>โซน</th><th class="n">โครงการในโซน</th><th class="n">ในรัศมีแหล่งน้ำนี้</th><th class="n">ในรัศมีสถานีล้นตลิ่ง</th><th class="n">ในรัศมีสถานีน้ำมาก</th><th>สถานะของโครงการในรัศมี</th></tr></thead><tbody>` +
@@ -1746,10 +1747,10 @@ function renderNotes() {
   $('notes').innerHTML = [
     'สถานะใช้สูตรประกาศ: ใช้สูตรเดิมก่อน และใช้สูตรเสริมเฉพาะกรณีที่สูตรเดิมได้ "ไม่ตรงเงื่อนไข" จาก 4 ค่า คือ น้ำหน้าถนนโครงการ ระดับน้ำบ่อในโครงการ น้ำในโครงการ และระบบไฟฟ้า ช่องที่เป็นข้อความหรือว่างนับเป็น 0',
     `ข้อมูลสำรวจล่าสุดจากไฟล์ "คำตอบทั้งหมด" ${SV && SV.at ? 'อัปโหลดเมื่อ ' + d2th(SV.at) : 'ยังไม่มี'} สถานะตามสูตร ${c('calc')} โครงการ ตาม ERT Update ${c('ert')} โครงการ ไม่มีข้อมูล ${c('none')} โครงการ`,
-    `ระดับน้ำดึงจาก ThaiWater (api-v3.thaiwater.net) อัตโนมัติทุกชั่วโมง ชุดที่แสดงอยู่ดึงเมื่อ${thDate(TWCUR.at)} ${TWCUR.note ? '(' + TWCUR.note + ')' : ''} รัศมีเตือน แม่น้ำ/ลำน้ำ 10 กม. คลอง กทม. 3 กม. ไม่ใช้สถานีที่ข้อมูลเก่ากว่า 24 ชั่วโมง (คลอง กทม. 6 ชั่วโมง)`,
+    `ระดับน้ำดึงจาก ThaiWater (api-v3.thaiwater.net) เมื่อกดปุ่มอัปเดตข้อมูลน้ำ ชุดที่แสดงอยู่ดึงเมื่อ${thDate(TWCUR.at)} ${TWCUR.note ? '(' + TWCUR.note + ')' : ''} รัศมีเตือน แม่น้ำ/ลำน้ำ 10 กม. คลอง กทม. 3 กม. ไม่ใช้สถานีที่ข้อมูลเก่ากว่า 24 ชั่วโมง (คลอง กทม. 6 ชั่วโมง)`,
     'กรุงเทพฯ และปริมณฑลแบ่งเป็น 4 โซน ฝั่งตะวันตกของแม่น้ำเจ้าพระยาเป็นโซน 4 ฝั่งตะวันออกแบ่งด้วยแนวถนนเพชรบุรี แนวอ่อนนุช และแนวลาดพร้าว–รามอินทรา ต่างจังหวัด 12 โซนเป็นการจัดกลุ่มจังหวัดที่ตั้งขึ้นสำหรับแดชบอร์ดนี้',
     RVD ? `ระยะจากแม่น้ำและคลองคำนวณจาก OpenStreetMap เมื่อ${thDate(RVD.at)} โครงการที่ไม่มีตัวเลขระดับน้ำ ถ้าอยู่ห่างแม่น้ำหรือคลองที่มีชื่อไม่เกิน ${ZW2} กม. เป็นเฝ้าระวังพิเศษ ไม่เกิน ${ZW} กม. เป็นเฝ้าระวัง` : 'ยังไม่มีข้อมูลระยะจากแม่น้ำ ให้ผู้ดูแลรัน Actions › Rivers and canals หนึ่งครั้ง',
-    BM.at ? `ระดับน้ำคลอง กทม. จาก ${BM.srcname || 'เว็บสำนักการระบายน้ำ (weather.bangkok.go.th/water)'} ดึงอัตโนมัติทุกชั่วโมง ชุดล่าสุด ${thDate(BM.at)} หน่วย ม.รทก. ห่างตลิ่งคิดจากตลิ่งด้านที่ต่ำกว่า จุดวัดที่ไม่มีระดับตลิ่งใช้ระยะถึงระดับวิกฤตแทน ข้อมูลเก่ากว่า 3 ชั่วโมงถือว่าค้าง จุดวัดที่ไม่มีพิกัดจับคู่โครงการด้วยเขต จึงเป็นการจับคู่แบบหยาบ` : 'ยังไม่มีข้อมูลระดับน้ำคลอง กทม. ให้ผู้ดูแลรัน Actions › BMA canal levels hourly หนึ่งครั้ง',
+    BM.at ? `ระดับน้ำคลอง กทม. จาก ${BM.srcname || 'เว็บสำนักการระบายน้ำ (weather.bangkok.go.th/water)'} ดึงเมื่อกดปุ่มอัปเดตข้อมูลน้ำ ชุดล่าสุด ${thDate(BM.at)} หน่วย ม.รทก. ห่างตลิ่งคิดจากตลิ่งด้านที่ต่ำกว่า จุดวัดที่ไม่มีระดับตลิ่งใช้ระยะถึงระดับวิกฤตแทน ข้อมูลเก่ากว่า 3 ชั่วโมงถือว่าค้าง จุดวัดที่ไม่มีพิกัดจับคู่โครงการด้วยเขต จึงเป็นการจับคู่แบบหยาบ` : 'ยังไม่มีข้อมูลระดับน้ำคลอง กทม. กดปุ่ม อัปเดตข้อมูลน้ำ หนึ่งครั้ง',
     'เว็บนี้เป็นฉบับสาธารณะ ไม่มีชื่อผู้รับผิดชอบ จำนวนผู้พักอาศัย และข้อมูลภายในอื่น'
   ].map(t => `<li>${esc(t)}</li>`).join('');
 }

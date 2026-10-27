@@ -1,0 +1,53 @@
+name: Update water data
+
+# Runs only when someone presses "Run workflow" (the dashboard's update button links here).
+# No hourly schedule any more.
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: data-commit
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fetch ThaiWater and map stations to projects
+        id: tw
+        continue-on-error: true
+        run: python scripts/thaiwater.py
+      - name: Fetch weather.bangkok.go.th/water and map stations to projects
+        id: bma
+        continue-on-error: true
+        run: python scripts/bma.py
+      - name: Keep the BMA page for checking when it could not be read
+        if: steps.bma.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bma-page
+          path: debug/
+          if-no-files-found: ignore
+      - name: Commit updated water data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data/water docs/data/bma scripts/bma_coords.csv
+          if git diff --cached --quiet; then echo "no change"; else
+            git commit -m "Water data $(TZ=Asia/Bangkok date '+%Y-%m-%d %H:%M')"
+            git pull --rebase --autostash
+            git push
+          fi
+      - name: Report a source that could not be read
+        if: steps.tw.outcome == 'failure' || steps.bma.outcome == 'failure'
+        run: |
+          echo "ThaiWater: ${{ steps.tw.outcome }}  BMA: ${{ steps.bma.outcome }}"
+          exit 1
